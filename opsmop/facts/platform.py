@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import platform
+import os
 
 from opsmop.core.common import memoize
 from opsmop.facts.facts import Facts
@@ -29,6 +30,7 @@ class PlatformFacts(Facts):
 
     @memoize
     def system(self):
+        """ This returns strings like "Linux" and is generally not exceptionally useful. """
         return platform.system()
 
     @memoize
@@ -37,8 +39,49 @@ class PlatformFacts(Facts):
 
     @memoize
     def version(self):
+        """ On Linux, this returns the kernel version """
         return platform.version()
-  
+
+    @memoize
+    def os_distribution_info(self):
+        # feel free to add your distribution here
+        if os.path.exists("/etc/redhat-release"):
+            data = open("/etc/redhat-release").read()
+            tokens = data.split()
+            for (i,t) in enumerate(tokens):
+               if '.' in t:
+                  break
+            distribution = " ".join(tokens[0:i-1])
+            variant = " ".join(tokens[i:-1])
+            return dict(distribution=distribution, version=tokens[i], variant=variant)
+        return None
+
+    @memoize
+    def os_distribution(self):
+        """ returns a string like 'CentOS Linux' """
+        info = self.os_distribution_info()
+        if info is None:
+            return None
+        return info['distribution']
+
+    @memoize 
+    def os_version_string(self):
+        """ This returns the OS version such as X.Y.Z """
+        info = self.os_distribution_info()
+        if info is None:
+            return None
+        return info['version']
+
+    @memoize
+    def os_version_number(self):
+        """ Returns an floating point version like 7.2, ignoring maintaince/build numbers """
+        info = self.os_distribution_info()
+        if info is None:
+            return 0
+        tokens = info['version'].split('.')
+        major_minor = "%s.%s" % (tokens[0], tokens[1])
+        return float(major_minor) 
+
     def default_package_manager(self):
         # TODO: this will return based on platform
         from opsmop.providers.package.brew import Brew
@@ -60,6 +103,9 @@ class PlatformFacts(Facts):
             version = self.version(),
             default_package_manager = self.default_package_manager(),
             default_service_manager = self.default_service_manager(),
+            os_distribution = self.os_distribution(),
+            os_version_string = self.os_version_string(),
+            os_version_number = self.os_version_number()
         )
 
     def invalidate(self):
