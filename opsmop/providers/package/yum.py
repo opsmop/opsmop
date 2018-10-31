@@ -14,14 +14,49 @@
 
 from opsmop.providers.package.package import Package
 
+TIMEOUT = 60
+VERSION_CHECK = "rpm -q %s"
+QUERY_FORMAT = "--queryformat '%{VERSION}\\n'"
+INSTALL = "yum install -y {name}"
+UPGRADE = "yum update -y {name}"
+UNINSTALL = "rpm -e {name}"
+
 class Yum(Package):
 
     """
-    Manages yum packages
+    Manages homebrew packages
     """
     
+    def _get_version(self):
+        version_check = "%s %s" % (VERSION_CHECK % self.name, QUERY_FORMAT)
+        output = self.test(version_check)
+        if output is None:
+            return None
+        return output      
+ 
+    def get_default_timeout(self):
+        # TODO: can just leave this in superclass
+        return TIMEOUT
+
     def plan(self):
-        raise NotImplementedError()
+        # TODO: can just leave this in superclass
+        super().plan()
 
     def apply(self):
-        raise NotImplementedError()
+        # TODO: can just leave this in superclass
+        which = None
+        if self.should('install'):
+            self.do('install')
+            which = INSTALL.format(name=self.name)
+        elif self.should('upgrade'):
+            self.do('upgrade')
+            which = UPGRADE.format(name=self.name)
+        elif self.should('remove'):
+            self.do('remove')
+            which = UNINSTALL.format(name=self.name)
+
+        if which:
+            return self.run(which)
+        return self.ok()
+
+

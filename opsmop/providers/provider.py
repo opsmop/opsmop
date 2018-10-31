@@ -82,14 +82,16 @@ class Provider(object):
             timeout = self.get_default_timeout()
         return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal)
 
-    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False):
+    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False, want_output=False):
         """ Common helper code for test and run """
         cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud)
         res = cmd.execute()
-        if res.rc == 0 or loose:
-            return res.data.rstrip()
-        else:
-            return None
+        if want_output:
+            if res.rc == 0 or loose:
+                return res.data.rstrip()
+            else:
+                return None
+        return res
 
     def test(self, cmd, input_text=None, timeout=None, echo=True, loud=False, loose=False):
         """
@@ -98,7 +100,7 @@ class Provider(object):
         Send "loud" to teach well-programmed methods to allow one command to squeak through even if provider.quiet() returns True.
         Loose will return the output even if the command fails.  If False, failed commands return None
         """
-        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud)
+        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud, want_output=True)
 
     def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False):
         """

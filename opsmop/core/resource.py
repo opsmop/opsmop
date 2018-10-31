@@ -18,7 +18,7 @@ import jinja2
 class Resource(object):
 
     def __init__(self,  *args, **kwargs):
-        self.setup(*args, *kwargs)
+        self.setup(*args, **kwargs)
 
     def setup(self, **kwargs):
         self.kwargs = kwargs

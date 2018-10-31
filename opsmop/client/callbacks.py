@@ -82,7 +82,7 @@ class CliCallbacks(BaseCallback):
         if len(actions_planned):
             self.i3("planned:")
             for x in actions_planned:
-                self.i5(f"| {x}")
+                self.i5("| %s" % x)
         else:
             self.i3("no changes needed")
 
@@ -124,7 +124,7 @@ class CliCallbacks(BaseCallback):
         self.i1("")
         role = resource.role()
         self.count = self.count + 1
-        self.banner(f"{self.count} :: {role.__class__.__name__} :: {resource}")
+        self.banner("{count} :: {role} :: {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
         self.i1("")
         if is_handler:
             self.i3("handler")

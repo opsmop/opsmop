@@ -44,7 +44,10 @@ class PlatformFacts(Facts):
 
     @memoize
     def os_distribution_info(self):
-        # feel free to add your distribution here
+        """
+        Loads OS names and versions. 
+        """
+        # patches welcome! feel free to update this for your distribution
         if os.path.exists("/etc/redhat-release"):
             data = open("/etc/redhat-release").read()
             tokens = data.split()
@@ -83,14 +86,25 @@ class PlatformFacts(Facts):
         return float(major_minor) 
 
     def default_package_manager(self):
-        # TODO: this will return based on platform
-        from opsmop.providers.package.brew import Brew
-        return Brew
+        # patches welcome! feel free to update this for your distribution        
+        distro = self.os_distribution()
+        if distro == "Darwin":
+            from opsmop.providers.package.brew import Brew
+            return Brew
+        elif distro in [ 'CentOS Linux', 'Red Hat Linux' ]:
+            from opsmop.providers.package.yum import Yum
+            return Yum
+        return None
 
     def default_service_manager(self):
-        # TODO: this will return based on platform
-        from opsmop.providers.service.brew import Brew
-        return Brew
+        # patches welcome! feel free to update this for your distribution        
+        distro = self.os_distribution()
+        if distro == "Darwin":
+            from opsmop.providers.service.brew import Brew
+            return Brew
+        else:
+            from opsmop.providers.service.systemd import Systemd
+            return Systemd
 
     def constants(self):
         """
