@@ -1,0 +1,11 @@
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+*.rdb
+*.mp4
+docs/build/
+__pycache__/
+/env/*
+*.swp
+
