@@ -211,7 +211,7 @@ to hear yours!
 License
 =======
 
-GPL v3.
+Apache 2
 
 Author
 ======
