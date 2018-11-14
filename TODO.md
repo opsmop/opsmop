@@ -19,6 +19,8 @@ TODO list (shorter term ideas):
 * Baseline for unit test infrastructure, ideally with mocked providers.
 * Start Sphinx documentation
 * Push documentation website (opsmop.io)
+* eliminate the need to use V by injecting all variables into the template namespace
+* if the type passed to Roles() or Handlers() is a class and not an instance (a possible user error - instantiate the class)
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py
