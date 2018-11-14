@@ -27,6 +27,9 @@ class Context(object):
     def on_plan(self, provider):
         self._run_callbacks('on_plan', provider)
 
+    def on_role(self, role):
+        self._run_callbacks('on_role', role)
+
     def on_command_echo(self, value):
         self._run_callbacks('on_command_echo', value)
 

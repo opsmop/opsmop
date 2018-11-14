@@ -28,6 +28,14 @@ class Provider(object):
         # isn't this already copied over - safe to remove?
         # self.name = getattr(self.resource, 'name', None)
 
+    def verb(self):
+        """ the verb for the applying operation in CLI output """
+        return "applying..."
+
+    def skip_plan_stage(self):
+        """ for trivial providers like debug, tell the callbacks to not do plan computations """
+        return False
+
     def quiet(self):
         """ if True, a resource claiming it is quiet will silence most properly programmed callbacks. """
         return False

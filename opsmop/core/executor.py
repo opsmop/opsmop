@@ -116,11 +116,14 @@ class Executor(object):
         provider.set_context(context)
 
         context.on_plan(provider)
-        provider.plan()
-        context.on_planned_actions(provider, provider.actions_planned)
-        provider.commit_to_plan()
+
+        if not provider.skip_plan_stage():
+            provider.plan()
+            context.on_planned_actions(provider, provider.actions_planned)
+            provider.commit_to_plan()
 
         if apply:
+
             context.on_apply(provider)
             result = provider.apply()
             if not handlers:
@@ -128,14 +131,16 @@ class Executor(object):
             
             assert result is not None
             assert issubclass(type(result), Result)
-            context.on_result(result)
-            if result.fatal:
-                context.on_fatal(result)
+
             if provider.register is not None:
                 va = dict()
                 va[provider.register] = result
                 context.on_update_variables(va)
                 Facts.update_variables(va)
+
+            context.on_result(result)
+            if result.fatal:
+                context.on_fatal(result)
 
         else:
             provider.apply_simulated_actions()

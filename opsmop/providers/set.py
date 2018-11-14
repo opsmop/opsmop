@@ -15,6 +15,12 @@ class Set(Provider):
                 temp_items[k] = v
         self.facts().update_variables(temp_items)
 
+    def verb(self):
+        return "setting..."
+
+    def skip_plan_stage(self):
+        return True
+
     def apply(self):
 
         self.do('set')

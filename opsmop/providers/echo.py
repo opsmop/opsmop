@@ -13,6 +13,12 @@ class Echo(Provider):
     def plan(self):
         self.needs('echo')
 
+    def verb(self):
+        return "output..."
+
+    def skip_plan_stage(self):
+        return True
+
     def apply(self):
         
         self.do('echo')

@@ -6,6 +6,9 @@ class Shell(Provider):
     def plan(self):
         self.needs('execute')
 
+    def verb(self):
+        return "running..."
+
     def apply(self):
 
         if not self.should('execute'):

@@ -13,6 +13,9 @@ class Stop(Type):
             msg = Field(kind=str, allow_none=False, help="string to print")
         )
 
+    def skip_plan_stage(self):
+        return True
+
     def validate(self):
         pass
 

@@ -21,6 +21,9 @@ class Echo(Type):
     def validate(self):
         pass
 
+    def hide_plan_stage(self):
+        return True
+
     def default_provider(self):
         from opsmop.providers.echo import Echo
         return Echo

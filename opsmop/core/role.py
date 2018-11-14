@@ -31,3 +31,9 @@ class Role(Resource):
 
     def set_handlers(self):
         return Handlers()
+
+    def __str__(self):
+        if 'name' in self.kwargs:
+            return "%s: %s" % (self.__class__.__name__, self.kwargs['name'])
+        else:
+            return self.__class__.__name__
