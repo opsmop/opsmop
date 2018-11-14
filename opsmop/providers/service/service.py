@@ -16,7 +16,7 @@ class Service(Provider):
             return False
         return status in [ 'running', 'started', 'stopped', 'enabled' ]
 
-    def plan(self, facts, on_boot=True):
+    def plan(self, on_boot=True):
 
         status = self._get_status()
 

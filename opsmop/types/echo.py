@@ -4,8 +4,6 @@ from opsmop.core.fields import Fields
 from opsmop.core.errors import ValidationError
 from opsmop.types.type import Type
 
-import inspect
-
 class Echo(Type):
 
     """
@@ -24,7 +22,7 @@ class Echo(Type):
     def validate(self):
         pass
 
-    def default_provider(self, facts):
+    def default_provider(self):
         from opsmop.providers.echo import Echo
         return Echo
 

@@ -10,10 +10,10 @@ class Brew(Service):
     def _get_status(self):
         return self.test(STATUS.format(name=self.name))
 
-    def plan(self, facts):
-        super().plan(facts, on_boot=False)
+    def plan(self):
+        super().plan(on_boot=False)
 
-    def apply(self, facts):
+    def apply(self):
 
         # restart/start/stop
         if self.should('restart'):

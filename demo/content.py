@@ -35,6 +35,6 @@ class Demo(Policy):
         return Roles(*roles)
    
 EXPORTED = [
-    Demo(id="demo"),
+    Demo(),
 ]
 

@@ -14,7 +14,7 @@ class Command(object):
     returns an "opsmop.core.result.Result" object.
     """
 
-    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env', 'callbacks' ]
+    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env' ]
 
     def __init__(self, cmd, provider=None, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False):
 
@@ -32,8 +32,6 @@ class Command(object):
         """
         assert provider is not None
         self.provider = provider
-        self.callbacks = self.provider.callbacks
-        assert self.callbacks is not None
         self.cmd = cmd
         self.timeout = timeout
         self.loud = loud
@@ -55,6 +53,7 @@ class Command(object):
             return t2
         return None
 
+
     def execute(self):
         """
         Execute a command (a list or string) with input_text as input, appending
@@ -64,8 +63,9 @@ class Command(object):
         because there are no database objects.
         """
 
-        self.callbacks.on_provider_execute_command(self.provider.resource, self.provider, self)
-
+        context = self.provider.context()
+        context.on_execute_command(self)
+        
         command = self.cmd
         timeout_cmd = self.get_timeout()
 
@@ -104,10 +104,10 @@ class Command(object):
         output = ""
         for line in stdout:
             if self.echo or self.loud:
-                self.provider.callbacks.on_command_echo(self.provider.resource, self.provider, self, line)
+                context.on_command_echo(line)
             output = output + line
         if output.strip() == "":
-            self.provider.callbacks.on_command_echo(self.provider.resource, self.provider, self, "(no output)")
+            context.on_command_echo("(no output)")
 
 
         process.wait()
@@ -119,5 +119,5 @@ class Command(object):
         else:
             res = Result(provider=self.provider, rc=rc, data=output, fatal=False)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
-        self.callbacks.on_provider_execute_command_result(self.provider.resource, self.provider, self, res)
+        context.on_command_result(res)
         return res

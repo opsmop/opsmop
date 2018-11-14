@@ -19,6 +19,6 @@ class FileExists(Condition):
             var = Field(kind=str),
         )
 
-    def evaluate(self, facts):
+    def evaluate(self):
         self.tests = FileTests(self.var)
         return self.tests.exists()

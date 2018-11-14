@@ -22,7 +22,7 @@ class Choice(Condition):
     def is_grouping(self):
         return True
 
-    def evaluate(self, facts):
+    def evaluate(self):
         if len(self.conditions) == 0:
             return None
         choice = random.choice(self.conditions)

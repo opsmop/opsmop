@@ -1,11 +1,17 @@
-from opsmop.providers.echo import Echo
-from opsmop.core.result import Result
+from opsmop.providers.provider import Provider
+import shutil
+import os
 
-COWSAY = "cowsay '{msg}'"
+class Stop(Provider):
 
-class Stop(Echo):
+    def quiet(self):
+        # silence most callbacks
+        return True
 
-    def apply(self, facts):
-        super().apply(facts)
-        return self.fatal(msg="user requested exit")
+    def plan(self):
+        self.needs('stop')
+
+    def apply(self):
         
+        self.do('stop')
+        return self.fatal(self.msg)

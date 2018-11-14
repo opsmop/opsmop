@@ -10,18 +10,18 @@ class Echo(Provider):
         # silence most callbacks
         return True
 
-    def plan(self, facts):
+    def plan(self):
         self.needs('echo')
 
-    def apply(self, facts):
+    def apply(self):
         
         self.do('echo')
-
         self.cowsay = shutil.which('cowsay')
+        txt = None
         if self.cowsay and os.environ.get('MOO'):
             cmd = COWSAY.format(msg=self.msg)
-            txt = self.run(cmd, echo=False, loud=True)
-            self.callbacks.on_echo(self, self.resource, txt)
+            txt = self.run(cmd, echo=False)
         else:
-            self.callbacks.on_echo(self, self.resource, self.msg)
+            txt = self.msg
+        self.echo(txt)
         return self.ok()

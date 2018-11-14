@@ -65,11 +65,10 @@ class Main(Role):
 
             Set(foo=0, bar=random.random(), baz= V.x + 2 , glorp=V.x + V.y, want="tails"),
             
-            # this is proof 'Set' doesn't quite work yet:
             Echo("want={{ V.want }}"),
 
-            # DEMO: a forced random failure, because we can
-            Stop("bar = {{ V.bar }}", when=More(0.2, 0.5))
+            # working on this...
+            # Stop("bar = {{ V.bar }}", when=More(0.9, 0.5))
 
         )
 

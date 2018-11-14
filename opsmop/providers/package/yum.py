@@ -6,10 +6,10 @@ class Yum(Package):
     Manages yum packages
     """
     
-    def plan(self, facts):
+    def plan(self):
         raise NotImplementedError()
 
-    def apply(self, facts):
+    def apply(self):
         raise NotImplementedError()
 
         

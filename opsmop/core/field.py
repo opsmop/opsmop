@@ -159,8 +159,11 @@ class Field(object):
             self.validator(v)
 
         # all checks cleared (whew) - save the field to the object
-        setattr(obj,k,v)
-
+        try:
+            setattr(obj,k,v)
+        except:
+            print("failed to set: %s=%s on %s" % (k, v, type(obj)))
+            raise
 
 
 

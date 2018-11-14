@@ -19,5 +19,5 @@ class More(Condition):
             b = Field()
         )
 
-    def evaluate(self, facts):
+    def evaluate(self):
         return self.get_value(self.a) > self.get_value(self.b)

@@ -3,6 +3,9 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.types.type import Type
+from opsmop.core.facts import Facts
+
+facts = Facts()
 
 class Service(Type):
 
@@ -27,5 +30,5 @@ class Service(Type):
             return Brew
         raise ValidationError("unsupported provider: %s" % method)
 
-    def default_provider(self, facts):
+    def default_provider(self):
         return facts.default_service_manager()

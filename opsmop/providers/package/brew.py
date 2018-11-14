@@ -19,10 +19,10 @@ class Brew(Package):
     def get_default_timeout(self):
         return TIMEOUT
 
-    def plan(self, facts):
+    def plan(self):
         super().plan()
 
-    def apply(self, facts):
+    def apply(self):
         which = None
         if self.should('install'):
             self.do('install')

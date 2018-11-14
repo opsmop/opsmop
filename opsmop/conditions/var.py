@@ -2,10 +2,7 @@ from opsmop.conditions.condition import Condition
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.conditions.deferred import Deferred
-from opsmop.client.facts import Facts
-
-_variables = dict()
-facts = Facts()
+from opsmop.core.facts import Facts
 
 class DeferredVariable(Deferred):
 
@@ -24,15 +21,16 @@ class DeferredVariable(Deferred):
             var = Field(kind=str),
         )
 
-    def evaluate(self, facts):
-        if not self.var in _variables:
+    def evaluate(self):
+        vars = Facts.variables()
+        if not self.var in vars:
             raise AttributeError("no variable found named: %s" % self.var)
-        result = _variables.get(self.var)
+        result = vars.get(self.var)
         return result
 
     def __getattr__(self, name):
         def value():
-            return self.evaluate(facts)
+            return self.evaluate()
         return Deferred(value)
 
 
@@ -42,17 +40,5 @@ class VType(type):
         return DeferredVariable(name)
 
 class V(object, metaclass=VType):
-
-    @classmethod
-    def set_variables(self, variables):
-        global _variables
-        _variables = variables
-
-    @classmethod
-    def update_variables(self, variables):
-        _variables.update(variables)
-
-    @classmethod
-    def all_variables(self):
-        return _variables.copy()
+    pass
   

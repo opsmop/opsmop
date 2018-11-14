@@ -1,7 +1,7 @@
 from opsmop.conditions.condition import Condition
 from opsmop.core.fields import Fields
 from opsmop.core.field import Field
-from opsmop.client.facts import Facts
+from opsmop.core.facts import Facts
 
 facts = Facts()
 
@@ -16,7 +16,7 @@ class Deferred(Condition):
             fn = Field(),
         )
 
-    def evaluate(self, facts):
+    def evaluate(self):
         result = self.fn()
         return result
 
@@ -29,8 +29,8 @@ class Deferred(Condition):
         def my_add():
             nonlocal other
             if issubclass(type(other), Condition):
-                other = other.evaluate(facts)
-            return self.evaluate(facts) + other
+                other = other.evaluate()
+            return self.evaluate() + other
 
         return Deferred(my_add)
         

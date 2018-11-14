@@ -1,5 +1,8 @@
 from opsmop.core.resource import Resource
 from opsmop.core.collection import Collection
+from opsmop.core.policy import Policy
+from opsmop.core.context import Context
+from opsmop.core.facts import Facts
 # FIXME: this is a weird way to update global variables and should be done differently, like on the policy?
 from opsmop.conditions.var import V 
 
@@ -25,9 +28,13 @@ class Visitor(object):
     see Executor.
     """
 
-    def __init__(self, policy, facts):
+    __slots__ = [ 'policy', 'context' ]
+
+    def __init__(self, policy=None, context=None):
+        assert issubclass(type(policy), Policy)
+        assert issubclass(type(context), Context)
         self.policy = policy
-        self.facts = facts
+        self.context = context
 
     def walk_resources(self):
         """
@@ -63,8 +70,11 @@ class Visitor(object):
         
         variable_stack = [ variables ]
 
+        # FIXME: the variable system should operate a bit more like a stack, and clear off
+        # when popping out of a depth level.
+
         for role in roles.items:
-            V.update_variables(role.variables)
+            Facts.update_variables(role.variables)
             if mode in [ MODE_RESOURCES ]:
                 for resource in role.resources.items:
                     for x in self._walk_items(resource, mode, condition_stack):

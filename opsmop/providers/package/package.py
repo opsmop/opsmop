@@ -7,7 +7,7 @@ class Package(Provider):
     def _get_version(self):
         raise NotImplementedError()
 
-    def plan(self, facts):
+    def plan(self):
 
         current_version = self._get_version()
 

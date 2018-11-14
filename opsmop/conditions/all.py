@@ -21,8 +21,8 @@ class All(Condition):
     def is_grouping(self):
         return True
 
-    def evaluate(self, facts):
-        computed = [ x.evaluate(facts) for x in self.conditions ]
+    def evaluate(self):
+        computed = [ x.evaluate() for x in self.conditions ]
         for x in computed:
             if not x:
                 return False

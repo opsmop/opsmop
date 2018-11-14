@@ -6,57 +6,60 @@ from opsmop.core.action import Action
 from opsmop.core.command import Command
 from opsmop.core.errors import ProviderError
 from opsmop.core.result import Result
+from opsmop.core.template import Template
+from opsmop.core.facts import Facts
 
 DEFAULT_TIMEOUT = 60
 
 class Provider(object):
 
-    def __init__(self, resource, facts):
+    def __init__(self, resource):
+        """
+        A provider object is obtained by calling the .provider() method of a resource object.
+        While a Type defines the parameters and input validation for an object, a Type may have multiple Provider implementations
+        that are returned contextually, whether based on environment or by the method= parameter on a Type
+        """
+        # FIXME: convert these to _vars and use properties. Executor code shouldn't access these directly.
         self.resource = resource
-        self.facts = facts
         self.actions_planned = []
-        self.callbacks = None 
         self.actions_taken = []
+        self._context = None
 
-        # FIXME: CODE IMPROVEMENT: to avoid doing self.resource and so on in the provider code, consider code that copies each field over
-        # to the resource and calling it here.
-        self.name = getattr(self.resource, 'name', None)
+        # isn't this already copied over - safe to remove?
+        # self.name = getattr(self.resource, 'name', None)
 
     def quiet(self):
-        # if True, silences most (executor) callbacks
+        """ if True, a resource claiming it is quiet will silence most properly programmed callbacks. """
         return False
 
     def has_changed(self):
+        """ Returns whether the provider has undertaken any actions """
         return len(self.actions_taken) > 0
 
-    def set_callbacks(self, callbacks):
-        self.callbacks = callbacks
-            
-    def apply(self, facts):
-        """
-        make things happen, use self.should() checks to determine what
-        and mark them off.
-        """
+    def apply(self):
+        """ makes resource configuration happen! use self.should() checks to determine what and mark them off with self.do().  Return a Result. """
         raise NotImplementedError
 
     def plan(self):
+        """ call self.should('foo') for any actions that should be undertaken by .apply() """
         raise NotImplementedError
 
     def needs(self, action_name):
+        """ declares than an action 'should' take place during an apply step """
         self.actions_planned.append(Action(action_name))
 
     def should(self, what):
-        for action in self.actions_planned:
-            if action.do == what:
-                return True
-        return False
+        """ returns True if an action should take place during an apply step """
+        return any(True for action in self.actions_planned if action.do == what)
 
     def do(self, what):
+        """ marks off that an action has been completed. not marking off all planned actions (or any unplanned ones) will result in an error """
         self.actions_taken.append(Action(what))
-        return True
-
 
     def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True):
+        """
+        A convenience method that returns an un-executed command object from any provider, this should be used for executing ALL shell commands in OpsMop.
+        """
         if self.ignore_errors:
             fatal = False
         if timeout is None:
@@ -64,6 +67,7 @@ class Provider(object):
         return Command(cmd, provider=self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal)
 
     def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False):
+        """ Common helper code for test and run """
         cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud)
         res = cmd.execute()
         if res.rc == 0 or loose:
@@ -72,23 +76,66 @@ class Provider(object):
             return None
 
     def test(self, cmd, input_text=None, timeout=None, echo=True, loud=False, loose=False):
+        """
+        Run a command (cmd) with optional input and timeouts. 
+        By default, the command will allow itself to be echoed by callbacks.
+        Send "loud" to teach well-programmed methods to allow one command to squeak through even if provider.quiet() returns True.
+        Loose will return the output even if the command fails.  If False, failed commands return None
+        """
         return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud)
 
     def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False):
+        """
+        Similar to test, this will call failed command callbacks when the commands fail, which MAY be intercepted
+        by properly-programmed callbacks to fail the entire execution process.
+        """
         return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud)
 
-    # FIXME: remove
-    #def error(self, message=None):
-    #    # use of 'error' is discouraged, it is better to return a Result(fatal=True) to give the callbacks
-    #    # an opportunity to decide what to do with it, as well as to allow ignore_errors=True to work.
-    #    # use this only for errors that must end in a traceback.
-    #    raise ProviderError(self, message)
-
     def get_default_timeout(self): 
+        """
+        Each provider class may define a default command timeout for all commands to avoid specifying a timeout
+        for each command.
+        """
         return DEFAULT_TIMEOUT
 
-    def ok(self):
-        return Result(provider=self)
+    def ok(self, data=None):
+        """ shortcut to return an ok result from .apply() """
+        return Result(provider=self, data=data)
 
     def fatal(self, msg):
+        """ shortcut to return a failed result from .apply() """
         return Result(provider=self, fatal=True, message=msg)
+
+    def commit_to_plan(self):
+        """ used in executor code to move the list of planned actions in to the list that self.should() will check """
+        self.actions = self.actions_planned
+
+    def apply_simulated_actions(self):
+        """ used in executor code (check mode only) to imply all commands were run when they were only simulated """
+        self.actions_taken = self.actions_planned
+
+    def echo(self, msg):
+        self._context.on_echo(msg)
+
+    def context(self):
+        """
+        Used by Executor class code to pass the Context to the resource.  Most normal types of providers should
+        not need to access the context object in any way but it is useful because it contains methods that can be called
+        to trigger a wide range of callbacks. Some more custom providers may use this to trigger callbacks, but a provider
+        like Service should never need to access them directly, because the executor and Command classes (etc) will take
+        care of triggering those callbacks. 
+        """
+        return self._context
+
+    def set_context(self, value):
+        self._context = value
+
+    def facts(self):
+        return Facts()
+
+    def template(self, msg):
+        return Template().from_string(msg, self)
+
+    def template_file(self, path):
+        return Template().from_file(path, self)
+

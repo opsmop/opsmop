@@ -17,7 +17,7 @@ class Set(Type):
             items = Field(kind=dict),
         )
 
-    def default_provider(self, facts):
+    def default_provider(self):
 
         from opsmop.providers.set import Set
         return Set

@@ -38,7 +38,7 @@ class File(Type):
         v.path_exists(self.from_file)
         v.path_exists(self.from_template)
 
-    def default_provider(self, facts):
+    def default_provider(self):
         from opsmop.providers.file import File
         return File
 

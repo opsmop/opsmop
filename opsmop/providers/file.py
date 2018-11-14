@@ -82,7 +82,7 @@ class File(Provider):
         if self.mode and ((self.f_dir and self.recursive) or not (self.f_mode == self.mode)):
             self.needs('chmod')
 
-    def plan(self, facts):
+    def plan(self):
 
         self.path         = Path(self.name)
         self.f_tests      = FileTests(self.name)
@@ -101,7 +101,7 @@ class File(Provider):
             self._plan_content_actions()
             self._plan_metadata_actions()
 
-    def apply(self, facts):
+    def apply(self):
         """
         Apply homebrew status changes.
         """

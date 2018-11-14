@@ -1,7 +1,7 @@
 from opsmop.conditions.condition import Condition
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.client.facts import Facts
+from opsmop.core.facts import Facts
 from opsmop.conditions.deferred import Deferred
 
 facts = Facts()
@@ -22,19 +22,18 @@ class DeferredVariable(Deferred):
             fact = Field(kind=str),
         )
 
-    def evaluate(self, facts):
+    def evaluate(self):
         return getattr(facts, self.fact)()
 
     def __call__(self):
         def value():
-            return self.evaluate(facts)
+            return self.evaluate()
         return Deferred(value)
 
 class FType(type):
 
     def __getattr__(cls, name):
         if getattr(facts, name, None) is None:
-            print("LOOKING FOR: %s" % name)
             raise AttributeError
         return DeferredFact(name)
 

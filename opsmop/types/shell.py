@@ -30,6 +30,6 @@ class Shell(Type):
         # v.path_exists(self.script)
         pass
 
-    def default_provider(self, facts):
+    def default_provider(self):
         from opsmop.providers.shell import Shell
         return Shell

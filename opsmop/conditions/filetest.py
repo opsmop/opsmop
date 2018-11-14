@@ -18,7 +18,7 @@ class FileTest(Condition):
             absent = Field(kind=str, default=None),
         )
 
-    def evaluate(self, facts):
+    def evaluate(self):
 
         # FIXME: this should use a core module called FileTests that can be shared with providers
         # and this will also simplify providers.file.File

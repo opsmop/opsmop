@@ -1,32 +1,32 @@
 from jinja2 import Environment, BaseLoader, FileSystemLoader, StrictUndefined
-# FIXME: facts does not belong in client, it belongs in core.
-from opsmop.client.facts import Facts
-# FIXME: this is not EXACTLY a condition and should be moved to core?
+from opsmop.core.facts import Facts
 
+facts = Facts()
 
 class FactLookup(object):
 
-    def __init__(self, facts):
-        self.facts = facts
+    def __init__(self):
+        pass
 
     def __getattr__(self, field):
-        f = getattr(self.facts, field)
+        f = getattr(facts, field)
         return f()
 
 class VariableLookup(object):
 
-    def __init__(self, variables, facts):
-        self.variables = variables
+    def __init__(self):
+        pass
 
     def __getattr__(self, field):
-        return self.variables.get(field)
+        return Facts.variables().get(field)
 
 class Template(object):
 
     @classmethod
     def _get_context(cls, resource):
-        variable_lookup = VariableLookup(resource.variables, resource.facts)
-        fact_lookup = FactLookup(resource.facts)
+        #print("V=",Facts.variables())
+        variable_lookup = VariableLookup()
+        fact_lookup = FactLookup()
         return dict(
             F = fact_lookup,
             V = variable_lookup
