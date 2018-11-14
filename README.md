@@ -21,13 +21,17 @@ In the meantime, I would *LOVE* to have your feedback and wish list and ideas on
 You can also send me a direct message at @laserllama on twitter, or email me at michael@michaeldehaan.net if you would
 like to share more info than you normally could on a public forum. It's 2018, what do you want in a configuration tool?
 
+Language Examples
+=================
+
+Sample content for opsmop is available in the demo repository:
+
+   [opsmop-demo](https://github.com/vespene-io/opsmop-demo)
+
 How To Review What's Here
 =========================
 
-To review opsmop, check out the code, then look at the language examples:
- 
-    vim demo/content.py (basics)
-    vim demo/conditionals.py (advanced features)
+See the opsmop-demo repo above.
 
 You will either need a python3 virtualenv, and then do "make requirements" to install packages:
 

@@ -20,9 +20,21 @@ TODO list (shorter term ideas):
 * Start Sphinx documentation
 * Push documentation website (opsmop.io)
 
+opsmop-pull - simple implementation
+* opsmop-pull [daemon|once] pull_cfg.py
+* defines TRANSPORT=Transport(), CLI_STATUS_CALLBACKS=[ CliStatusCallback() ], PULL_STATUS_CALLBACKS=[ PullStatusCallback1(), ... ]
+* asks transports.is_there_content()
+* calls transport.download_content() -> returns (temp_dir, filename)
+* uses opsmop.core.api with CLI_STATUS_CALLBACKS
+* calls each .report_status in PULL_STATUS_CALLBACKS
+* calls transport.sleep(), loops if called with 'daemon' mode.
+* initial version comes with GitTransport(repo_url=<>) and recommended use is with ssh-agent to deal with checkout keys
+
+opsmop-push -
+* implementation ideas TBD
+
 TODO list (later):
 
-* Remote pull and push features per list
 * Cool ideas everyone comes up with
 * Merging stuff
 * SPOILERS!

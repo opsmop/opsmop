@@ -31,6 +31,7 @@ class FactsBase(object):
     @classmethod
     def update_variables(cls, variables):
         global _variables
+        assert type(variables) == dict
         _variables.update(variables)
 
 class Facts(FactsBase):

@@ -20,6 +20,7 @@ class Resource(object):
         return self._variables
  
     def set_variables(self, variables):
+        assert type(variables) == dict
         self._variables = variables       
 
     def fields(self):

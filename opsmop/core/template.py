@@ -18,6 +18,7 @@ class VariableLookup(object):
         pass
 
     def __getattr__(self, field):
+        print("F=%s" % Facts.variables())
         return Facts.variables().get(field)
 
 class Template(object):
