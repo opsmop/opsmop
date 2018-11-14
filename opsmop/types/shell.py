@@ -13,8 +13,7 @@ class Shell(Type):
     """
 
     def __init__(self, cmd=None, *args, **kwargs):
-        kwargs['cmd'] = cmd
-        super().__init__(*args, **kwargs)
+        self.create(cmd=cmd, **kwargs)
 
     def fields(self):
         return Fields(

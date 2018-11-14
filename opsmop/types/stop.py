@@ -6,8 +6,7 @@ from opsmop.core.field import Field
 class Stop(Type):
 
     def __init__(self, msg, *args, **kwargs):
-        kwargs['msg'] = msg
-        super().__init__(self, *args, **kwargs)
+        self.create(msg=msg, **kwargs)
 
     def fields(self):
         return Fields(

@@ -7,10 +7,7 @@ from opsmop.types.type import Type
 class Set(Type):
 
     def __init__(self, *args, **kwargs):
-        new_dict = dict(
-            items = kwargs.copy()
-        )
-        super().__init__(*args, **new_dict)
+        self.create_from_arbitrary_kwargs(**kwargs)
 
     def fields(self):
         return Fields(

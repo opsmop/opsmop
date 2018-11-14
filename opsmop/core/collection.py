@@ -10,23 +10,17 @@ class Collection(Resource):
 
     Example:
 
-    Collection(
-        Resource(...),
-        Resource(...)
-    )
+        Collection(
+            Resource(...),
+            Resource(...)
+        )
 
     OR
 
-    Collection(*resource_list)
+        Collection(*resource_list)
 
-    OR (because of the way the deserializer works)
-
-    Collection(items=resource_list)
-
-    are all equivalent.
     
     key-value arguments are available after the resource declaration, like:
-
     Collection(*resource_list, when=is_os_x)
     """
 

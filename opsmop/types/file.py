@@ -12,8 +12,7 @@ class File(Type):
     """
 
     def __init__(self, name=None, *args, **kwargs):
-        kwargs['name'] = name
-        super().__init__(*args, **kwargs)
+        self.create(name=name, **kwargs)
 
     def fields(self):
         return Fields(

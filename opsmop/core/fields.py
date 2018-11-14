@@ -10,6 +10,7 @@ class Fields(object):
     """
 
     __slots = [ 'fields' ]
+    COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors' ]
 
     def __init__(self, **fields):
 

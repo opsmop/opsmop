@@ -1,6 +1,7 @@
 from opsmop.core.resource import Resource
 from opsmop.conditions.condition import Condition
 from opsmop.core.template import Template
+from opsmop.core.fields import Fields
 
 class Type(Resource):
     
@@ -30,6 +31,28 @@ class Type(Resource):
         inst = cls(self)
         self.copy_fields_to_provider(inst)
         return inst
+
+    def create(self, **kwargs):
+        """ 
+        Easy pseudo-constructor for shortcuts like Echo('foo') vs Echo(msg='foo') in the DSL.
+        Allows all arguments not in kwargs to hop into kwargs 
+        """
+        super().__init__(self, **kwargs)
+
+    def create_from_arbitrary_kwargs(self, **kwargs):
+        # this is an uncommon way to create objects but puts all keys not in the common
+        # set (like 'when', etc) into the 'items' element of the object. Set is the only
+        # method that may need to do this, except for possibly a Debug module. This happens
+        # because this module explicitly does not use a true Field specification and accepts
+        # arbitrary arguments.
+        items = dict()
+        new_kwargs = dict()
+        for (k,v) in kwargs.items():
+            if k not in Fields.COMMON_FIELDS:
+                items[k] = v
+            else:
+                new_kwargs[k] = v
+        self.create(items=items, **new_kwargs)
 
     def set_variables(self, variables):
         """ Used by executor code to assign a variables dictionary (for use by templates, etc) """

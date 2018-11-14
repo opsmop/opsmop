@@ -8,5 +8,3 @@ class BaseCallback(object):
     def context(self):
         return self._context
 
-    def set_context(self, value):
-        self._context = value
