@@ -1,7 +1,3 @@
-from collections import namedtuple
-from opsmop.core.resource import Resource
-from opsmop.providers.provider import Provider
-
 
 class Context(object):
 

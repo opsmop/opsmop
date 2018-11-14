@@ -1,9 +1,3 @@
-import json
-import sys
-import importlib
-
-from opsmop.core.template import Template
-
 
 class Resource(object):
 

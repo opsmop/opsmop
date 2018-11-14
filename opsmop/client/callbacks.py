@@ -1,5 +1,4 @@
 import sys
-import traceback
 from opsmop.core.callback import BaseCallback
 
 # FIXME: this is moving in the right direction but still needs to get refactored a good bit
@@ -114,7 +113,6 @@ class CliCallbacks(BaseCallback):
     
     def _indent(self, level, msg):
         spc = "     " * level
-        m = "%s%s"
         print("%s%s" % (spc, msg))
 
 

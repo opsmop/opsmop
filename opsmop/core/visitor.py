@@ -3,16 +3,11 @@ from opsmop.core.collection import Collection
 from opsmop.core.policy import Policy
 from opsmop.core.context import Context
 from opsmop.core.facts import Facts
-# FIXME: this is a weird way to update global variables and should be done differently, like on the policy?
-from opsmop.conditions.var import V 
-
 
 MODE_RESOURCES = "resources"
 MODE_HANDLERS = "handlers"
 
-# WARNING: this file is kind of a mess at the moment, but largely works.
-# once stabilized, it will get cleaned up lots.
-
+# FIXME: refactor
 
 class Visitor(object):
 
@@ -66,10 +61,9 @@ class Visitor(object):
         # the same is true of variables
         condition_stack = []
         if condition:
-            condition_stack.append(when)
+            # FIXME: verify this is being used
+            condition_stack.append(condition)
         
-        variable_stack = [ variables ]
-
         # FIXME: the variable system should operate a bit more like a stack, and clear off
         # when popping out of a depth level.
 

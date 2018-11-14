@@ -1,6 +1,6 @@
 
 import sys
-import argparse
+# import argparse
 
 from opsmop.client.callbacks import CliCallbacks
 from opsmop.core.api import Api

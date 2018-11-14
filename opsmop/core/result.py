@@ -33,7 +33,6 @@ class Result(object):
         return not self.fatal
 
     def __str__(self):
-        v = ""
         rc_msg = ""
         msg = ""
         if self.message is not None:

@@ -20,7 +20,7 @@ class Less(Condition):
         )
 
     def evaluate(self):
-        return self.get_value(a) < self.get_value(b)
+        return self.get_value(self.a) < self.get_value(self.b)
 
 def model():
     return Less

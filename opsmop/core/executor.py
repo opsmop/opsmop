@@ -1,10 +1,8 @@
 from opsmop.core.visitor import Visitor
 from opsmop.core.facts import Facts
 from opsmop.core.result import Result
-from opsmop.core.errors import ProviderError
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy
-from opsmop.core.facts import Facts
 
 facts = Facts()
 

@@ -4,6 +4,10 @@ Bug queue and PRs will be open by December.
 TODO list (shorter term ideas):
 
 * Apache2 license headers
+* make sure the variable system works like a scoped stack where values are cleared on each indent 
+* verify condition/skipped behavior
+* Still allow some way for Set('') to also do global scope.  Maybe Global()
+* CLI should use ArgumentParser to have --options
 * upgrade the default CLI output (what we have now is just a placeholder)
 * continued callback code improvement
 * make a Debug module (like Set, but different)
@@ -11,7 +15,6 @@ TODO list (shorter term ideas):
 * implement yum and apt for Package
 * implement systemd for Service
 * finish out testing File module, Service:brew and Package:brew
-* CLI should use ArgumentParser to have --options
 * Shell module should allow File's easy copy behavior to transfer scripts
 * Baseline for unit test infrastructure, ideally with mocked providers.
 * Start Sphinx documentation

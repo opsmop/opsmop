@@ -100,6 +100,8 @@ class Field(object):
         """
         Verify we have a list where every element is of the requested type
         """
+        # FIXME: it doesn't appear this is used by anything yet?
+        vt = type(v)
         if self.kind not in [ list, tuple ]:
             raise Exception("%s, field %s: expected a list of type %s, found a %s" % (obj, k, self.of, vt))
         if self.of:
@@ -110,7 +112,8 @@ class Field(object):
         """
         Verify we have a dict where every element is of the requested type
         """
-        # verify we have a dict where every element is of the requested type
+        # FIXME: it doesn't appear this is used by anything yet?
+        vt = type(v)
         if self.kind != dict:
             raise Exception("%s, field %s: expected a dict of type %s, found a %s" % (obj, k, self.of, vt))
         if self.of:
@@ -140,8 +143,6 @@ class Field(object):
         Used by a Resource constructor to set the value of ONE given field taking any field
         validation and coercion into account.
         """
-
-        from opsmop.core.resource import Resource
 
         # compute the actual value, subbing in a default if required, coercing the value if required, etc
         v = self._get_coerced_resource_value(obj, k)

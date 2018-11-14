@@ -1,7 +1,3 @@
-
-
-from opsmop.core.field import Field
-from opsmop.core.fields import Fields
 from opsmop.core.collection import Collection
 
 class Roles(Collection):

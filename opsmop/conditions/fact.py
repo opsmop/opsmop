@@ -6,7 +6,7 @@ from opsmop.conditions.deferred import Deferred
 
 facts = Facts()
 
-class DeferredVariable(Deferred):
+class DeferredFact(Deferred):
 
     """
     A Condition is the declarative representation of a conditional that is fed to a "when" clause.

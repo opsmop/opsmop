@@ -1,5 +1,4 @@
 
-from opsmop.core.context import Context
 from opsmop.core.executor import Executor
 
 import os
@@ -35,7 +34,6 @@ class Api(object):
 
         if not os.path.exists(path):
             raise Exception("file does not exist: %s" % path)
-            sys.exit(1)
 
         ran = run_path(path)
         dirname = os.path.dirname(path)

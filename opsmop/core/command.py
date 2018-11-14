@@ -71,7 +71,7 @@ class Command(object):
 
         shell = True
         if type(command) == list:
-            if timeout and timeout_cmd:
+            if self.timeout and timeout_cmd:
                 command.insert(0, self.timeout)
                 command.insert(0, timeout_cmd)
             shell = False

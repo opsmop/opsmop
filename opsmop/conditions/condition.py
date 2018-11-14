@@ -1,6 +1,4 @@
 from opsmop.core.resource import Resource
-from opsmop.core.field import Field
-from opsmop.core.fields import Fields
 
 class Condition(Resource):
 
