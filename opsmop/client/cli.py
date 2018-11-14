@@ -27,7 +27,7 @@ class Cli(object):
  
     def go(self):
        
-        if len(self.args) < 2 or sys.argv[1] == "--help":
+        if len(self.args) < 3 or sys.argv[1] == "--help":
             print(USAGE)
             sys.exit(1)
 

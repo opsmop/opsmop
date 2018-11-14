@@ -80,9 +80,6 @@ class Executor(object):
         for resource in visitor.walk_handlers():
             resource.validate()
 
-        if not (check or apply):
-            context._on_complete(policy)
-
         for resource in visitor.walk_resources():
             self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply)
             
@@ -106,6 +103,9 @@ class Executor(object):
         assert context is not None
 
         context.on_resource(resource, handlers)
+
+        if not check and not apply:
+            return
 
         if not self.conditions_true(context, resource):
             context.on_skipped(resource)

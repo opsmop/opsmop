@@ -68,7 +68,6 @@ class Visitor(object):
         # when popping out of a depth level.
 
         for role in roles.items:
-            print("VARS=%s" % role.variables)
             Facts.update_variables(role.variables)
             if mode in [ MODE_RESOURCES ]:
                 for resource in role.resources.items:
