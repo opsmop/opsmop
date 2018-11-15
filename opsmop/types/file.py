@@ -11,11 +11,12 @@ class File(Type):
     Represents a software package
     """
 
-    def __init__(self, name=None, *args, **kwargs):
-        self.create(name=name, **kwargs)
+    def __init__(self, name=None, **kwargs):
+        self.setup(name=name, **kwargs)
 
     def fields(self):
         return Fields(
+            self,
             name = Field(kind=str, help="path to the DESTINATION file"),
             from_file = Field(kind=str, default=None, help="use this file as source data"),
             from_template = Field(kind=str, default=None, help="use this template as source data"),

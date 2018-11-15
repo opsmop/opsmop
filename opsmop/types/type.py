@@ -1,10 +1,12 @@
 from opsmop.core.resource import Resource
-from opsmop.conditions.condition import Condition
+from opsmop.core.condition import Condition
 from opsmop.core.template import Template
 from opsmop.core.fields import Fields
+from opsmop.core.facts import Facts
 
 class Type(Resource):
-    
+
+
     def validate(self):
         raise NotImplementedError
 
@@ -30,47 +32,8 @@ class Type(Resource):
             cls = self.default_provider()
         inst = cls(self)
         self.copy_fields_to_provider(inst)
+        self.resolve_provider_fields(inst)
         return inst
-
-    def create(self, **kwargs):
-        """ 
-        Easy pseudo-constructor for shortcuts like Echo('foo') vs Echo(msg='foo') in the DSL.
-        Allows all arguments not in kwargs to hop into kwargs 
-        """
-        super().__init__(self, **kwargs)
-
-    def create_from_arbitrary_kwargs(self, **kwargs):
-        # this is an uncommon way to create objects but puts all keys not in the common
-        # set (like 'when', etc) into the 'items' element of the object. Set is the only
-        # method that may need to do this, except for possibly a Debug module. This happens
-        # because this module explicitly does not use a true Field specification and accepts
-        # arbitrary arguments.
-        items = dict()
-        new_kwargs = dict()
-        for (k,v) in kwargs.items():
-            if k not in Fields.COMMON_FIELDS:
-                items[k] = v
-            else:
-                new_kwargs[k] = v
-        self.create(items=items, **new_kwargs)
-
-    def set_variables(self, variables):
-        """ Used by executor code to assign a variables dictionary (for use by templates, etc) """
-        self.variables = variables
-
-    def set_facts(self, facts):
-        """ Used by executor code to assign a facts object for easy reference """
-        self.facts = facts
-
-    def set_condition_stack(self, stack):
-        """ Used by executor code to assign a stack of conditions, all of which must be true to plan or apply the resource """
-        self.condition_stack = stack
-
-    def get_condition_stack(self):
-        conditions = self.condition_stack[:]
-        if self.when:
-            conditions.append(self.when)
-        return conditions
 
     def get_provider(self, provider):
         return None
@@ -81,8 +44,19 @@ class Type(Resource):
         Rather than having to do self.resource.name/owner/whatever within the provider
         """
 
-        for (k, spec) in self.field_spec.fields.items():
-            value = getattr(self, k)
+        if self._field_spec is None:
+            # this is for types like Set() that have unrestricted parameters
+            for (k,v) in self.kwargs.items():
+                setattr(provider, k, v)
+        else:
+            for (k, spec) in self._field_spec.fields.items():
+                value = getattr(self, k)
+                setattr(provider, k, value)
+
+    def resolve_provider_fields(self, provider):
+
+        for (k, spec) in self._field_spec.fields.items():
+            value = getattr(provider, k)
             if issubclass(type(value), Condition):
                 value = value.evaluate()
             if type(value) == str:
@@ -96,7 +70,7 @@ class Type(Resource):
         return
 
     def facts(self):
-        return self._context.facts
+        return Facts()
 
     def context(self):
         return self._context

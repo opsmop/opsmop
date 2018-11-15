@@ -6,15 +6,13 @@ from opsmop.core.field import Field
 class Stop(Type):
 
     def __init__(self, msg, *args, **kwargs):
-        self.create(msg=msg, **kwargs)
+        self.setup(msg=msg, **kwargs)
 
     def fields(self):
         return Fields(
+            self,
             msg = Field(kind=str, allow_none=False, help="string to print")
         )
-
-    def skip_plan_stage(self):
-        return True
 
     def validate(self):
         pass

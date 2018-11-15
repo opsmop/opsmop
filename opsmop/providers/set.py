@@ -1,19 +1,21 @@
 from opsmop.providers.provider import Provider
 from opsmop.core.template import Template
-from opsmop.conditions.deferred import Deferred
+from opsmop.core.eval import Eval
 
 class Set(Provider):
 
     def plan(self):
         self.needs('set')
+        self.copy_variables()
 
-        # we can update all values that are not deferred variables
-        # in the plan stage but others need to wait.
+    def copy_variables(self):
         temp_items = dict()
-        for (k,v) in self.items.items():
-            if not issubclass(type(v), Deferred):
+        for (k,v) in self.extra_variables.items():
+            if issubclass(type(v), Eval):
+                temp_items[k] = v.evaluate(self.resource)
+            else:
                 temp_items[k] = v
-        self.facts().update_variables(temp_items)
+        self.resource.update_parent_variables(temp_items)
 
     def verb(self):
         return "setting..."
@@ -22,17 +24,11 @@ class Set(Provider):
         return True
 
     def apply(self):
-
         self.do('set')
-
-        new_items = dict()
-        for (k,v) in self.items.items():
-            if issubclass(type(v), Deferred):
-                v = v.evaluate()
-            new_items[k] = v
-            self.echo("%s => %s" % (k,v))
-        self.facts().update_variables(new_items)
-        #self.context.on_update_variables(new_items)
+        # we run this again so that any registered variables can be erased if so desired
+        self.copy_variables()
         return self.ok()
+
+
         
 

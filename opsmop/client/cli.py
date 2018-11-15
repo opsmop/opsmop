@@ -37,7 +37,6 @@ class Cli(object):
 
         api = Api.from_file(path=path, callbacks=callbacks)
         
-        print("")
         if mode == 'validate':
             # just check for missing files and invalid types
             api.validate()

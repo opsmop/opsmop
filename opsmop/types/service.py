@@ -13,8 +13,12 @@ class Service(Type):
     Represents a OS background service.
     """
 
+    def __init__(self, name=None, **kwargs):
+        self.setup(name=name, **kwargs)
+
     def fields(self):
         return Fields(
+            self,
             name = Field(kind=str),
             started = Field(kind=bool, default=True),
             enabled = Field(kind=bool, default=True),

@@ -14,9 +14,13 @@ class Role(Resource):
     For an example see demo/content.py
     """
 
+    def __init__(self, *args, **kwargs):
+        (original, common) = self.split_common_kwargs(kwargs)
+        self.setup(extra_variables=original, **common)
 
     def fields(self):
         return Fields(
+            self,
             name = Field(kind=str, default=None),
             variables = Field(kind=dict, loader=self.set_variables),
             resources = Field(kind=list, of=Resource, loader=self.set_resources),

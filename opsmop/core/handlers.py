@@ -2,33 +2,21 @@
 
 from opsmop.core.resource import Resource
 from opsmop.core.collection import Collection
+from opsmop.core.resources import Resources
+from opsmop.core.fields import Fields
+from opsmop.core.field import Field
 
-class Handlers(Collection):
+class Handlers(Resources):
 
-    """
-    A Handlers object is a basic collection of resources, just like Resources() but is different
-    that it is represented as a dictionary instead of a list.  The keys of the dictionary are the
-    names of the signals that the handler responds to.  For an example, see demo/content.py
-    in the source tree.
-    """
-
-    def __init__(self, *args, **kwargs):
-
-        # normally Collection objects take lists, but Handlers is hacked a tiny amount to provide
-        # some syntactic sugar so it can take a dict.
-        
+    def __init__(self, **kwargs):
         handlers = []
-        if 'items' in kwargs:
-            handlers = kwargs['items']
-        else:
-            for (k,v) in kwargs.items():
-                if (k != 'items') and issubclass(type(v), Resource):
-                    v.handles = k
-                    handlers.append(v)
+        for (k,v) in kwargs.items():
+            v.handles = k
+            handlers.append(v)
+        self.setup(items=handlers)
 
-        self.kwargs = {}
-        self.kwargs['items'] = handlers
-        self.field_spec = self.fields()
-        self.field_spec.find_unexpected_keys(self)
-        self.field_spec.load_parameters(self)
-
+    def fields(self):
+        return Fields(
+            self,
+            items = Field(kind=list, of=Resource),
+        )

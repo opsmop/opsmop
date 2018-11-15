@@ -1,4 +1,8 @@
 
+COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors' ]
+
+# FIXME: refactor
+
 class Fields(object):
 
     """
@@ -10,9 +14,8 @@ class Fields(object):
     """
 
     __slots = [ 'fields' ]
-    COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors' ]
 
-    def __init__(self, **fields):
+    def __init__(self, resource, **fields):
 
         """
         Construct a fields object. 
@@ -35,17 +38,24 @@ class Fields(object):
         """
 
         self.fields = fields
+        for (k,v) in self.common_field_spec(resource).items():
+            self.fields[k] = v
+
+    def common_field_spec(self, resource):
 
         from opsmop.core.field import Field
         from opsmop.core.resource import Resource
-        from opsmop.conditions.condition import Condition
 
-        self.fields['when'] = Field(kind=Condition, default=None)
-        self.fields['signals'] = Field(kind=list, of=Resource, default=None)
-        self.fields['handles'] = Field(kind=str, default=None)
-        self.fields['method'] = Field(kind=str, default=None)
-        self.fields['register'] = Field(kind=str, default=None)
-        self.fields['ignore_errors'] = Field(kind=bool, default=False)
+        return dict(
+            when            = Field(default=None),
+            signals         = Field(kind=list, of=Resource, default=None),
+            handles         = Field(kind=str, default=None),
+            method          = Field(kind=str, default=None),
+            register        = Field(kind=str, default=None),
+            ignore_errors   = Field(kind=bool, default=False),
+            variables       = Field(kind=dict, loader=resource.set_variables),
+            extra_variables = Field(kind=dict, empty=True),
+        )
 
     def find_unexpected_keys(self, obj):
 

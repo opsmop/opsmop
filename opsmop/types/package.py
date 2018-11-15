@@ -12,8 +12,12 @@ class Package(Type):
     Represents a software package
     """
 
+    def __init__(self, name=None, **kwargs):
+        self.setup(name=name, **kwargs)
+
     def fields(self):
         return Fields(
+            self,
             name = Field(kind=str, help="the name of the package to install"),
             version = Field(kind=str, default=None, help="what version to install"),
             latest = Field(kind=bool, default=False, help="if true, upgrade the package regardless of version"),

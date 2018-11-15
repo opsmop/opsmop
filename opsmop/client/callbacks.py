@@ -89,6 +89,11 @@ class CliCallbacks(BaseCallback):
         self.i5("= %s" % result)
         # pay attention to self.context.category and 
 
+    def on_evaluation_failed(self, expr):
+        self.i3("conditional evaluation error, unable to evaluate expression:")
+        self.i5("| %s" % expr)
+        self.fatal()
+
     def on_skipped(self, skipped):
         self.i3("skipped")
 

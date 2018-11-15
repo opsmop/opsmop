@@ -5,10 +5,9 @@ TODO list (shorter term ideas):
 
 * Apache2 license headers
 * make sure the variable system works like a scoped stack where values are cleared on each indent 
-* verify condition/skipped behavior
+* on j2 template errors, have much nicer error info (not a traceback)
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
 * CLI should use ArgumentParser to have --options
-* upgrade the default CLI output (what we have now is just a placeholder)
 * continued callback code improvement
 * make a Debug module (like Set, but different)
 * make FileUtils a seperate class in common, simply file type/provider code lots
@@ -21,6 +20,7 @@ TODO list (shorter term ideas):
 * Push documentation website (opsmop.io)
 * eliminate the need to use V by injecting all variables into the template namespace
 * if the type passed to Roles() or Handlers() is a class and not an instance (a possible user error - instantiate the class)
+* make conditional __str__ human readable and ideally mirror entry format
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py

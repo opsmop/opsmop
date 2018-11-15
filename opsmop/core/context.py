@@ -70,3 +70,6 @@ class Context(object):
 
     def on_update_variables(self, variables):
         self._run_callbacks('on_update_variables', variables)
+
+    def on_evaluation_failed(self, expr):
+        self._run_callbacks('on_evaluation_failed', expr)

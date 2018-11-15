@@ -25,15 +25,10 @@ class Collection(Resource):
     """
 
     def __init__(self, *args, **kwargs):
-        # the previous comment for usage
-        self.kwargs = kwargs
-        if not 'items' in kwargs:
-            self.kwargs['items'] = args
-        self.field_spec = self.fields()
-        self.field_spec.find_unexpected_keys(self)
-        self.field_spec.load_parameters(self)
+        self.setup(items=args, **kwargs)
 
     def fields(self):
         return Fields(
+            self,
             items = Field(kind=list, of=Resource),
         )

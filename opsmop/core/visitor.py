@@ -1,13 +1,15 @@
 from opsmop.core.resource import Resource
 from opsmop.core.collection import Collection
+from opsmop.core.handlers import Handlers
 from opsmop.core.policy import Policy
 from opsmop.core.context import Context
-from opsmop.core.facts import Facts
+from opsmop.core.scope import Scope
 
 MODE_RESOURCES = "resources"
 MODE_HANDLERS = "handlers"
 
 # FIXME: refactor
+# FIXME: we should rewrite the whole visitor class because it's not *quite* recursive
 
 class Visitor(object):
 
@@ -29,7 +31,9 @@ class Visitor(object):
         assert issubclass(type(policy), Policy)
         assert issubclass(type(context), Context)
         self.policy = policy
+        self.policy._scope = Scope.for_top_level(self.policy)
         self.context = context
+        self.policy.update_variables(self.policy.variables)
 
     def walk_resources(self):
         """
@@ -68,15 +72,20 @@ class Visitor(object):
         # when popping out of a depth level.
 
         for role in roles.items:
+            self.policy.child_scope(role)
             self.context.on_role(role)
-            Facts.update_variables(role.variables)
+
             if mode in [ MODE_RESOURCES ]:
                 for resource in role.resources.items:
-                    for x in self._walk_items(resource, mode, condition_stack):
-                         yield x
+                    role.child_scope(resource)
+                    results = []
+                    for x in self._walk_items(role, resource, mode, condition_stack, results):
+                        yield x
             if mode in [ MODE_HANDLERS  ] :
                 for handler in role.handlers.items:
-                    for x in self._walk_items(handler, mode, condition_stack):
+                    role.child_scope(handler)
+                    results = []
+                    for x in self._walk_items(role, handler, mode, condition_stack, results):
                         yield x
         return
 
@@ -89,38 +98,31 @@ class Visitor(object):
             results.update(variables)
         return results
 
-    def _walk_items(self, obj, mode, conditions):
+    def get_children(self, obj):
+        if issubclass(type(obj), Collection):
+            return obj.items
+        else:
+            return []
+
+    def _walk_items(self, parent, obj, mode, conditions, results):
         """
         Actual traversal code for the object tree.
         This handles recursion into nested resources
         """
-
-        # FIXME: this may need some work to make sure variable trees work as expected
-        # FIXME: AND ALSO conditions!!!
-
-        ot = type(obj)
+        if type(obj) == list:
+            for x in obj:
+                self._walk_items(parent, x, mode, conditions, results)
+            return results
 
         conditions = conditions[:]
+        if obj.when:
+            conditions.append(obj.when)
+        parent.child_scope(obj)
+        
+        if not issubclass(type(obj), Collection):
+            results.append(obj)
 
-        if issubclass(ot, Resource):
-            if obj.when:
-                conditions.append(obj.when)
-
-        if issubclass(ot, Collection):
-            for x in obj.items:
-                for recursed in self._walk_items(x, mode, conditions):
-                    yield recursed
-
-        elif type(obj) == list:
-            for x in obj:
-                for recursed in self._walk_items(x, mode, conditions):
-                    yield recursed
-            
-
-        else:
-            # this is the return for each step of self.walk_resources or self.walk_handlers
-            # it is only defined here.
-            obj.set_condition_stack(conditions)
-            yield obj
-
-        return
+        children = self.get_children(obj)
+        for child in children:
+            self._walk_items(obj, child, mode, conditions, results)
+        return results

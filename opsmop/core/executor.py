@@ -3,6 +3,9 @@ from opsmop.core.facts import Facts
 from opsmop.core.result import Result
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy
+from opsmop.core.scope import Scope
+from opsmop.core.eval import Eval
+from opsmop.core.condition import Condition
 
 facts = Facts()
 
@@ -72,7 +75,6 @@ class Executor(object):
         signals = []
 
         visitor = Visitor(policy=policy, context=context)
-        Facts.update_variables(policy.variables)
 
         for resource in visitor.walk_resources():
             resource.validate()
@@ -94,7 +96,17 @@ class Executor(object):
         assert resource is not None
         stack = resource.condition_stack
         context.on_conditions(stack)
-        return all(cond.evaluate() for cond in stack)
+        for cond in stack:
+            if type(cond) == str:
+                if not Eval(cond).evaluate(resource):
+                    return False
+            elif issubclass(type(cond), Condition):
+                if not cond.evaluate(resource):
+                    return False
+            elif not cond:
+                return False
+
+        return True
 
 
     def execute_resource(self, resource=None, context=None, check=False, apply=False, handlers=False, signals=None):
@@ -136,7 +148,7 @@ class Executor(object):
                 va = dict()
                 va[provider.register] = result
                 context.on_update_variables(va)
-                Facts.update_variables(va)
+                provider.resource.update_parent_variables(va)
 
             context.on_result(result)
             if result.fatal:

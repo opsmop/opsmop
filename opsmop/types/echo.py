@@ -11,18 +11,16 @@ class Echo(Type):
     """
 
     def __init__(self, msg, *args, **kwargs):
-        self.create(msg=msg, **kwargs)
+        self.setup(msg=msg, **kwargs)
 
     def fields(self):
         return Fields(
+            self,
             msg = Field(kind=str, allow_none=False, help="string to print")
         )
 
     def validate(self):
         pass
-
-    def hide_plan_stage(self):
-        return True
 
     def default_provider(self):
         from opsmop.providers.echo import Echo

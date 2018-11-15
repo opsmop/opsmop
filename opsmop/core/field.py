@@ -1,4 +1,7 @@
 # WARNING: this code is relatively low level and will be cleaned up lots. 
+# FIXME: refactor
+
+from opsmop.core.condition import Condition
 
 class Field(object):
 
@@ -75,7 +78,8 @@ class Field(object):
                     v = dict()
                 elif self.kind == list:
                     v = []
-                raise Exception("%s, field %s, invalid use of 'empty' without a type" % (obj, k))
+                else:
+                    raise Exception("%s, field %s, invalid use of 'empty' without a type" % (obj, k))
             else:
                 raise Exception("%s, field %s, missing required value" % (obj, k))
 
@@ -89,7 +93,13 @@ class Field(object):
         """
         Verify an object is of a given type or can be serialized INTO that type.
         """
+
+        from opsmop.core.eval import Eval
+
         vt = type(v)
+        if issubclass(vt, Eval):
+            # this will be computed later in the provider
+            return
         if self.allow_none and v is None:
             return
         if vt == want_type or issubclass(vt, want_type):
@@ -134,8 +144,9 @@ class Field(object):
             elif type(v) == dict:
                 self._type_check_dict(obj, k, v)
 
-        elif (v is not None) and (not issubclass(vt, self.kind)):
+        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Eval):
             # we requested a simple type check, but don't care about contents if the contents are supposed to be a dict or list
+            # an Eval type also gets to slide by (and may POSSIBLY have fun at runtime)
             raise Exception("%s, field %s: value(%s) is not (%s)" % (obj, k, v, self.kind))
 
     def load(self, obj, k):

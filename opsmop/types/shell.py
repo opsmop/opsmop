@@ -12,11 +12,12 @@ class Shell(Type):
     Represents a command to (maybe) be run
     """
 
-    def __init__(self, cmd=None, *args, **kwargs):
-        self.create(cmd=cmd, **kwargs)
+    def __init__(self, cmd=None, **kwargs):
+        self.setup(cmd=cmd, **kwargs)
 
     def fields(self):
         return Fields(
+            self,
             cmd      = Field(kind=str, default=None, help="execute this shell code in the default shell"),
             timeout  = Field(kind=int, default=99999, help="max time to allow this command to run") 
         )

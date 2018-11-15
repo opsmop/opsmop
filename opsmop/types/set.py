@@ -7,14 +7,15 @@ from opsmop.types.type import Type
 class Set(Type):
 
     def __init__(self, *args, **kwargs):
-        self.create_from_arbitrary_kwargs(**kwargs)
+        (original, common) = self.split_common_kwargs(kwargs)
+        self.setup(extra_variables=original, **common)
 
     def fields(self):
         return Fields(
-            items = Field(kind=dict),
+            self,
+            variables = Field(kind=dict)
         )
 
     def default_provider(self):
-
         from opsmop.providers.set import Set
         return Set
