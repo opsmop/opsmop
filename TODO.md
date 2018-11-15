@@ -3,8 +3,16 @@ Bug queue and PRs will be open by December.
 
 TODO list (shorter term ideas):
 
-* Apache2 license headers
+* when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
+  this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode
+  traversal and filter them in *APPLY* mode traversal.  This means the visitor needs to understand check vs apply.
+* overhaul comments and audit fixmes
+* cleanup field.py
+* eliminate filetest.py / overhaul file module
+* validators.py should use common file test class
+* cleanup executor.py
 * fix nested scopes in the variable system
+* Apache2 license headers
 * cleanup the visitor and scope code, which is a little self-referential in resource.py
 * on j2 template errors, have much nicer error info (not a traceback)
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
