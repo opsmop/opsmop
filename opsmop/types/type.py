@@ -58,7 +58,7 @@ class Type(Resource):
         for (k, spec) in self._field_spec.fields.items():
             value = getattr(provider, k)
             if issubclass(type(value), Deferred):
-                value = value.evaluate()
+                value = value.evaluate(provider.resource)
             setattr(provider, k, value)
 
     def validate(self):

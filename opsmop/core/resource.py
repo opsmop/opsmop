@@ -1,4 +1,3 @@
-
 from opsmop.core.fields import COMMON_FIELDS
 
 class Resource(object):
