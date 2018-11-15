@@ -3,6 +3,7 @@ Bug queue and PRs will be open by December.
 
 TODO list (shorter term ideas):
 
+* bug: from_content needs template in provider, use T() in demo if needed.
 * change EXPORTED to a def() ... then just call the def.
 * -----
 * DOCS!
