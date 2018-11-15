@@ -23,7 +23,7 @@ class Debug(Provider):
 
         for (k, expr) in self.evals.items():
             actual = expr
-            if issubclass(v, Condition):
+            if issubclass(v, Deferred):
                  actual = expr.evaluate(self.resource)
             self.echo("%s => %s" % (k, actual))
           

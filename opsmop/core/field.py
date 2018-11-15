@@ -1,7 +1,7 @@
 # WARNING: this code is relatively low level and will be cleaned up lots. 
 # FIXME: refactor
 
-from opsmop.core.condition import Condition
+from opsmop.core.deferred import Deferred
 
 class Field(object):
 
@@ -149,7 +149,7 @@ class Field(object):
             elif type(v) == dict:
                 self._type_check_dict(obj, k, v)
 
-        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Condition):
+        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Deferred):
             # we requested a simple type check, but don't care about contents if the contents are supposed to be a dict or list
             # an Eval type also gets to slide by (and may POSSIBLY have fun at runtime)
             raise Exception("%s, field %s: value(%s) is not (%s) but (%s)" % (obj, k, v, self.kind, vt))

@@ -2,7 +2,7 @@ from jinja2 import Environment, BaseLoader, FileSystemLoader, StrictUndefined
 from jinja2.nativetypes import NativeEnvironment
 from opsmop.core.facts import Facts
 from opsmop.core.resource import Resource
-from opsmop.core.condition import Condition
+from opsmop.core.deferred import Deferred
 
 
 facts = Facts()
@@ -16,7 +16,7 @@ class FactLookup(object):
         f = getattr(facts, field)
         return f()
 
-class T(Condition):
+class T(Deferred):
 
 
     def __init__(self, expr):

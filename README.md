@@ -1,6 +1,8 @@
 OpsMop
 ======
 
+(Fair warning: FULL DOC SITE COMING THIS WEEKEND - this Readme may not be 100% accurate!)
+
 OpsMop is a next-generation configuration management platform from Michael DeHaan, focused on web-scale deployments, extremely maintainable high-quality plugins, and ease of use through a Python 3 DSL.
 
 OpsMop is currently an alpha level codebase in very active development, currently offering a limited set of supported
@@ -53,6 +55,68 @@ the OpsMop policy will be relative to there.
 To look at modules to see how easy it is to write a module, I recommend looking at modules
 like 'service' (brew implemented, quickly), 'package' (also just brew ATM), and 'shell'.
 
+Available Types for OpsMop Language Files
+=========================================
+
+See opsmop/resources/*.py for the methods they take.  
+See demo/*.py for example usage.
+
+* Set - sets runtime variables
+* File - copies files or templates, sets modes, etc
+* Echo - prints debug or informational messages
+* Shell - runs shell commands, either from files or just by strings
+* Service - starts and enables services, disables, etc - currently a rough brew example only
+* Package - installs or upgrades packages - currently a rough brew example only
+
+This is very minimal.  Our near-term next steps will be to fill out the service and package
+management modules.  
+
+yum, apt for package and systemd for service will come first.
+
+Once we're happy with *one* implementation in each category for package and service,
+pull requests will be opened up for everything, including entirely new types of resources.
+
+The goal is for all modules to serve as very strong examples for future modules before
+we get going too fast.
+
+Extensive module documentation with examples will be added very soon.
+
+Templates
+=========
+
+Any string in an OpsMop policy can be a template, and of course from_template
+in the File module also loads templates.
+
+Templates are evaluated with Jinja2.
+
+Only OpsMop variables and facts are available in templates at this time.
+
+See the "V.x" and "F.x" type examples in demo/content.py
+
+Additional modifications to allow access to the Python scope may be added later.
+
+Facts
+=====
+
+Facts are variables about the OS for use in templates.
+
+OpsMop has a facts system, see demo/conditionals.py and opsmop/client/facts.py
+
+The facts are based on memoized functions where expensive facts are calculated only
+once the first time they are accessed, leading to an extremely responsive experience.
+
+This means there is no reason to disable fact evaluation.
+
+Deferreds
+==========
+
+As demoed in demo/conditionals.py, OpsMop has a very sophisticated conditional evaluation
+system, that calculates as much as possible at load time, but still has options for
+runtime evaluation.
+
+Deferreds can easily access external resources of all kinds, possibly including
+remotely managed feature flag gates!
+
 Bugs
 ====
 
@@ -62,35 +126,6 @@ API
 ===
 
 The command line tool is only a small focus of this project. See opsmop.core.api for the code behind the command line.
-
-Resource Acceptance
-===================
-
-In general, I want OpsMop to only have about 30-50 well-written core resources *TOPS* (types, not providers, providers
-have no cap).  Some resources like services and packages may have 10 or so implementations for different platforms.
-
-To control sprawl, where possible, our resources have multiple capabilities. For instance to add support to download files from the internet, this would go into the "file" module, rather than adding another module that was verb based like "curl".  Similarly,
-"file" already does templates.
-
-Where tools have easy command line equivalents we may encourage continued use of
-those command line tools. Yum update? Just shell out to yum update.
-
-Similarly, where command lines are strong ways to implement a provider, we use those, to keep code simpler,
-more reliable, and less fragile than using a wide set of dependencies.
-
-We generally like to see provider code implementations be VERY short, often relying on helper classes
-added to opsmop.core.*, which is how things like templating code is standardized.
-
-When reviewing resource code, pay special note to .plan("action"), .should("action"), and .do("action").
-
-Plan says something is going to be done, should checks if it should be done, and then do does it. Doing
-an action that is not planned, or planning an action and not doing it cause very useful errors.
-
-These three methods are part of the well-split plan and execution model in OpsMop, which not only
-allows for a very strong dry-run mode, but also error checking if a provider fails to perform an action
-that it decided to do.
-
-This will be covered in the upcoming plugin development guide.
 
 License
 =======

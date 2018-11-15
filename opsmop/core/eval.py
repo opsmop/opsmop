@@ -1,4 +1,4 @@
-from opsmop.core.condition import Condition
+from opsmop.core.deferred import Deferred
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.facts import Facts
@@ -6,7 +6,7 @@ from opsmop.core.template import Template
 
 facts = Facts()
 
-class Eval(Condition):
+class Eval(Deferred):
 
     """
     when=Eval("a > b")

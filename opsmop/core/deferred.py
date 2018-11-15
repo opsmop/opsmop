@@ -1,6 +1,6 @@
 from opsmop.core.resource import Resource
 
-class Condition():
+class Deferred():
 
     """
     A representation of a condition that is fed to a "when" clause.

@@ -1,5 +1,5 @@
 from opsmop.core.resource import Resource
-from opsmop.core.condition import Condition
+from opsmop.core.deferred import Deferred
 from opsmop.core.template import Template
 from opsmop.core.fields import Fields
 from opsmop.core.facts import Facts
@@ -57,7 +57,7 @@ class Type(Resource):
 
         for (k, spec) in self._field_spec.fields.items():
             value = getattr(provider, k)
-            if issubclass(type(value), Condition):
+            if issubclass(type(value), Deferred):
                 value = value.evaluate()
             setattr(provider, k, value)
 

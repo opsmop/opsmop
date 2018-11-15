@@ -5,7 +5,7 @@ from opsmop.core.context import Context
 from opsmop.core.policy import Policy
 from opsmop.core.scope import Scope
 from opsmop.core.eval import Eval
-from opsmop.core.condition import Condition
+from opsmop.core.deferred import Deferred
 
 facts = Facts()
 
@@ -100,7 +100,7 @@ class Executor(object):
             if type(cond) == str:
                 if not Eval(cond).evaluate(resource):
                     return False
-            elif issubclass(type(cond), Condition):
+            elif issubclass(type(cond), Deferred):
                 if not cond.evaluate(resource):
                     return False
             elif not cond:
