@@ -4,7 +4,8 @@ Bug queue and PRs will be open by December.
 TODO list (shorter term ideas):
 
 * Apache2 license headers
-* make sure the variable system works like a scoped stack where values are cleared on each indent 
+* fix nested scopes in the variable system
+* cleanup the visitor and scope code, which is a little self-referential in resource.py
 * on j2 template errors, have much nicer error info (not a traceback)
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
 * CLI should use ArgumentParser to have --options
@@ -20,7 +21,7 @@ TODO list (shorter term ideas):
 * Push documentation website (opsmop.io)
 * eliminate the need to use V by injecting all variables into the template namespace
 * if the type passed to Roles() or Handlers() is a class and not an instance (a possible user error - instantiate the class)
-* make conditional __str__ human readable and ideally mirror entry format
+* make conditionals human readable in callbacks - show test & evaluated value
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py
