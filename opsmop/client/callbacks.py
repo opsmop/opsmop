@@ -127,9 +127,14 @@ class CliCallbacks(BaseCallback):
         # FIXME: re-implement the counter table, but much cleaner
         pass
 
-    def on_fatal(self):
-        self.i1("FAILED")
+    def on_fatal(self, msg=None):
+        if msg:
+            self.i1("FAILED: %s" % msg)
+        else:
+            self.i1("FAILED")
         self.summarize()
+        # FIXME: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
+        # FIXME: further, run callbacks should catch any exceptions from *ALL* callbacks and re-raise
         sys.exit(1)
 
     def on_all_policies_complete(self):

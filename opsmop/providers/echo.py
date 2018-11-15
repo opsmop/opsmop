@@ -1,3 +1,4 @@
+from opsmop.core.template import Template
 from opsmop.providers.provider import Provider
 import shutil
 import os
@@ -7,11 +8,7 @@ COWSAY = "cowsay '{msg}'"
 class Echo(Provider):
 
     def quiet(self):
-        # silence most callbacks
         return True
-
-    def plan(self):
-        self.needs('echo')
 
     def verb(self):
         return "output..."
@@ -21,13 +18,12 @@ class Echo(Provider):
 
     def apply(self):
         
-        self.do('echo')
         self.cowsay = shutil.which('cowsay')
-        txt = None
+        txt = Template.from_string(self.msg, self.resource)
+
         if self.cowsay and os.environ.get('MOO'):
-            cmd = COWSAY.format(msg=self.msg)
+            cmd = COWSAY.format(msg=txt)
             txt = self.run(cmd, echo=False)
-        else:
-            txt = self.msg
         self.echo(txt)
+
         return self.ok()

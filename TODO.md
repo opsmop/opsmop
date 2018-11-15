@@ -30,6 +30,7 @@ TODO list (shorter term ideas):
 * eliminate the need to use V by injecting all variables into the template namespace
 * if the type passed to Roles() or Handlers() is a class and not an instance (a possible user error - instantiate the class)
 * make conditionals human readable in callbacks - show test & evaluated value
+* add an Assert module that uses Eval and then calls Stop, similar to Stop+When, once present, simplify all the scope examples
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py

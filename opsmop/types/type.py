@@ -59,8 +59,6 @@ class Type(Resource):
             value = getattr(provider, k)
             if issubclass(type(value), Condition):
                 value = value.evaluate()
-            if type(value) == str:
-                value = self.template(value)
             setattr(provider, k, value)
 
     def validate(self):

@@ -36,3 +36,6 @@ class Role(Resource):
     def set_handlers(self):
         return Handlers()
 
+    def __str__(self):
+        return "Role: %s" % self.__class__.__name__
+

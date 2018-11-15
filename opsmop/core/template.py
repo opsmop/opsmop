@@ -2,6 +2,8 @@ from jinja2 import Environment, BaseLoader, FileSystemLoader, StrictUndefined
 from jinja2.nativetypes import NativeEnvironment
 from opsmop.core.facts import Facts
 from opsmop.core.resource import Resource
+from opsmop.core.condition import Condition
+
 
 facts = Facts()
 
@@ -13,6 +15,19 @@ class FactLookup(object):
     def __getattr__(self, field):
         f = getattr(facts, field)
         return f()
+
+class T(Condition):
+
+
+    def __init__(self, expr):
+        super().__init__()
+        self.expr=expr
+
+    def evaluate(self, resource):
+        return Template.from_string(self.expr, resource)
+
+    def __str__(self):
+        return "T: <'%s'>" % self.expr
 
 class Template(object):
 

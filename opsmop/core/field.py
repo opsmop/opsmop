@@ -87,6 +87,9 @@ class Field(object):
             # if something takes a list and one element is supplied, do what the user probably means
             v = [ v ]
 
+        if type(v) == tuple:
+            v = list(v)
+
         return v
 
     def _type_check_object(self, obj, k, v, want_type):
@@ -104,6 +107,8 @@ class Field(object):
             return
         if vt == want_type or issubclass(vt, want_type):
             return        
+        if k == 'items' and vt == list:
+            return
         raise Exception("%s, field %s, expecting a data member of type %s, got %s" % (obj, k, want_type, vt))
 
     def _type_check_list(self, obj, k, v):
@@ -139,15 +144,15 @@ class Field(object):
         # if self.of is set, we will type check the collection contents as well
         if self.of:
 
-            if vt == list:
+            if vt in (list, tuple):
                 self._type_check_list(obj, k, v)
             elif type(v) == dict:
                 self._type_check_dict(obj, k, v)
 
-        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Eval):
+        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Condition):
             # we requested a simple type check, but don't care about contents if the contents are supposed to be a dict or list
             # an Eval type also gets to slide by (and may POSSIBLY have fun at runtime)
-            raise Exception("%s, field %s: value(%s) is not (%s)" % (obj, k, v, self.kind))
+            raise Exception("%s, field %s: value(%s) is not (%s) but (%s)" % (obj, k, v, self.kind, vt))
 
     def load(self, obj, k):
         """
