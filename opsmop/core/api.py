@@ -39,9 +39,11 @@ class Api(object):
         dirname = os.path.dirname(path)
         os.chdir(dirname)
 
-        if 'EXPORTED' not in ran:
-            raise Exception("unable to find EXPORTED=[] in %s" % path)
-        policies = [ x for x in ran['EXPORTED'] ]
+        if 'main' not in ran:
+            raise Exception("unable to find main() function in %s" % path)
+        policies = ran['main']()
+        if type(policies) != list:
+            policies = [ policies ]
 
         return cls(policies=policies, callbacks=callbacks)
         
