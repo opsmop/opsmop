@@ -3,6 +3,10 @@ Bug queue and PRs will be open by December.
 
 TODO list (shorter term ideas):
 
+* change EXPORTED to a def() ... then just call the def.
+* -----
+* DOCS!
+* ----
 * when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
   this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode
   traversal and filter them in *APPLY* mode traversal.  This means the visitor needs to understand check vs apply.
@@ -18,19 +22,13 @@ TODO list (shorter term ideas):
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
 * CLI should use ArgumentParser to have --options
 * continued callback code improvement
-* make a Debug module (like Set, but different)
 * make FileUtils a seperate class in common, simply file type/provider code lots
 * implement yum and apt for Package
 * implement systemd for Service
 * finish out testing File module, Service:brew and Package:brew
 * Shell module should allow File's easy copy behavior to transfer scripts
 * Baseline for unit test infrastructure, ideally with mocked providers.
-* Start Sphinx documentation
-* Push documentation website (opsmop.io)
-* eliminate the need to use V by injecting all variables into the template namespace
-* if the type passed to Roles() or Handlers() is a class and not an instance (a possible user error - instantiate the class)
 * make conditionals human readable in callbacks - show test & evaluated value
-* add an Assert module that uses Eval and then calls Stop, similar to Stop+When, once present, simplify all the scope examples
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py
