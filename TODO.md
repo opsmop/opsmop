@@ -3,11 +3,10 @@ Bug queue and PRs will be open by December.
 
 TODO list (shorter term ideas):
 
-* bug: from_content needs template in provider, use T() in demo if needed.
-* change EXPORTED to a def() ... then just call the def.
 * -----
 * DOCS!
 * ----
+* add a generic "changed_when" and an implicit register to a variable called "last" to make it easy to use
 * when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
   this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode
   traversal and filter them in *APPLY* mode traversal.  This means the visitor needs to understand check vs apply.
