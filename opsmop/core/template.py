@@ -33,7 +33,6 @@ class Template(object):
 
     @classmethod
     def _get_context(cls, resource):
-        assert(type(resource), Resource)
         fact_lookup = FactLookup()
         context = resource.get_variables()
         context["F"] = fact_lookup
@@ -41,16 +40,12 @@ class Template(object):
 
     @classmethod
     def from_string(cls, msg, resource):
-        assert(type(msg), str)
-        assert(type(resource), Resource)
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
         context = cls._get_context(resource)
         return j2.render(context)
         
     @classmethod
     def from_file(cls, path, resource):
-        assert(type(path), str)
-        assert(type(resource), Resource)
         loader = FileSystemLoader(searchpath="./")
         env = Environment(loader=loader, undefined=StrictUndefined)
         template = env.get_template(path)
@@ -59,8 +54,6 @@ class Template(object):
 
     @classmethod
     def native_eval(cls, msg, resource):
-        assert(type(msg), str)
-        assert(type(resource), Resource)
         msg = "{{ %s }}" % msg
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
         context = cls._get_context(resource)
