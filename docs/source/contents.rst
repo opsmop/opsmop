@@ -1,28 +1,30 @@
 
 .. toctree::
-   :caption: Getting Started
+   :caption: Intro
    :maxdepth: 1
 
-   About OpsMop <index>
-   Setup Guide <setup>
-   Tutorial <tutorial>
+   About<index>
+   Setup<setup>
 
 .. toctree::
-   :caption: Additional Topics
+   :caption: Fundamentals
    :maxdepth: 1
 
-   Types <types>
-   Plugins <cli>
-   CLI <cli>
-   Security <security>
-   Settings <settings>
-   Upgrades <upgrades>
+   Local Mode <local>
+   Policy Files <language>
+   Main Resources <main>   
+   Aux Resources <aux>
 
 .. toctree::
-   :caption: Community
+   :caption: Next Steps
    :maxdepth: 1
 
-   Resources <resources>
-   Development Setup <development_setup>
-   Development Guide <development_guide>
+   Pull Mode <pull>
+   Push/Orchestration Mode <push>
+   FAQ <faq>
+   Community <community>
+   Plugin Development <plugin_development>
+   Core Development <core_development>
 
+.. toctree:
+   :caption: BLARG
