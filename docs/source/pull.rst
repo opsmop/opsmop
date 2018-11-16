@@ -1,2 +1,2 @@
-link to proposed config
+Coming Soon!
 

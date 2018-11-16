@@ -5,10 +5,14 @@ Setup
 * The first formal "release" is planned for approximately January 2019
 * Following the "master" branch on GitHub is encouraged
 
+.. _python3:
+
 Python 3
 --------
 
 OpsMop requires Python 3.  
+
+.. _python3_linux:
 
 Python 3 on Linux/Unix
 ----------------------
@@ -16,6 +20,8 @@ Python 3 on Linux/Unix
 Skills test!
 
 If needed, please install Python 3.6 or higher.
+
+.. _python3mac:
 
 Python 3 on Mac OS X
 --------------------
@@ -43,6 +49,8 @@ And::
 
     source env/bin/activate
 
+.. _checkout:
+
 Git Checkout and Dependencies
 -----------------------------
 
@@ -55,7 +63,9 @@ Now install python dependencies with pip:
 
 	cd opsmop/
 	make requirements
-	
+
+.. _first_test:	
+
 Trying Things Out
 -----------------
 
@@ -63,7 +73,9 @@ The other chapters will explain opsmop in greater depth, but let's see
 if this works::
 
     bin/opsmop apply ../opsmop-demo/content/hello.py
-	
+
+.. _pypi:	
+
 What About PyPi?
 ----------------
 

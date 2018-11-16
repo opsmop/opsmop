@@ -1,16 +1,25 @@
 Language
 ========
 
-Please reference `the opsmop-demo repository <https://github.com/vespene-io/opsmop-demo/tree/master/content>`_ while reading
+OpsMop configuration is expressed in a Python DSL.
+
+This documentation works best if you have another tab open. Please reference 
+`the opsmop-demo repository <https://github.com/vespene-io/opsmop-demo/tree/master/content>`_ while reading
 this chapter, in particular `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ for the most
 minimal language example. Other files in that directory show more advanced language features.
+
+.. _policy:
 
 Policy
 ======
 
-OpsMop configuration policies are expressed in a Python DSL.
+Pull up `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ and skim the source.
 
-Typically policies contain the following import to load in a wide array of useful OpsMop classes. Use of your own
+The top-level objects in OpsMop are *Policies*, and a configuration can load in more than one of them.
+It is fine to refer an opsmop python file *as* a policy, even if it instantiates one or more Policy objects.
+
+Since OpsMop is Python, nothing can do anything if we don't import some useful tools. Typically policies contain 
+the following import to load in a wide array of useful OpsMop classes. Use of your own
 objects and imports is 100% encouraged, but often not required::
 
     from opsmop.core.easy import *
@@ -30,16 +39,50 @@ All policies contain a main function which return either a Policy object or a li
 
 A policy constructor *may* take key-value parameters to set variables usable throughout the policy.
 
-A policy class *may* define a seperate set_variables() method that returns further variables, perhaps
+A policy class *may* also define a seperate set_variables() method that returns further variables, perhaps
 fetched from an environment or external system.
 
 A policy class *must* define a set_roles() method, which returns a collection of roles that describe
-the configuration of that policy. Using only one role is acceptable.
+the configuration of that policy. Using only one role is acceptable. Why? A policy without roles has
+nothing to do.  Of course, you could be sneaky and define no roles at all. The system would tolerate that.
+But it would be boring.
 
-Role
-====
+Let's continue.
 
-Roles are the core of OpsMop::
+.. _its_python:
+
+Aside: Info for Python Developers
+=================================
+
+The examples we're showing are 'easy mode'  and are about to show are all constructed in a fairly common way. 
+However, it's important to remember that OpsMop is fully programmable too.
+
+If you want to put your roles in different files, or define them *after* your policy, the system is Python, and does
+not enforce any particular style.  Any packages you may import need to be part of your PYTHONPATH, however.
+You can subclass anything.
+
+Python developers may also wish to note that any Collection objects, like Roles, take Pythonic args,
+which means you can feed lists to them::
+        
+    def set_roles(self):
+        return Roles(*role_list)
+
+Why? OpsMop is a bit of a cyborg system - it is partly for humans, and partly for machines. Unlike
+many other configuration systems, we often expect your policies may programatically deside to
+be different, based on any external system, and they can if you so wish. Code generation is
+simply not neccessary to create dynamically-behaving policies. 
+
+If your 'set_roles' method wants to load up an XML file to decide to build out some roles, that's ok,
+we won't judge. Ok, we will - but you can do it! 
+
+Later in the :ref:`plugin_development` guide we'll talk about extending the rest of OpsMop.
+
+.. _roles:
+
+Roles
+=====
+
+Roles are the reusable core of OpsMop::
 
     class HelloRole(Role):
 
@@ -57,7 +100,7 @@ Roles are the core of OpsMop::
         def set_handlers(self):
             return Handlers()
 
-You can see roles instantiated in the "set_roles()" method of the Hello policy above. Roles, like Policies,
+You can see role instances are instantiated in the "set_roles()" method of the Hello policy above. Roles, like Policies,
 can also take key=value arguments in their constructor to established scoped variables. Also, like Policies,
 roles *may* define a set_variables() method that returns additional variables, potentially sourced from
 external systems.
@@ -65,15 +108,22 @@ external systems.
 Roles *must* define a set_resources method, which returns a collection of Resource objects, that actually
 describe what the role will do.
 
-Technically resources can also be nested, which allows a way to attach parameters to multiple resources in a block.
+Technically resources can also be nested, which allows a way to attach parameters to multiple resources in a block(F.os_type). 
 This is covered in some of the content in the example repo, and is not neccessary in most installations. For instance,
 nested resources can be used to implement tight variable scoping, or assign one conditional to multiple resources
 simultaneously.
+
+If you are getting lost, refer back to the example repo and skim it - and seeing it all in context should help it
+sync in.
+
+.. _types:
 
 Types
 =====
 
 The set_resources() method in a role will return a collection of type instances.
+
+What are type instances?
 
 OpsMop plugins are in two parts: Types and Providers.  Types, like "File"
 describe a configuration intent and can take a variety of parameters::
@@ -85,162 +135,36 @@ Similarly::
     File(name="/tmp/foo.txt", owner='root', group='wheel', mode=0x755)
 
 Additionally, common parameters exist, driving such features as conditionals, variable registration, and more.
-These will be described below.
+These will be described in :ref:`advanced`.
 
 The OpsMop policy language works with types, whereas providers are the implementation behind
-those types that actually performs the work.
+those types that actually performs the work - when writing a *Policy* these are not interacted with directly.
 
 So what we are doing right now is saying "the file should look like this", but the behavior is not implemented
-in that "File()" class - it's in the provider.  This is covered later in :ref:`plugin_development`.
+in that "File()" class - it's in the provider code.  This is covered later in :ref:`plugin_development`.
 
-Provider Selection
-==================
+.. _handlers:
 
-Often, a Type may be coded to return a default provider on a specific platform, but this is always
-overrideable, either with one of the providers that ship with OpsMop or your own. To install a package
-using the default provider for the operating system::
+Handlers
+========
 
-    Package(name="cowsay")
+The handlers section is just like the regular resources section, except that handlers run only when events change being notified
+by a 'signal' from a resource::
 
-This would usually select "yum", "apt", or "brew" on CentOS, Ubuntu, or OS X, respectively.
+     def set_resources():
+         return Resources(
+             File(name="/etc/foo.conf", from_template="templates/foo.conf.j2", signals="restart_foo")
+         )
 
-To specify or force a specific provider::
-
-    Package(name="cowsay", method="yum")
-
-To specify a provider OpsMop doesn't know about, it's still possible to select one out of tree::
-
-    Package(name="cowsay", method="your.custom.provider.spork")
-
-Expressing that full path is verbose, so it helps to save those strings to a python constant.
-    
-    Package(name="cowsay", method=SPORK)
-
-This is a good reminder that 100% of everything in OpsMop is scriptable and subclassable.
-
-Variable Scoping
-================
-
-We've already talked a little bit about variables, and knowledge of variables weighs in on
-future sections.
-
-In the opsmop-demo repository, `var_scoping.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
-the various variable scopes in OpsMop. 
-
-Templates
-=========
-
-Sometimes you will want to inject a variable into a string.
-
-OpsMop uses Jinja2 for templating, but does not automatically template every string.
-
-Only a few certain utility modules automatically assume their inputs are templates::
-
-    Echo("My name is {{ name }}")
-
-To explictly template a string:
-
-    Package(name="foo", version=T("{{ major }}.{{ minor }}"))
-
-The value "T" is a late binding indication that the value should be templated just
-before check-or-apply mode application.
-
-Warning: Because template expressions are late binding, they will push some type-checking that would
-normally happen before check-and-apply stages to runtime evaluation. For example, if this
-file was missing, it might not be determined until halfway through the evaluation of a policy::
-
-    File(name="/etc/foo.cfg", from_file=T("content/{{ platform }}.cfg"))
-
-Eval
-====
-
-Similar to T(), a computation of two variables is doable with Eval::
-
-    Echo(Eval("a + b"))
-
-The difference with Eval() vs "T()" is that Eval can return native python types, whereas T() always
-returns a string.
-
-Conditions
-==========
-
-Any role, policy, or resource can be given a conditional.  If the conditional is true, that resource
-and resources therein will be skipped during the check or apply phase.
-
-Expressions are specified with "when=", which accepts legal Jinja2 expressions.  This is technically
-implemented using Eval() but leaving off Eval is provided as syntactic sugar::
-
-    Shell("reboot", when="a > b")
-
-This is the same as the overly redundant::
-
-    Shell("reboot", when=Eval("a > b"))
-
-Bonus: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
-subclasses of Deferred if you wish to write any kind of runtime lookup into an external system.
-See :ref:`plugin_development`.
-
-Facts
-=====
-
-Facts are information about the system, including information like the OS version and architecture,
-that are discovered by OpsMop dynamically at runtime.  
-
-The facts implementation of OpsMop uses on-demand memoization, so the cost of computing an expensive 
-fact will not be realized unless it is actually referenced.
-
-Facts are accessed by using the "F" accessor in the policy language, and can be used anywhere::
-
-    Echo("The OS type is {{ F.os_type }}")
-
-Here is a conditional:
-
-	Echo("I am Linux", when="F.is_linux")
-
-Registration
-============
-
-The value of one command may be saved and fed into the output of another. This value is entered into
-local scope, and can be saved into global scope using SetGlobal, which is detailed in a later chapter::
-
-    Shell("date", register="date"),
-    Echo({{ date.rc }}),
-    Echo("{{ date.data }}"),
-
-Ignore Errors
-=============
-
-Most commands will intentionally stop the execution of an OpsMop policy upon hitting an error. A common
-example would be Shell() return codes. This is avoidable, and quite useful in combination with the register
-command.
-
-    Shell("ls foo | wc -l", register="line_count", ignore_errors=True)
-    Echo("{{ line_count.data }}")    
-
-Signals
-=======
-
-Handler objects, described above, are resources that only activate when another resource reports having
-changed the system. Resources mark change any time they fulfill an action that they have planned.
-
-	File("/etc/foo.conf", from_template="templates/foo.conf.j2", signals="restart foo app")
-
-Signals will cause the corresponding handler to fire, for instance, if the Role defines some handlers 
-like so::
-
-    set_handlers(self):
-        return Handlers(
-           restart_foo_app = Service(name="foo", restarted=True) 
-        )
-
-Then the restart command would only one if some resource with the designated 'signals' parameter
-indicated some change was neccessary. In the above example, if the configuration file already had
-the correct contents, it would not request a restart of the service.
+     def set_handlers():
+         return Handlers(
+             Service(name='foo', state='restarted')
+         )
 
 Next Steps
 ==========
 
-* :ref:`main`
-* :ref:`aux`
+* :ref:`modules`
+* :ref:`advanced`
 * :ref:`plugin_development`
 

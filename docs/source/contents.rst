@@ -5,26 +5,13 @@
 
    About<index>
    Setup<setup>
+   Local Mode<local>
+   Language<language>
+   Advanced Language<advanced>
+   Modules<modules>
+   Pull Mode<pull>
+   Push/Orchestration Mode<push>
+   Development<development>
+   FAQ<faq>
+   Community<community>
 
-.. toctree::
-   :caption: Fundamentals
-   :maxdepth: 1
-
-   Local Mode <local>
-   Policy Files <language>
-   Main Resources <main>   
-   Aux Resources <aux>
-
-.. toctree::
-   :caption: Next Steps
-   :maxdepth: 1
-
-   Pull Mode <pull>
-   Push/Orchestration Mode <push>
-   FAQ <faq>
-   Community <community>
-   Plugin Development <plugin_development>
-   Core Development <core_development>
-
-.. toctree:
-   :caption: BLARG
