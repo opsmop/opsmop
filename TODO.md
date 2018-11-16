@@ -3,10 +3,12 @@ Bug queue and PRs will be open by December.
 
 TODO list (shorter term ideas):
 
-* changed_when, failed_when
-* -----
+* module docs generator
 * DOCS!
-* ----
+* much better errors from template code
+* if set_resources returns a resource but not a collection assume a list
+* ditto for set_roles
+* changed_when, failed_when
 * site facts (/etc/opsmop/facts.d)
 * when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
   this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode

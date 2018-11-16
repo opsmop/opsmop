@@ -15,6 +15,7 @@ from opsmop.core.template import T
 
 # types
 from opsmop.types.file import File
+from opsmop.types.directory import Directory
 from opsmop.types.echo import Echo
 from opsmop.types.service import Service
 from opsmop.types.package import Package
@@ -26,5 +27,5 @@ from opsmop.types.debug import Debug
 
 __all__ = [
     'Policy', 'Roles', 'Role', 'Resources', 'Handlers', 'Eval', 'T',
-    'File', 'Echo', 'Service', 'Package', 'Shell', 'Set', 'Stop', 'Assert', 'Debug'
+    'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 'Set', 'Stop', 'Assert', 'Debug'
 ]

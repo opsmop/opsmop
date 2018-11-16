@@ -20,11 +20,11 @@ class Policy(Resource):
             roles = Field(kind=list, of=Role, loader=self.set_roles)
         )
 
-    def set_variables():
+    def set_variables(self):
         return dict()
         
-    def set_roles():
-        return []
+    def set_roles(self):
+        raise Exception("Policy class must implement set_roles")
 
 
 

@@ -249,6 +249,8 @@ command.
 Change Reporting Control
 ========================
 
+NOTE: pending feature - this feature will be released shortly.
+
 A resource will mark itself as containing changes if it performs any actions to the system.
 Sometimes, particularly for shell commands, this is not appropriate. The state can
 be overriden as follows:
@@ -262,6 +264,8 @@ the end of the policy execution.
 
 Failure Status Overrides
 ========================
+
+NOTE: pending feature - this feature will be released shortly.
 
 By default if a command returns a fatal error, the program will halt at this step.  The 'ignore_errors'
 mentioned above is technically equivalent to::

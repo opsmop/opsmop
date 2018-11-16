@@ -17,16 +17,16 @@ class File(Type):
     def fields(self):
         return Fields(
             self,
-            name = Field(kind=str, help="path to the DESTINATION file"),
-            from_file = Field(kind=str, default=None, help="use this file as source data"),
-            from_template = Field(kind=str, default=None, help="use this template as source data"),
-            from_content = Field(kind=str, default=None, help="use this string as source data"),
+            name = Field(kind=str, help="path to the destination file"),
+            from_file = Field(kind=str, default=None, help="path to a source file"),
+            from_template = Field(kind=str, default=None, help="path to a source Jinja2 template"),
+            from_content = Field(kind=str, default=None, help="use this string as source data instead of a file"),
             owner = Field(kind=str, default=None, help="owner name"),
             group = Field(kind=str, default=None, help="group name"),
-            mode = Field(kind=int, default=None, help="file mode, in octal (no strings)"),
+            mode = Field(kind=int, default=None, help="file mode, in hex/octal (not a string)"),
             absent = Field(kind=bool, default=False, help="if true, delete the file/directory"),
-            directory = Field(kind=bool, default=False, help="if true, look for a directory, not a file."),
-            overwrite = Field(kind=bool, default=True, help="if false, existing files will not be copied over"),
+            directory = Field(kind=bool, default=False, help="don't use this. Use the Directory() type instead", internal=True),
+            overwrite = Field(kind=bool, default=True, help="replace existing files"),
         )
 
     def validate(self):
@@ -41,6 +41,3 @@ class File(Type):
     def default_provider(self):
         from opsmop.providers.file import File
         return File
-
-def model():
-    return Package

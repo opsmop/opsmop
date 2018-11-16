@@ -27,8 +27,8 @@ class ProviderError(OpsMopError):
     """
 
     def __init__(self, provider, msg):
-        self.resource = provider.resource
         self.provider = provider
+        self.resource = provider.resource
         self.msg = msg
 
 

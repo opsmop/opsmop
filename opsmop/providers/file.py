@@ -1,7 +1,9 @@
 from opsmop.providers.provider import Provider
 from opsmop.core.filetests import FileTests
 from opsmop.core.template import Template
+from opsmop.core.errors import ProviderError
 from pathlib import Path
+
 import shutil
 import os
 
@@ -20,9 +22,9 @@ class File(Provider):
         Conversions between files and directories are not allowed.  Block them with fatal errors.
         """
         if self.directory and self.f_file:
-            raise ProviderError(self.resource, 'unsafe transition: requested directory but a file was already present')
+            raise ProviderError(self, 'unsafe transition: requested directory but a file was already present')
         elif self.directory and self.f_wants_copy:
-            raise ProviderError(self.resource, 'unsafe transition: cannot copy file over directory')
+            raise ProviderError(self, 'unsafe transition: cannot copy file over directory')
 
     def _plan_file_removal_actions(self):
         if not self.f_exists:
@@ -72,7 +74,10 @@ class File(Provider):
                         self.needs('copy_content')
         else:
             if not self.f_exists:
-                raise ProviderError(self.resource, "file path does not exist: %s" % self.name)
+                if self.directory:
+                    self.needs('mkdir')
+                else:
+                    raise ProviderError(self, "file path does not exist: %s" % self.name)
 
     def _plan_metadata_actions(self):
         if self.owner and ((self.f_dir and self.recursive) or not (self.f_owner == self.owner)):
@@ -109,14 +114,23 @@ class File(Provider):
         # TODO: from_url would be a great feature to have
         
         if self.should('rm'):
+            self.do('rm')
             self.path.unlink()
             return
         
         if self.should('rmdir'):
+            self.do('rmdir')
             self.path.rmdir()
             return
 
-        if self.should('copy_file'):
+        if self.should('mkdir'):
+            self.do('mkdir')
+            if self.mode:
+                os.makedirs(self.name, self.mode)
+            else:
+                os.makedirs(self.name)
+
+        elif self.should('copy_file'):
             self.do('copy_file')
             shutil.copy2(self.from_file, self.name)
 

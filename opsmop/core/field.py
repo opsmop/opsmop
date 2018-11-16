@@ -14,7 +14,8 @@ class Field(object):
     """
     
     # prevent accidental typos of field arguments that don't exist when working on resource type code
-    __slots__ = [ 'kwargs', 'kind', 'of', 'default', 'empty', 'loader', 'validator', 'allow_none', 'help' ]
+    __slots__ = [ 'kwargs', 'kind', 'of', 'default', 'empty', 
+        'loader', 'validator', 'allow_none', 'internal', 'help' ]
 
     def __init__(self, **kwargs):
 
