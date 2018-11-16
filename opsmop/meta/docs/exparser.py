@@ -14,16 +14,14 @@ class Record(object):
     def __init__(self):
         # things which we'll figure out as we scan the example
         self.name = ""
+        self.purpose = ""
         self.provider_names = []
         self.related_modules = []
         self.category = ""
         self.description = []
         self.examples = []
         self.current_example = Example()
-
-        # internal state of the parser
         self.phase = 'module'
-        pass
     
     def set_phase(self, phase):
         self.phase = phase
@@ -134,6 +132,8 @@ class Record(object):
                 pass
             elif command == 'category':
                 self.category = rest
+            elif command == 'purpose':
+                self.purpose = rest
             elif command == 'related':
                 self.related_modules = [ x.strip() for x in rest.split(",") ]
             elif command == 'providers':
