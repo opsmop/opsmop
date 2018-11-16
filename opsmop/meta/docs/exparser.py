@@ -137,7 +137,7 @@ class Record(object):
             elif command == 'related':
                 self.related_modules = [ x.strip() for x in rest.split(",") ]
             elif command == 'providers':
-                self.provider_modules = [ x.strip() for x in rest.split(",") ]
+                self.providers = [ x.strip() for x in rest.split(",") ]
             elif command == 'fyi':
                 pass
             elif command == 'description':
@@ -160,8 +160,6 @@ class Record(object):
             # in limbo, seeing a start block moves us into example phase
             if command == 'start_block':
                 self.set_phase('example')
-                self.current_example = Example()
-                self.examples.append(self.current_example)
             else:
                 raise Exception("invalid command: %s" % command)
 
@@ -199,6 +197,7 @@ class Record(object):
                 self.examples.append(self.current_example)
                 self.current_example = Example()
                 self.set_phase('example')
+                pass
             else:
                 raise Exception("unknown command: %s" % command)
 
