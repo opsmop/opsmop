@@ -42,6 +42,7 @@ class Template(object):
     def from_string(cls, msg, resource):
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
         context = cls._get_context(resource)
+        print("DEBUG: context = %s" % context)
         return j2.render(context)
         
     @classmethod

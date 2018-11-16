@@ -14,6 +14,13 @@ class Debug(Provider):
     def apply(self):
         
         variables = self.resource.get_variables()
+        dump_variables = dict()
+
+        len1 = len(self.variable_names)
+        len2 = len(self.evals.items())
+        if len1 == 0 and len2 == 0:
+            for (k, v) in variables.items():
+                self.echo("%s = %s" % (k, v))
 
         for vname in self.variable_names:
             if vname in variables:

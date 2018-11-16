@@ -116,12 +116,12 @@ class File(Provider):
         if self.should('rm'):
             self.do('rm')
             self.path.unlink()
-            return
+            return self.ok()
         
         if self.should('rmdir'):
             self.do('rmdir')
             self.path.rmdir()
-            return
+            return self.ok()
 
         if self.should('mkdir'):
             self.do('mkdir')

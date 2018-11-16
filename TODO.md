@@ -5,6 +5,7 @@ TODO list (shorter term ideas):
 
 * module docs generator
 * DOCS!
+* when the Debug() module is called with no arguments it should show all variables in scope.
 * much better errors from template code
 * if set_resources returns a resource but not a collection assume a list
 * ditto for set_roles
