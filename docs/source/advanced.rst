@@ -19,6 +19,8 @@ Often, a Type may be coded to return a default provider on a specific platform, 
 overrideable, either with one of the providers that ship with OpsMop or your own. To install a package
 using the default provider for the operating system::
 
+.. code-block:: python
+
     def resources(self):
         return Resources(
             Package(name="cowsay")
@@ -27,6 +29,8 @@ using the default provider for the operating system::
 This would usually select "yum", "apt", or "brew" on CentOS, Ubuntu, or OS X, respectively.
 
 To specify or force a specific provider::
+
+.. code-block:: python
     
     def resources(self):
         return Resources(
@@ -35,9 +39,13 @@ To specify or force a specific provider::
 
 To specify a provider OpsMop doesn't know about, it's still possible to select one out of tree::
 
+.. code-block:: python
+
     Package(name="cowsay", method="your.custom.provider.spork")
 
 Expressing that full path is verbose, so it helps to save those strings to a python constant.
+
+.. code-block:: python
     
     Package(name="cowsay", method=SPORK)
 
@@ -70,19 +78,23 @@ OpsMop uses Jinja2 for templating, but does not automatically template every str
 
 Only a few certain utility modules automatically assume their inputs are templates::
 
+.. code-block:: python
+
     Echo("My name is {{ name }}")
 
 To explictly template a string:
+
+.. code-block:: python
 
     Package(name="foo", version=T("{{ major }}.{{ minor }}"))
 
 The value "T" is a late binding indication that the value should be templated just
 before check-or-apply mode application.
 
-.. warn::
+.. note::
     Use of an undefined variable in a template will cause an error.
 
-.. warn::
+.. note::
     Because template expressions are late binding, they will push some type-checking that would
     normally happen before check-and-apply stages to runtime evaluation. For example, if this
     file was missing, it might not be determined until halfway through the evaluation of a policy::
@@ -95,6 +107,8 @@ Eval
 ====
 
 Similar to T(), a computation of two variables is doable with Eval::
+
+.. code-block:: python
 
     Echo(Eval("a + b"))
 
@@ -116,14 +130,20 @@ and resources therein will be skipped during the check or apply phase.
 Expressions are specified with "when=", which accepts legal Jinja2 expressions.  This is technically
 implemented using Eval() but leaving off Eval is provided as syntactic sugar::
 
+.. code-block:: python
+
     Shell("reboot", when="a > b")
 
 This is the same as the overly redundant::
+
+.. code-block:: python
 
     Shell("reboot", when=Eval("a > b"))
 
 And while it serves no purpose that couldn't be achieved with a comment, technically this also disables
 a resource::
+
+.. code-block:: python
 
     Shell("reboot", when=False)
 
@@ -141,6 +161,8 @@ Nested Scopes
 =============
 
 Nested Scopes were created for quickly attaching a condition to a large number of resources::
+
+.. code-block:: python
 
     def set_resources():
         return Resources(
@@ -179,13 +201,19 @@ that are discovered by OpsMop dynamically at runtime.
 
 Facts are accessed by using the "F" accessor in the policy language, and can be used anywhere::
 
+.. code-block:: python
+
     Echo("The OS type is {{ F.os_type }}")
 
 Or more simply::
 
+.. code-block:: python
+
     Echo(F.os_type)
 
 Here is a conditional::
+
+.. code-block:: python
 
 	Echo("I am Linux", when="F.is_linux")
 
@@ -210,6 +238,8 @@ The value of one command may be saved and fed into the output of another.
 
 This value is entered into local scope, and can be saved into global scope using SetGlobal(), 
 which is described in a later chapter::
+
+.. code-block:: python
 
     def resources(self):
         return Resources(
@@ -238,6 +268,8 @@ Most commands will intentionally stop the execution of an OpsMop policy upon hit
 example would be Shell() return codes. This is avoidable, and quite useful in combination with the register
 command.
 
+.. code-block:: python
+
     def resources(self):
         return Resources(
             Shell("ls foo | wc -l", register="line_count", ignore_errors=True),
@@ -255,6 +287,8 @@ A resource will mark itself as containing changes if it performs any actions to 
 Sometimes, particularly for shell commands, this is not appropriate. The state can
 be overriden as follows:
 
+.. code-block:: python
+
     Shell("/bin/foo --args", register="x", ignore_errors=True, changed_when="x.rc == 1", notify="some_step")
 
 If not using handlers, the change reporting isn't too significant, but it will affect CLI output counts at
@@ -269,16 +303,22 @@ NOTE: pending feature - this feature will be released shortly.
 
 By default if a command returns a fatal error, the program will halt at this step.  The 'ignore_errors'
 mentioned above is technically equivalent to::
+
+.. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when=False)
 
 However, that's a weird example! In a more practical example, suppose we have a shell command that
 is programmed incorrectly and returns 5 on success::
 
+.. code-block:: python
+
     Shell("/bin/foo --args", register="x", failed_when="x.rc != 5")
 
 Ok, that's ALSO a weird example.  What if we have a shell command that we should consider failed
 if it doesn't contain the word "SUCCESS" in the output?  Easy::
+
+.. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when="x.data.find('SUCCESS') == -1")
 
@@ -286,6 +326,8 @@ Find in the above example is a Python method available on string objects, and x.
 output of any shell command.
 
 If you find it clearer to read, remember you can assign a conditional test to a variable::
+
+.. code-block:: python
 
     Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
 
@@ -297,12 +339,16 @@ Signals
 Handler objects, described above, are resources that only activate when another resource reports having
 changed the system. Resources mark change any time they fulfill an action that they have planned.
 
+.. code-block:: python
+
 	File("/etc/foo.conf", from_template="templates/foo.conf.j2", signals="restart foo app")
 
 Signals will cause the corresponding handler to fire, for instance, if the Role defines some handlers 
 like so::
 
-    set_handlers(self):
+.. code-block:: python
+
+    def set_handlers(self):
         return Handlers(
            restart_foo_app = Service(name="foo", restarted=True) 
         )

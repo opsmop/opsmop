@@ -22,9 +22,13 @@ Since OpsMop is Python, nothing can do anything if we don't import some useful t
 the following import to load in a wide array of useful OpsMop classes. Use of your own
 objects and imports is 100% encouraged, but often not required::
 
+.. code-block:: python
+
     from opsmop.core.easy import *
 
 All policies contain a main function which return either a Policy object or a list of Policy objects::
+
+.. code-block:: python
 
     class Hello(Policy):
   
@@ -63,6 +67,8 @@ You can subclass anything.
 
 Python developers may also wish to note that any Collection objects, like Roles, take Pythonic args,
 which means you can feed lists to them::
+
+.. code-block:: python
         
     def set_roles(self):
         return Roles(*role_list)
@@ -83,6 +89,8 @@ Roles
 =====
 
 Roles are the reusable core of OpsMop::
+
+.. code-block:: python
 
     class HelloRole(Role):
 
@@ -127,10 +135,14 @@ What are type instances?
 
 OpsMop plugins are in two parts: Types and Providers.  Types, like "File"
 describe a configuration intent and can take a variety of parameters::
+
+.. code-block:: python
             
     File(name="/tmp/foo.txt", from_content=msg)
 
 Similarly::
+
+.. code-block:: python
 
     File(name="/tmp/foo.txt", owner='root', group='wheel', mode=0x755)
 
@@ -150,6 +162,8 @@ Handlers
 
 The handlers section is just like the regular resources section, except that handlers run only when events change being notified
 by a 'signal' from a resource::
+
+.. code-block:: python
 
      def set_resources():
          return Resources(

@@ -6,9 +6,9 @@ venv:
 
 html:
 	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
-#	(rm -rf docs/build/html)
-#	(rm -rf docs/build/doctrees)
-#	(cd docs; make html)
+	(rm -rf docs/build/html)
+	(rm -rf docs/build/doctrees)
+	(cd docs; make html)
 
 # docs_publish:
 # 	# cp -a docs/build/html/* ../opsmops-docs.github.io/

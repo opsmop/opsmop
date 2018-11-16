@@ -67,6 +67,8 @@ class Page(object):
             fd.write("\n")
             for line in e.description:
                 fd.write("%s\n" % line)
+
+            fd.write(".. code-block:: python")
             fd.write("\n\ncode:")
             fd.write("\n")
             for line in e.code:
