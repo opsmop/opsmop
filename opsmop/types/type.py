@@ -20,10 +20,6 @@ class Type(Resource):
         name in addition to the required 'default_provider' method.
         """
 
-        # FIXME: don't be confused here, the keyword 'method' is really the name
-        # of the provider, we should rename this to provider to make the
-        # code not imply Python methods
-
         cls = None
         if 'method' in self.kwargs:
             method = self.kwargs.get('method')
@@ -83,7 +79,8 @@ class Type(Resource):
         return Template().from_file(path, self)
 
     def __str__(self):
-        # FIXME: we should run fields.copy_fields into this object and not just the provider
+        # FIXME: if we run a version of the fields copy code on this object instead
+        # of the provider we won't have to do self.kwargs here.
         str_name = ""
         if 'name' in self.kwargs:
             str_name = self.__class__.__name__ + ": %s" % self.kwargs['name']

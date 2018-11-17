@@ -1,38 +1,52 @@
-STATUS: Still being refactored/upgraded to establish a strong baseline for future additions.
-Bug queue and PRs will be open by December.
+Bug queue and PRs will be open by December.  TODO list (shorter term ideas/priorities):
 
-TODO list (shorter term ideas):
+docs generator
+* module docs generator / docs
 
-* module docs generator
-* DOCS!
-* when the Debug() module is called with no arguments it should show all variables in scope.
-* much better errors from template code
-* if set_resources returns a resource but not a collection assume a list
-* ditto for set_roles
+facts:
+* flesh out OS facts
+* site facts (/etc/opsmop/facts.d). In opsmop facts are functions so this is easy.
+
+core platform:
+* rename 'method' to 'provider' in the language
+* much better errors from template code - not full tracebacks
+* better asserts if things like set_resources does not return a Resources(), ditto for set_roles
+* add 'with' - takes a real variable or an Eval()
+* rename 'register' to 'save'
+* allow 'save' to take a 'save_value=Eval()'
+* validators.py should use common file test class
+* fix (small bugs with) nested scopes in the variable system
 * changed_when, failed_when
-* site facts (/etc/opsmop/facts.d)
+* make conditionals human readable in callbacks - show test & evaluated value
 * when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
   this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode
   traversal and filter them in *APPLY* mode traversal.  This means the visitor needs to understand check vs apply.
-* overhaul comments and audit fixmes
+
+modules:
+* Still allow some way for Set('') to also do global scope.  Maybe Global()
+* add a 'sudo' parameter to shell which just does sudo -u
+* when the Debug() module is called with no arguments it should show all variables in scope.
+* finish out testing File module, Service:brew and Package:brew
+* finish out package/service modules for main OSes
+* make FileUtils a seperate class in common, simply file type/provider code lots
+* Shell module should allow File's easy copy behavior to transfer scripts
+* File should be able to fetch URLs
+* Basic REST module
+
+testing:
+* Baseline for unit test infrastructure, ideally with mocked providers.
+
+generalized refactoring
+* consistently use underscore _vars for member data throughout
+* more of __slots__ throughout
 * cleanup field.py
 * eliminate filetest.py / overhaul file module
-* validators.py should use common file test class
-* cleanup executor.py
-* fix nested scopes in the variable system
-* Apache2 license headers
+* cleanup executor.py some
 * cleanup the visitor and scope code, which is a little self-referential in resource.py
-* on j2 template errors, have much nicer error info (not a traceback)
-* Still allow some way for Set('') to also do global scope.  Maybe Global()
-* CLI should use ArgumentParser to have --options
-* continued callback code improvement
-* make FileUtils a seperate class in common, simply file type/provider code lots
-* implement yum and apt for Package
-* implement systemd for Service
-* finish out testing File module, Service:brew and Package:brew
-* Shell module should allow File's easy copy behavior to transfer scripts
-* Baseline for unit test infrastructure, ideally with mocked providers.
-* make conditionals human readable in callbacks - show test & evaluated value
+
+code docs
+* Apache2 license headers
+* review and update all comments
 
 opsmop-pull - simple implementation
 * opsmop-pull [daemon|once] pull_cfg.py
@@ -44,11 +58,10 @@ opsmop-pull - simple implementation
 * calls transport.sleep(), loops if called with 'daemon' mode.
 * initial version comes with GitTransport(repo_url=<>) and recommended use is with ssh-agent to deal with checkout keys
 
-opsmop-push -
+opsmop-push:
 * implementation ideas TBD
 
-TODO list (later):
-
+others:
 * Cool ideas everyone comes up with
 * Merging stuff
 * SPOILERS!

@@ -8,9 +8,6 @@ from opsmop.core.scope import Scope
 MODE_RESOURCES = "resources"
 MODE_HANDLERS = "handlers"
 
-# FIXME: refactor
-# FIXME: we should rewrite the whole visitor class because it's not *quite* recursive
-
 class Visitor(object):
 
     """
@@ -50,9 +47,6 @@ class Visitor(object):
         return self._walk(mode=MODE_HANDLERS)
 
     def _walk(self, mode='resources'):
-
-        # FIXME: does this pay attention to signals?  Are we calling it correctly in Executor?
-
         """
         Generic traversal code for resources OR handlers
         """
@@ -61,27 +55,24 @@ class Visitor(object):
         condition = self.policy.when
         roles = self.policy.roles
             
-        # conditions are stored as we go, building up a array of conditions in order
-        # the same is true of variables
+        # FIXME: conditions are stored as we go, building up a array of conditions in order
+        # this could be simplified by using scopes like with variables.
+
         condition_stack = []
         if condition:
-            # FIXME: verify this is being used
             condition_stack.append(condition)
-        
-        # FIXME: the variable system should operate a bit more like a stack, and clear off
-        # when popping out of a depth level.
 
         for role in roles.items:
             self.policy.child_scope(role)
             self.context.on_role(role)
 
-            if mode in [ MODE_RESOURCES ]:
+            if mode == MODE_RESOURCES:
                 for resource in role.resources.items:
                     role.child_scope(resource)
                     results = []
                     for x in self._walk_items(role, resource, mode, condition_stack, results):
                         yield x
-            if mode in [ MODE_HANDLERS  ] :
+            if mode == MODE_HANDLERS:
                 for handler in role.handlers.items:
                     role.child_scope(handler)
                     results = []

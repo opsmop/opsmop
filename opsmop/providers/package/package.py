@@ -11,8 +11,7 @@ class Package(Provider):
 
         current_version = self._get_version()
 
-        # FIXME: this can probably take advantage of the StrictVersion class to be smarter.
-
+        # FIXME: this can probably should advantage of the StrictVersion class to be smarter.
         if not current_version and self.absent:
             self.needs('uninstall')
         elif self.latest:

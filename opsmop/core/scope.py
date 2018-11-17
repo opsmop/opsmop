@@ -10,17 +10,14 @@ class Scope(object):
 
     def __init__(self, variables=None, level=0, parent=None, resource=None):
 
-        # FIXME: refactor this method
-
         assert resource is not None
 
         if variables is None:
             variables = dict()
         assert type(variables) is dict
 
-        # FIXME: consistently use _vars for member data throughout
-        # FIXME: use more of __slots__ throughout
-        # FIXME: docstrings for all the new stuff, review old docstrings
+        # TODO: consistently use underscore _vars for member data throughout
+        # TODO: use more of __slots__ throughout
 
         self.parent = parent
         self.level = level

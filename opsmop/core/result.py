@@ -18,9 +18,6 @@ class Result(object):
         data - the output of a CLI command, or any structured data for use with 'register'
         fatal - a flag that indicates the result should probably end the program, but it is up to the callback code
         """
-
-        # FIXME: this is only used for command responses now and message, traceback are obsolete and can be removed
-
         assert provider is not None
         self.provider = provider
         self.resource = provider.resource

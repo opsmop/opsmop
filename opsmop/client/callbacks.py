@@ -19,10 +19,7 @@ class CliCallbacks(BaseCallback):
         self.last_role = None
         self.phase = None
         self.count = 0
-
-        # keep a list of resource counters
-        # FIXME: we should know how many we validated, which gives a percentage - DO THIS NEXT!
-
+å
     def banner(self, msg, big=False):
         msg_len = len(msg)
         sep = None
@@ -49,7 +46,6 @@ class CliCallbacks(BaseCallback):
         self.i5("| %s" % echo)
 
     def on_execute_command(self, command):
-        # FIXME: this looks redundant with on_begin_command, is the other called?
         if command.echo:
            self.i5("# %s" % command.cmd)
 
@@ -124,7 +120,7 @@ class CliCallbacks(BaseCallback):
         self.role = role
 
     def summarize(self):
-        # FIXME: re-implement the counter table, but much cleaner
+        # TODO: reimplement the counter and percentages summary
         pass
 
     def on_fatal(self, msg=None):
@@ -133,8 +129,8 @@ class CliCallbacks(BaseCallback):
         else:
             self.i1("FAILED")
         self.summarize()
-        # FIXME: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
-        # FIXME: further, run callbacks should catch any exceptions from *ALL* callbacks and re-raise
+        # TODO: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
+        # TODO: further, run_callbacks in Context() should catch any exceptions from *ALL* callbacks and re-raise
         sys.exit(1)
 
     def on_all_policies_complete(self):

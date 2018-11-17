@@ -1,5 +1,4 @@
-# WARNING: this code is relatively low level and will be cleaned up lots. 
-# FIXME: refactor
+# TODO: refactor
 
 from opsmop.core.deferred import Deferred
 
@@ -116,7 +115,6 @@ class Field(object):
         """
         Verify we have a list where every element is of the requested type
         """
-        # FIXME: it doesn't appear this is used by anything yet?
         vt = type(v)
         if self.kind not in [ list, tuple ]:
             raise Exception("%s, field %s: expected a list of type %s, found a %s" % (obj, k, self.of, vt))
@@ -128,7 +126,6 @@ class Field(object):
         """
         Verify we have a dict where every element is of the requested type
         """
-        # FIXME: it doesn't appear this is used by anything yet?
         vt = type(v)
         if self.kind != dict:
             raise Exception("%s, field %s: expected a dict of type %s, found a %s" % (obj, k, self.of, vt))

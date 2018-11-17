@@ -22,12 +22,12 @@ class Facts(object):
         return "MadeUpLinux"
   
     def default_package_manager(self):
-        # FIXME: this will return based on platform
+        # TODO: this will return based on platform
         from opsmop.providers.package.brew import Brew
         return Brew
 
     def default_service_manager(self):
-        # FIXME: this will return based on platform
+        # TODO: this will return based on platform
         from opsmop.providers.service.brew import Brew
         return Brew
 
