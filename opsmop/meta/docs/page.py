@@ -1,4 +1,8 @@
 import os
+import importlib
+import collections
+
+from opsmop.core.fields import Fields
 
 class Page(object):
 
@@ -32,10 +36,47 @@ class Page(object):
         buf = buf + "\n"
         return buf
 
+    def get_fields(self, common=False):
+        module = importlib.import_module("opsmop.types.%s" % self.record.name)
+        class_name = self.record.name.title()
+        cls  = getattr(module, class_name)
+        inst = cls()
+        fields = cls().fields().fields
+        common_fields = Fields.common_field_spec(self, inst)
+        if common:
+            return collections.OrderedDict(sorted(common_fields.items()))
+        else:
+            for (k,v) in common_fields.items():
+                del fields[k]
+            return collections.OrderedDict(sorted(fields.items()))
+
+    def parameter_table(self, fd, caption):
+        fd.write(".. list-table: %s\n" % caption)
+        fd.write("    :header-rows: 1\n")
+        fd.write("    * - Name\n")
+        fd.write("      - Help\n")
+        fd.write("      - Kind\n")
+        fd.write("      - Default\n")
+
+
+    def field_row(self, fd, name, v):
+        def kind(foo):
+            if foo is None:
+                return "any"
+            else:
+                return foo.__name__
+
+        if v.help is not None:
+            # internal fields have no help
+            fd.write("    * - %s\n" % name)
+            fd.write("      - %s\n" % v.help)
+            fd.write("      - %s\n" % kind(v.kind))
+            fd.write("      - %s\n" % v.default)
 
     def generate(self):
 
         record = self.record
+
         fd = open(self.dest_path, "w")
 
         fd.write("\n")
@@ -58,6 +99,23 @@ class Page(object):
         for line in record.description:
             fd.write("%s\n" % line)
         fd.write("\n")
+
+        # Parameters
+        fields = self.get_fields(common=False)
+        fd.write("\n")
+        fields = self.get_fields(common=False)
+        if len(fields.keys()):
+            self.parameter_table(fd, 'Module Parameters')
+            for (k, v) in fields.items():
+                self.field_row(fd, k, v)
+            fd.write("\n\n")
+
+        # Common Parameters For All Modules
+        fields = self.get_fields(common=True)
+        self.parameter_table(fd, 'Common Parameters')
+        for (k, v) in fields.items():
+            self.field_row(fd, k, v)
+        fd.write("\n\n")
 
         # Examples
         fd.write("\n")

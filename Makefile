@@ -4,11 +4,17 @@ requirements:
 venv:
 	virtualenv env -p /usr/local/bin/python3
 
-html:
-	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
+html: cleardocs gendocs sphinx
+
+cleardocs:
 	(rm -rf docs/build/html)
 	(rm -rf docs/build/doctrees)
+
+sphinx:
 	(cd docs; make html)
+
+gendocs:
+	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
 
 # docs_publish:
 # 	# cp -a docs/build/html/* ../opsmops-docs.github.io/

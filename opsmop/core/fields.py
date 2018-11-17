@@ -47,14 +47,14 @@ class Fields(object):
         from opsmop.core.resource import Resource
 
         return dict(
-            when            = Field(default=None),
-            signals         = Field(kind=list, of=Resource, default=None),
-            handles         = Field(kind=str, default=None),
-            method          = Field(kind=str, default=None),
-            register        = Field(kind=str, default=None),
-            ignore_errors   = Field(kind=bool, default=False),
-            variables       = Field(kind=dict, loader=resource.set_variables),
-            extra_variables = Field(kind=dict, empty=True),
+            when            = Field(default=None, help="attaches a condition to this resource"),
+            signals         = Field(kind=list, of=Resource, default=None, help="signals a handler event by name"),
+            handles         = Field(kind=str, default=None, help=None),
+            method          = Field(kind=str, default=None, help="selects a non-default provider by name"),
+            register        = Field(kind=str, default=None, help="saves the resource result into a named variable"),
+            ignore_errors   = Field(kind=bool, default=False, help="proceeds in the event of most error conditions"),
+            variables       = Field(kind=dict, loader=resource.set_variables, help=None),
+            extra_variables = Field(kind=dict, empty=True, help=None),
         )
 
     def find_unexpected_keys(self, obj):

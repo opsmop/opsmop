@@ -25,7 +25,9 @@ class File(Type):
             group = Field(kind=str, default=None, help="group name"),
             mode = Field(kind=int, default=None, help="file mode, in hex/octal (not a string)"),
             absent = Field(kind=bool, default=False, help="if true, delete the file/directory"),
-            directory = Field(kind=bool, default=False, help="don't use this. Use the Directory() type instead", internal=True),
+            # don't use directory=, it's internal magic used by the Directory() type to allow two 
+            # types to share the File provider implementation. This may go away so use that instead.
+            directory = Field(kind=bool, default=False, help=None, internal=True),
             overwrite = Field(kind=bool, default=True, help="replace existing files"),
         )
 
