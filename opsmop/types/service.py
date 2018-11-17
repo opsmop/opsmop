@@ -33,4 +33,4 @@ class Service(Type):
         raise ValidationError("unsupported provider: %s" % method)
 
     def default_provider(self):
-        return facts.default_service_manager()
+        return Facts.default_service_manager()
