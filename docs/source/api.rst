@@ -22,3 +22,6 @@ It is probably easiest to simply refer to GitHub to start:
 From the above links, you should see it is quickly easy to customize the output of the system as well as write
 your new applications.
 
+See Also
+--------
+* :ref:`development`

@@ -28,7 +28,7 @@ If needed, please install Python 3.6 or higher.
 Python 3 on Mac OS X
 --------------------
 
-If not already installed, use Homebrew:
+If not already installed, use Homebrew::
 
     brew install Python
 
@@ -60,6 +60,8 @@ Checkout both opsmop demo and the demo content::
 
     git clone https://github.com/vespene-io/opsmop.git
     git clone https://github.com/vespene-io/opsmop-demo.git 
+
+Don't forget about that demo repo!  It's the best way to learn OpsMop.
 
 Now install python dependencies with pip:
 

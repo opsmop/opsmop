@@ -4,20 +4,14 @@ from opsmop.core.facts import Facts
 from opsmop.core.resource import Resource
 from opsmop.core.deferred import Deferred
 
-
-facts = Facts()
-
-class FactLookup(object):
-
-    def __init__(self):
-        pass
-
-    def __getattr__(self, field):
-        f = getattr(facts, field)
-        return f()
-
 class T(Deferred):
 
+    """
+    T() is a deferred that evaluates a template at runtime, allowing variables
+    established by Set() to be used. While some providers (like Echo) will template
+    arguments automatically, most arguments in OpsMop must be explicitly templated
+    with T. In the future T may also support some additional options.
+    """
 
     def __init__(self, expr):
         super().__init__()
@@ -33,16 +27,14 @@ class Template(object):
 
     @classmethod
     def _get_context(cls, resource):
-        fact_lookup = FactLookup()
         context = resource.get_variables()
-        context["F"] = fact_lookup
+        context["Facts"] = Facts
         return context
 
     @classmethod
     def from_string(cls, msg, resource):
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
         context = cls._get_context(resource)
-        print("DEBUG: context = %s" % context)
         return j2.render(context)
         
     @classmethod

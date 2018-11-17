@@ -4,7 +4,7 @@ import random
 # CONSTANTS: FIXME: move into core/constants.py
 MAC_OS = "MAC_OS"
 
-class Facts(object):
+class FactsGenerator(object):
 
     """
     As this evolves, facts can be dynamically injected into this base class based on platform, allowing a subclass
@@ -36,3 +36,7 @@ class Facts(object):
 
     def random(self):
         return random.random()
+
+Facts = FactsGenerator()
+
+

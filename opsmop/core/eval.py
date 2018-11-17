@@ -4,8 +4,6 @@ from opsmop.core.fields import Fields
 from opsmop.core.facts import Facts
 from opsmop.core.template import Template
 
-facts = Facts()
-
 class Eval(Deferred):
 
     """

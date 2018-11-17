@@ -9,6 +9,7 @@
    Language<language>
    Advanced Language<advanced>
    Modules<modules/modules>
+   Facts<facts>
    Pull Mode<pull>
    Push/Orchestration Mode<push>
    Development<development>

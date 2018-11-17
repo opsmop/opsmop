@@ -17,7 +17,7 @@ class CliCallbacks(BaseCallback):
         self.last_role = None
         self.phase = None
         self.count = 0
-å
+
     def banner(self, msg, big=False):
         msg_len = len(msg)
         sep = None

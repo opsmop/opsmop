@@ -2,7 +2,7 @@ from opsmop.providers.provider import Provider
 from opsmop.core.deferred import Deferred
 from opsmop.core.template import Template
 
-class Assert(Provider):
+class Asserts(Provider):
 
     def quiet(self):
         return True

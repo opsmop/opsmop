@@ -32,6 +32,8 @@ modules:
 * Shell module should allow File's easy copy behavior to transfer scripts
 * File should be able to fetch URLs
 * Basic REST module
+* user 
+* group
 
 testing:
 * Baseline for unit test infrastructure, ideally with mocked providers.

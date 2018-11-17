@@ -34,7 +34,7 @@ Often it may be best to discuss a development idea on the forum before contribut
 
 Of course not all contributions are code.  We're also quite welcome to have documentation improvements.  The documentation
 source lives in the 'docs/source' folder of the main repo, except for module docs, which are auto-generated from content
-in the 'opsmop-demo' repo. We're also of course very appreciative of bug reports and helping other users with questions.
+in the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo. We're also of course very appreciative of bug reports and helping other users with questions.
 
 Bugs should also be filed directly in GitHub, but if you would like some help or want to discuss a bug more widely, the
 forum is fine for that too. If you have a question such as 'how do I do X?' that's a better topic for the forum

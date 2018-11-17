@@ -29,7 +29,7 @@ Check Mode
 
 Check mode runs a policy and reports on actions that should be changed, but does not
 make any changes.  This is often called a 'dry-run' mode, and it is a first-class
-citizen of OpsMop.
+citizen of OpsMop::
 
    opsmop check opsmop-demo/content/hello.py
 

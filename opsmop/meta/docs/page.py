@@ -14,7 +14,7 @@ class Page(object):
         self.record = record
 
     def sphinx_link(self, link, title, prefix=""):
-        return ":ref:`%s%s <%s>`_" % (prefix, title, link)
+        return "`%s%s <%s>`_" % (prefix, title, link)
 
     def example_link(self, name):
         return "https://github.com/vespene-io/opsmop-demo/blob/master/module_docs/%s.py" % (name)
@@ -51,8 +51,8 @@ class Page(object):
             return collections.OrderedDict(sorted(fields.items()))
 
     def parameter_table(self, fd, caption):
-        fd.write(".. list-table: %s\n" % caption)
-        fd.write("    :header-rows: 1\n")
+        fd.write(".. list-table:: %s\n" % caption)
+        fd.write("    :header-rows: 1\n\n")
         fd.write("    * - Name\n")
         fd.write("      - Help\n")
         fd.write("      - Kind\n")
@@ -126,8 +126,7 @@ class Page(object):
             for line in e.description:
                 fd.write("%s\n" % line)
 
-            fd.write(".. code-block:: python")
-            fd.write("\n\ncode:")
+            fd.write("\n.. code-block:: python\n")
             fd.write("\n")
             for line in e.code:
                 fd.write("    %s\n" % line)

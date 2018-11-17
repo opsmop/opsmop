@@ -7,8 +7,6 @@ from opsmop.core.scope import Scope
 from opsmop.core.eval import Eval
 from opsmop.core.deferred import Deferred
 
-facts = Facts()
-
 class Executor(object):
 
     def __init__(self, policies=None, callbacks=None):

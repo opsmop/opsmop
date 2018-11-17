@@ -35,6 +35,11 @@ class Index(object):
                 self.fd.write("* %s" % self.gen_rst_link(record))
             self.fd.write("\n")
 
+        self.fd.write("\n")
+        self.fd.write("Don't see what you want yet? Opsmop is very new and modules and capabilities are being added all the time!.\n")
+        self.fd.write("Your needs matter to us. Think there should be a new module, a new parameter, or want to help build a new provider? You are welcome to stop by the :ref:`forum`.\n")
+        self.fd.write("\n")
+
         self.fd.close()
         print("written: %s" % self.dest_path)
 

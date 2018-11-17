@@ -5,8 +5,6 @@ from opsmop.core.resource import Resource
 from opsmop.types.type import Type
 from opsmop.core.facts import Facts
 
-facts = Facts()
-
 class Service(Type):
 
     """
