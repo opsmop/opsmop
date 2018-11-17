@@ -18,36 +18,39 @@ class T(Deferred):
         self.expr=expr
 
     def evaluate(self, resource):
-        return Template.from_string(self.expr, resource)
+        return Template().from_string(self.expr, resource)
 
     def __str__(self):
         return "T: <'%s'>" % self.expr
 
 class Template(object):
 
-    @classmethod
-    def _get_context(cls, resource):
-        context = resource.get_variables()
-        context["Facts"] = Facts
-        return context
+    def _get_context(self, resource, recursive_stop=None):
 
-    @classmethod
-    def from_string(cls, msg, resource):
+        from opsmop.core.eval import Eval
+
+        self._variables = resource.get_variables()
+
+        #for (k, v) in self._variables.items():
+        #    if (v != recursive_stop) and (issubclass(type(v), Eval)):
+        #        context[v] = v.evaluate(self) 
+
+        return self._variables
+
+    def from_string(self, msg, resource):
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
-        context = cls._get_context(resource)
+        context = self._get_context(resource)
         return j2.render(context)
         
-    @classmethod
-    def from_file(cls, path, resource):
+    def from_file(self, path, resource):
         loader = FileSystemLoader(searchpath="./")
         env = Environment(loader=loader, undefined=StrictUndefined)
         template = env.get_template(path)
-        context = cls._get_context(resource)
+        context = self._get_context(resource)
         return template.render(context)
 
-    @classmethod
-    def native_eval(cls, msg, resource):
+    def native_eval(self, msg, resource):
         msg = "{{ %s }}" % msg
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
-        context = cls._get_context(resource)
-        result = j2.render(context)
+        context = self._get_context(resource)
+        return j2.render(context)

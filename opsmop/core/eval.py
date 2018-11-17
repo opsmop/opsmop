@@ -12,10 +12,11 @@ class Eval(Deferred):
 
     def __init__(self, expr):
         super().__init__()
-        self.expr=expr
+        self.expr = expr
 
     def evaluate(self, resource):
-        return Template.native_eval(self.expr, resource)
+
+        return Template().native_eval(self.expr, resource)
 
     def __str__(self):
         return "Eval: <'%s'>" % self.expr
