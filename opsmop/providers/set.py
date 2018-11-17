@@ -1,6 +1,6 @@
 from opsmop.providers.provider import Provider
 from opsmop.core.template import Template
-from opsmop.core.eval import Eval
+from opsmop.core.deferred import Deferred
 
 class Set(Provider):
 
@@ -11,11 +11,10 @@ class Set(Provider):
     def copy_variables(self):
         temp_items = dict()
         for (k,v) in self.extra_variables.items():
-            if issubclass(type(v), Eval):
+            if issubclass(type(v), Deferred):
                 temp_items[k] = v.evaluate(self.resource)
             else:
                 temp_items[k] = v
-        #print("YO, %s" % temp_items)
         self.resource.update_parent_variables(temp_items)
 
     def verb(self):
