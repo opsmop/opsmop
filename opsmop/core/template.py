@@ -30,10 +30,7 @@ class Template(object):
         from opsmop.core.eval import Eval
 
         self._variables = resource.get_variables()
-
-        #for (k, v) in self._variables.items():
-        #    if (v != recursive_stop) and (issubclass(type(v), Eval)):
-        #        context[v] = v.evaluate(self) 
+        self._variables["Facts"] = Facts
 
         return self._variables
 
