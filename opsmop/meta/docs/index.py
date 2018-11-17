@@ -25,7 +25,15 @@ class Index(object):
 
         for category in categories:
 
-            self.fd.write(".. list-table:: %s\n" % category)
+            self.fd.write("%s" % category.title())
+            clen = len(category)
+            line = "-" * clen
+            self.fd.write("\n")
+            self.fd.write("-" * clen)
+            self.fd.write("\n")
+
+
+            self.fd.write(".. list-table:: \n")
             self.fd.write("    :header-rows: 1\n\n")
             self.fd.write("    * - Name\n")
             self.fd.write("      - Purpose\n")
@@ -37,10 +45,11 @@ class Index(object):
             self.fd.write("\n")
 
         
-        self.fd.write("Hey But What About... ?\n")
-        self.fd.write("-----------------------\n")
+        self.fd.write("Something Missing ?\n")
+        self.fd.write("-------------------\n")
         self.fd.write("\n")
-        self.fd.write("Don't see what you want yet? Opsmop is very new and modules and capabilities are being added all the time!.\n")
+        self.fd.write("No doubt there is.\n")
+        self.fd.write("If you don't see what you want yet? Opsmop is very new and modules and capabilities are being added all the time!.\n")
         self.fd.write("Your needs matter to us. Think there should be a new module, a new parameter, or want to help build a new provider? You are welcome to stop by the :ref:`forum`.\n")
         self.fd.write("\n")
 
@@ -55,6 +64,6 @@ class Index(object):
 
     def gen_rst_link(self, record):
         name = record.name
-        return ":ref:`module_%s`" % (record.name)
+        return ":ref:`%s <module_%s>`" % (record.name.title(), record.name)
 
     

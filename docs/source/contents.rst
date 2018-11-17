@@ -4,15 +4,15 @@
    :maxdepth: 1
 
    About<index>
-   Setup<setup>
-   Local Mode<local>
+   Setup Guide<setup>
+   Using Local Mode<local>
    Language<language>
    Advanced Language<advanced>
-   Modules<modules/modules>
-   Facts<facts>
+   Module Index<modules/modules>
+   Facts List<facts>
    Pull Mode<pull>
    Push/Orchestration Mode<push>
-   Development<development>
    FAQ<faq>
+   Development<development>
    Community<community>
 
