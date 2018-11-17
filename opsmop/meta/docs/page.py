@@ -39,9 +39,14 @@ class Page(object):
     def get_fields(self, common=False):
         module = importlib.import_module("opsmop.types.%s" % self.record.name)
         class_name = self.record.name.title()
+        print("GETTING CLASS=%s" % class_name)
         cls  = getattr(module, class_name)
-        inst = cls()
-        fields = cls().fields().fields
+        try:
+            inst = cls()
+        except TypeError:
+            # for shortcut Types that take a first argument
+            inst = cls('')
+        fields = inst.fields().fields
         common_fields = Fields.common_field_spec(self, inst)
         if common:
             return collections.OrderedDict(sorted(common_fields.items()))

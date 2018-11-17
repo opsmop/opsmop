@@ -85,6 +85,16 @@ What About PyPi?
 
 Versions of opsmop will be available in PyPi after the first release in 2019.
 
+Setup Problems or Questions?
+----------------------------
+
+There are lots of new things and some part of the documentation may even be lies!
+Actually no, but we're working on a lot of things.
+
+We'd love to help you out.  Stop by the :ref:`forum` and get to know us.
+
+Understanding what you want to do helps us build a better OpsMop.
+
 Next Steps
 ----------
 

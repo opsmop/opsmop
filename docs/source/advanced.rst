@@ -3,40 +3,48 @@
 Language Part 2
 ---------------
 
-Once you have covered the basics of the language in :ref:`language`, here are some additional
-advanced language features you may be interested in.
+Once you have covered the basics of the language in :ref:`language`, there are many more
+additional advanced language features you may be interested in.
 
 We say these are 'advanced' features not because they are complicated, but just because they
 are optional.  
 
-The most simple configurations in OpsMop will simply use modules like
+Many simple configurations in OpsMop may simply use modules like
 :ref:`module_service`, :ref:`module_package`, and :ref:`module_file`, and 
 will not need all of these features, but it is also very likely that every OpsMop
 configuration will use at least some of these.
 
 OpsMop encourages random-access learning.
 
-The language examples will refer to many modules detailed further in the :ref:`modules` section.
+The language examples below will refer to many modules detailed further in the :ref:`modules` section.
 Feel free to jump back and forth. The best way to understand these features is to consult
 the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo on GitHub, and also as you 
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
-Some of these examples are contrived and don't deploy real applications, but are constructed to teach 
-lessons about things such as :ref:`variable_scoping` or :ref:`conditionals`.  
+Some of these examples below are contrived and don't deploy real applications, but are constructed to teach 
+lessons about things such as :ref:`variable_scoping` or :ref:`conditionals`.  Real OpsMop policies
+for deploying an application stack would be longer and use a larger mixture of modules.
 
-By studying these examples, you can quickly experiment and try to put
+By studying these examples though, you can quickly experiment and try to put
 them together in your own :ref:`policy` configurations.
+
+OpsMop does not believe you should need an extremely large library of example configurations, we want you to learn
+the tool and be able to easily construct your own.
 
 .. _method:
 
 Provider Selection
 ==================
 
-Often, :ref:`types` may be coded to return a default *Provider* on a specific platform.  Providers
-are the implementation code that make changes expressed in a Type.
+When we talk about things like "File()", "Service()", or "Package()" in OpsMop, we call them resources,
+but really resources come in two parts - Types and Providers.
 
-Many Types have only one provider, but many Types, especially :ref:`module_service` will have many different
-ones.
+Often, :ref:`types` may be coded to return a default *Provider* on a specific platform.  Sometimes
+types have only one implementation. The File() resource has only one implementation but there will be
+many different implementations for Package().
+
+Providers are the implementation code that make changes expressed in a Type.  The Type just defines
+the request.
 
 To install a package using the default *Provider*, we don't have to do anything special:
 
@@ -48,8 +56,8 @@ To install a package using the default *Provider*, we don't have to do anything 
         )
 
 However, the default type is not always the one you will want to use.  For instance, the default
-Package provider on Ubuntu would be "apt", but what if we wanted to install a package from Python's 
-pip?
+Package provider on Ubuntu would be "apt", and on CentOS 7 it would be "yum", but what if we wanted
+to install a package from Python's pip?
 
 To specify or force a specific provider:
 
@@ -78,13 +86,25 @@ to improve readability.
     OpsMop is very new so providers will be growing rapidly for modules.  These are a great
     first area for contributions if you have needs for one.  See :ref:`development`.
 
+.. note:
+
+    It is deceptive to assume a package name is the same on all platforms.  Conditionals and various
+    other systems allow solutions, but in the most common cases, your site content will just need
+    to code for the platform you use.  While multi-platform content is interesting, if you don't need
+    it, don't worry about it.
+
 .. _var_scoping:
 
 Variable Scoping
 ================
 
+OpsMop uses variables in both templates and conditionals.
+
 We've already talked a little bit about variables, and knowledge of variables weighs in on
 future sections and nearly everything in OpsMop.  
+
+It is important to not confuse Python variables with OpsMop variables.  To transfer a Python class variable
+or global variable into OpsMop template space, use :ref:`module_set`.
 
 OpsMop has a very simple to understand variable system based on the
 concept of scope.  Variables defined at outer scopes are always available further
@@ -94,66 +114,10 @@ These variables are 'scope-local'.
 In the opsmop-demo repository, `var_scoping.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
 the various variable scopes in OpsMop. 
 
-Because this is a complex example, we'll refer you to GitHub and ask you to run the example.
+Because this is a long example, we'll refer you to GitHub and ask you to read and perhaps run the example. In browsing
+the source, you will understand more about what is possible with variable scopes.
 
-.. _templates:
 
-Templates
-=========
-
-The :ref:`var_scoping` shows that variables can be set in many places.  But what good are variables if you can't use them?
-
-Ref :ref:`conditionals` are one way to use variables, but the most common way would be templates.
-Templates take  variables and inject them into strings.
-
-OpsMop uses Jinja2 for templating, which is a powerful templating language that has quite a few capabilities
-beyond simple substitution, conditions, and loops.
-
-The most basic use of templating is in the file module:
-
-.. code-block: python
-  
-   Template(name="/etc/foo.conf", from_file="templates/foo.conf.j2")
-
-See :ref:`module_file` for more information.
-
-It is important to understand templating in OpsMop works differently than in some other systems. It is more explicit.
-OpsMop does not automatically template every string. Only a few certain utility modules automatically assume their inputs are templates. 
-One is :ref:`module_echo`:
-
-.. code-block:: python
-
-    Echo("My name is {{ name }}")
-
-To explictly template a string for some other parameter, we have to use 'T()':
-
-.. code-block:: python
-
-    Package(name="foo", version=T("{{ major }}.{{ minor }}"))
-
-The value "T" is a late binding indication that the value should be templated just
-before check-or-apply mode application. Any variable in the current scope is available to 'T()'.
-However, python variables are actually not.  To make them available to OpsMop you would need to add
-them to the local scope:
-
-.. code-block:: python
-
-    Set(foo_version=foo_version),
-    Package(name="foo", version=foo_version)
-
-.. note::
-    Use of an undefined variable in a template will intentionally cause an error.
-    This can be handled by using filters in Jinja2 if you need to supply a default.
-
-.. note::
-    Because template expressions are late binding, they will push some type-checking that would
-    normally happen before check-and-apply stages to runtime evaluation. For example, if this
-    file was missing, it might not be determined until halfway through the evaluation of a policy::
-
-        File(name="/etc/foo.cfg", from_file=T("files/{{ platform }}.cfg"))
-
-    This is usually safe if you understand all possible values of the variable. In the worst case,
-    it will produce a runtime error.
 
 .. _eval:
 

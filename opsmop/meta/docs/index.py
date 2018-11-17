@@ -19,22 +19,26 @@ class Index(object):
         self.fd.write("OpsMop Module Index\n")
         self.fd.write("===================\n")   
         self.fd.write("\n")
-        self.fd.write("Available modules by category:\n")
+        self.fd.write("Available modules by category:\n\n")
         
         categories = self.categories(self.records)
 
         for category in categories:
-            self.fd.write("\n")
-            self.fd.write(category.title() + "\n")
-            clen = len(category)
-            underscore = "-" * clen
-            self.fd.write(underscore + "\n")
-            self.fd.write("")
 
+            self.fd.write(".. list-table:: %s\n" % category)
+            self.fd.write("    :header-rows: 1\n\n")
+            self.fd.write("    * - Name\n")
+            self.fd.write("      - Purpose\n")
             for record in self.records_for_category(self.records, category):
-                self.fd.write("* %s" % self.gen_rst_link(record))
+                self.fd.write("    * - %s\n" % self.gen_rst_link(record))
+                self.fd.write("      - %s\n" % record.purpose)
+
+            self.fd.write("\n")
             self.fd.write("\n")
 
+        
+        self.fd.write("Hey But What About... ?\n")
+        self.fd.write("-----------------------\n")
         self.fd.write("\n")
         self.fd.write("Don't see what you want yet? Opsmop is very new and modules and capabilities are being added all the time!.\n")
         self.fd.write("Your needs matter to us. Think there should be a new module, a new parameter, or want to help build a new provider? You are welcome to stop by the :ref:`forum`.\n")
@@ -51,6 +55,6 @@ class Index(object):
 
     def gen_rst_link(self, record):
         name = record.name
-        return ":ref:`module_%s` - %s\n" % (record.name, record.purpose)
+        return ":ref:`module_%s`" % (record.name)
 
     

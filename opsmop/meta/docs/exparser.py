@@ -22,16 +22,21 @@ class Record(object):
         self.examples = []
         self.current_example = Example()
         self.phase = 'module'
+        self.count = 0
     
     def set_phase(self, phase):
         self.phase = phase
+
+        print("---------------------------------------------------------")
+        print("%s phase | %s" % (self.count, self.phase))
+        print("---------------------------------------------------------")
 
     @classmethod
     def from_file(cls, filename):
         r = cls()
         r.name = os.path.basename(filename).replace(".py","")
-        print("======+==================================================")
-        print("M     | %s" % r.name)
+        print("=========================================================")
+        print("%s M     | %s" % ('0', r.name))
         data = open(filename).read().splitlines()
         for line in data:
             if not r.handle_line(line):
@@ -44,6 +49,7 @@ class Record(object):
         elif not ":"  in line:
             # commands must contain a colon unless they are blocks or DESCRIPTION starters
             return (False, None, None)
+
         if not line.startswith("#"):
             # commands must be in comments
             return (False, None, None)
@@ -52,6 +58,7 @@ class Record(object):
             if tokens[0].upper() != tokens[0]:
                 # commands must be in all caps. This is done
                 # so we don't get confused by colons in URLs and so on.
+                print("REJECT: %s" % tokens[0])
                 return (False, None, None)
         # at this point we are sure it is a command
         if '#------------' in line.replace(" ",""):
@@ -69,8 +76,10 @@ class Record(object):
 
 
     def handle_line(self, line):
+        self.count = self.count + 1
 
         (is_command, command, rest) = self.load_command(line)
+        print("%s line  | %s" % (self.count, line))
 
         #if command == 'policy':
         #    return False
@@ -125,7 +134,7 @@ class Record(object):
             # from module mode the only state transition is into module_description mode
             # when we find the description command
             if command not in ['start_block', 'end_block']:
-                print("set   | %-20s | %s" % (command, rest))
+                print("%s set   | %-20s | %s" % (self.count, command, rest))
             if command == 'module':
                 pass
             elif command == 'start_block':
@@ -141,7 +150,7 @@ class Record(object):
             elif command == 'fyi':
                 pass
             elif command == 'description':
-                print("------+--------------------------------------------------")
+                print("---------------------------------------------------------")
                 self.set_phase('description')
             elif command == 'end_block':
                 raise Exception("unexpected end block without description")
@@ -167,17 +176,18 @@ class Record(object):
             # in example phase we can only move into example description phase
             # by hitting the description command
             if command == 'example':
-                print("------+--------------------------------------------------")
-                print("exmp  | %s" % rest)
-                print("------+--------------------------------------------------")
+                print("---------------------------------------------------------")
+                print("%s exmp  | %s" % (self.count, rest))
+                print("---------------------------------------------------------")
 
                 self.current_example.name = rest
+            elif command == 'setup':
+                self.set_phase('done')
             elif command == 'description':
+                print("MOV!")
                 self.set_phase('example_description')
             elif command == 'see_files' or command == 'see_file':
                 self.current_example.see_files = [ x.strip() for x in rest.split(",")]
-            elif command == 'setup':
-                self.set_phase('done')
             else:
                 raise Exception("unknown command: %s" % command)
 
@@ -185,7 +195,7 @@ class Record(object):
             # in example description phase we can only move into example code phase
             # by hitting an end block
             if command == 'end_block':
-                print("------+")
+                print("-------")
                 self.set_phase('example_code')
             else:
                 raise Exception("unknown command: %s" % command)
@@ -197,7 +207,6 @@ class Record(object):
                 self.examples.append(self.current_example)
                 self.current_example = Example()
                 self.set_phase('example')
-                pass
             else:
                 raise Exception("unknown command: %s" % command)
 
@@ -212,13 +221,13 @@ class Record(object):
         if line.startswith("#"):
             line = line.replace("#","")
             line = line.strip()
-            print("desc  | %s" % line)
+            print("%s desc  | %s" %  (self.count, line))
             example.description.append(line)
 
     def handle_example_code(self, example, line):
         line = line.rstrip()
         example.code.append(line)
-        print("code  | %s" % line)
+        print("%s code  | %s" % (self.count, line))
 
 
     def handle_module_description(self, line):
@@ -226,7 +235,7 @@ class Record(object):
             line = line.replace("#","")
             line = line.strip()
             if line:
-                print("mdesc | %s" % line)
+                print("%s mdesc | %s" % (self.count, line))
                 self.description.append(line)
 
 

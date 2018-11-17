@@ -157,10 +157,85 @@ restart service 'foo'. If the file was already correct, the service would not be
 
 See also :ref:`module_file` and :ref:`module_service`.
 
+Variables
+=========
+
+The method 'set_variables' on a Resource or a Role can define variables, and roles can also be set as parameters
+when instantiating a Role.
+
+These variables are best showcased with a more involved example though, so know that they exist, read on,
+and in a bit prepare to dig into the example on :ref:`var_scoping`.
+
+Technically, ref:`facts` are not variables, they are really functions - but they are like variables that are
+always accessible in templates and conditionals. You will see more about facts as you browse the examples
+in the 'opsmop-demo' repository.
+
+.. _templates:
+
+Templates
+=========
+
+The most common way to use variables in OpsMop are with templates.
+Templates take variables and inject them into strings. Because Templates apply to not just
+the :ref:`file` module, but also other parts of OpsMop, they warrant a section in the language guide.
+
+OpsMop uses `Jinja2 <http://jinja.pocoo.org/docs/>`_ for templating, which is a powerful 
+templating language that has quite a few capabilities beyond simple substitution, conditions, and loops.
+
+The most common use of templating is the :ref:`module_file`:
+
+.. code-block: python
+  
+    File(name="/etc/foo.conf", from_file="templates/foo.conf.j2")
+
+It is important to understand templating in OpsMop works differently than in some other config systems. It is more explicit.
+OpsMop does not automatically template every string. Only a few certain utility modules automatically assume their inputs are templates. 
+One is :ref:`module_echo`:
+
+.. code-block:: python
+
+    Echo("My name is {{ name }}")
+
+To explictly template a string for some other parameter, we need to use 'T()':
+
+.. code-block:: python
+
+    Package(name="foo", version=T("{{ major }}.{{ minor }}"))
+
+The value "T" is a late binding indication that the value should be templated just
+before check-or-apply mode application. Any variable in the current scope is available to 'T()'.
+However, python variables are actually not.  To make them available to OpsMop you would need to add
+them to the local scope:
+
+.. code-block:: python
+
+    Set(foo_version=foo_version),
+    Package(name="foo", version=foo_version)
+
+.. note::
+    Use of an undefined variable in a template will intentionally cause an error.
+    This can be handled by using filters in Jinja2 if you need to supply a default.
+    This feature, while it may seem annoying, is actually a very good thing - you don't
+    want an installation to continue with an improperly configured config file, when
+    certain values are mysteriously blank.
+
+.. note::
+    Because template expressions are late binding, they will push some type-checking that would
+    normally happen before check-and-apply stages to runtime evaluation. For example, if this
+    file was missing, it might not be determined until halfway through the evaluation of a policy::
+
+        File(name="/etc/foo.cfg", from_file=T("files/{{ platform }}.cfg"))
+
+    This is usually safe if you understand all possible values of the variable. In the worst case,
+    it will produce a runtime error.
+
+
 In Summary
 ==========
 
-Policies, Roles, Types, and Handlers make up the key concepts of OpsMop.  There are many advanced
+Policies, Roles, Types, and Handlers - along with Variables and Templates make up the key concepts of OpsMop.  
+
+There are many advanced
 language features available, which you should skim to get a feel of what is possible beyond
 the simple examples here. See :ref:`advanced` next.
 
