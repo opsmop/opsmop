@@ -1,3 +1,5 @@
+.. _local:
+
 Local
 -----
 
@@ -6,6 +8,8 @@ The easiest mode of opsmop to use is the local mode.
 Opsmop uses policy files written in a pure-Python DSL.
 
 See also :ref:`language`.
+
+.. _validate:
 
 Validate Mode
 =============
@@ -18,6 +22,8 @@ If you checked out the :ref:`demo` policy::
 
    opsmop validate opsmop-demo/content/filename.py
 
+.. _check:
+
 Check Mode
 ==========
 
@@ -26,6 +32,8 @@ make any changes.  This is often called a 'dry-run' mode, and it is a first-clas
 citizen of OpsMop.
 
    opsmop check opsmop-demo/content/hello.py
+
+.. _apply:
 
 Apply Mode
 ==========

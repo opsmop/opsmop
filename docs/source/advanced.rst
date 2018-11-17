@@ -6,13 +6,22 @@ Language Part 2
 After covering the basics of the language in :ref:`language` here are some additional
 advanced language features. 
 
-Not everyone will need to make use of these, feel free to learn them as you go and
-do not feel like you need to understand them or use them all at once.
+We say these are advanced features not because they are complicated, but because they
+are optional.  The most simple configurations in OpsMop will simply use modules like
+:ref:`module_service`, :ref:`module_package`, and :ref:`module_file`, and frequently
+will not need all of these features, but it is also very likely that every OpsMop
+configuration will use at least some of these.
 
 The language examples will refer to many modules detailed further in the :ref:`modules` section.
 Feel free to jump back and forth. The best way to understand these features is to consult
 the 'opsmop-demo' feature on GitHub, and also as you read through :ref:`modules`, you will
 see some of these features used in the examples in context.
+
+We also strongly recommend looking at the opsmop demo repository on GitHub, because it shows
+how all of these features interact.  Some of these examples are contrived and don't deploy
+real applications, but are so contructed to teach lessons about things such as :ref:`variable_scoping`
+or :ref:`conditionals`.  By studying these examples, you can quickly experiment and try to put
+them together in your own :ref:`policy` configurations.
 
 .. _method:
 
@@ -33,7 +42,7 @@ using the default *Provider*, we don't have to do anything special:
 
 This would usually select "yum", "apt", or "brew" on CentOS, Ubuntu, or OS X, repectively.
 
-To specify or force a specific provider::
+To specify or force a specific provider:
 
 .. code-block:: python
     
@@ -42,7 +51,7 @@ To specify or force a specific provider::
             Package(name="cowsay", method="yum")
         )
 
-To specify a provider OpsMop doesn't know about, it's still possible to select one out of tree::
+To specify a provider OpsMop doesn't know about, it's still possible to select one out of tree:
 
 .. code-block:: python
 
@@ -59,7 +68,7 @@ Expressing that full path is verbose, so it helps to save those strings to a pyt
     OpsMop is very new so providers will be growing rapidly for modules.  These are a great
     first area for contributions if you have needs for one.  See :ref:`development`.
 
-.. _scoping:
+.. _var_scoping:
 
 Variable Scoping
 ================
@@ -125,23 +134,23 @@ However, python variables are not.  To make them available to OpsMop you would n
 Eval
 ====
 
-Similar to T(), a computation of two variables is doable with Eval::
+Similar to T(), a computation of two variables is doable with Eval:
 
 .. code-block:: python
 
     Echo(Eval("a + b"))
 
 The difference with Eval() vs "T()" is that Eval can return native python types, whereas T() always
-returns a string.  Here is a contrived example::
+returns a string.  Here is a contrived example:
 
     Set(a=2, b=3),
     Set(c=Eval('a+b')),
     Debug(a, b, c)
    
 .. note::
-    Eval is quite useful with :ref:`conditions`, described below.
+    Eval is quite useful with :ref:`conditionals`, described below.
 
-.. _conditions:
+.. _conditionals:
 
 Conditions
 ==========
@@ -150,14 +159,14 @@ Any role, policy, or resource can be given a conditional.  If the conditional is
 and resources therein will be skipped during the check or apply phase.
 
 Expressions are specified with "when=", which accepts legal Jinja2 expressions.  This is technically
-implemented using Eval() but leaving off Eval is provided as syntactic sugar::
+implemented using Eval() but leaving off Eval is provided as syntactic sugar:
 
 .. code-block:: python
 
     Shell("reboot", when="a > b")
 
 
-This is the same as the overly redundant::
+This is the same as the overly redundant:
 
 .. code-block:: python
 
@@ -165,7 +174,7 @@ This is the same as the overly redundant::
 
 
 And while it serves no purpose that couldn't be achieved with a comment, technically this also disables
-a resource::
+a resource:
 
 .. code-block:: python
 
@@ -174,7 +183,7 @@ a resource::
 .. note::
     Development info: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
     subclasses of Deferred if you wish to write any kind of runtime lookup into an external system.
-    See :ref:`plugin_development`.
+    See :ref:`development`.
 
 .. note::
     Referencing an undefined variable in a condition will intentionally result in an error.
@@ -207,52 +216,6 @@ Nested Scopes were created for quickly attaching a condition to a large number o
 Nested scopes can also be used for variable handling, as 
 demoed in `var_scoping <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_.
 
-.. _facts:
-
-Facts
-=====
-
-Facts are information about the system, including information like the OS version and architecture,
-that are discovered by OpsMop dynamically at runtime.  
-
-.. note:
-
-    The facts implementation of OpsMop uses on-demand memoization, so the cost of computing an expensive 
-    fact will not be realized unless it is actually referenced.
-
-Facts are accessed by using the "F" accessor in the policy language, and can be used anywhere::
-
-.. code-block:: python
-
-    Echo("The OS type is {{ F.os_type }}")
-
-
-Or more simply::
-
-.. code-block:: python
-
-    Echo(F.os_type)
-
-
-Here is a conditional::
-
-.. code-block:: python
-
-	Echo("I am Linux", when=F.is_linux)
-
-
-For a full list of available facts see :ref:`facts_list`.
-
-.. note:
-
-   Referencing a fact that doesn't exist will cause an error.
-
-.. note:
-
-   At this time you can create your own facts by subclassing ospmop.core.facts.F.  Keep in mind that the development implementation
-   for templates, however, does *NOT* allow injection of your own Facts into the template engine. To work around this, you can
-   register your fact with Set() to store it in the variable namespace.
-
 .. _registration:
 
 Registration
@@ -261,7 +224,7 @@ Registration
 The value of one command may be saved and fed into the output of another. 
 
 This value is entered into local scope, and can be saved into global scope using SetGlobal(), 
-which is described in a later chapter::
+which is described in a later chapter:
 
 .. code-block:: python
 
@@ -277,7 +240,7 @@ which is described in a later chapter::
 .. note:
     Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module is often easier.
 
-Registration works well with :ref:`conditions`, :ref:`failed_when` and :ref:`changed_when`
+Registration works well with :ref:`conditionals`, :ref:`failed_when` and :ref:`changed_when`
 
 .. note:
     Depending on resource, the value "rc" or "data" may be None. Register is most commonly
@@ -307,7 +270,7 @@ command.
 Change Reporting Control
 ========================
 
-NOTE: pending feature - this feature will be released shortly.
+NOTE: this is a pending feature - this feature will be released shortly.
 
 A resource will mark itself as containing changes if it performs any actions to the system.
 Sometimes, particularly for shell commands, this is not appropriate. The state can
@@ -321,23 +284,22 @@ be overriden as follows:
 If not using handlers, the change reporting isn't too significant, but it will affect CLI output counts at
 the end of the policy execution.
 
-.. _failed_when
+.. _failed_when:
 
 Failure Status Overrides
 ========================
 
-NOTE: pending feature - this feature will be released shortly.
+NOTE: this is a pending feature - this feature will be released shortly.
 
 By default if a command returns a fatal error, the program will halt at this step.  The 'ignore_errors'
-mentioned above is technically equivalent to::
+mentioned above is technically equivalent to:
 
 .. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when=False)
 
-
 However, that's a weird example! In a more practical example, suppose we have a shell command that
-is programmed incorrectly and returns 5 on success::
+is programmed incorrectly and returns 5 on success:
 
 .. code-block:: python
 
@@ -345,17 +307,15 @@ is programmed incorrectly and returns 5 on success::
 
 
 Ok, that's ALSO a weird example.  What if we have a shell command that we should consider failed
-if it doesn't contain the word "SUCCESS" in the output?  Easy::
+if it doesn't contain the word "SUCCESS" in the output?  Easy:
 
 .. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when="x.data.find('SUCCESS') == -1")
 
-
 Find in the above example is a Python method available on string objects, and x.data contains the
-output of any shell command.
-
-If you find it clearer to read, remember you can assign a conditional test to a variable::
+output of any shell command.  It is much clearer to save the conditional string to a class or
+package variable and use it this way:
 
 .. code-block:: python
 
@@ -376,7 +336,7 @@ changed the system. Resources mark change any time they fulfill an action that t
 
 
 Signals will cause the corresponding handler to fire, for instance, if the Role defines some handlers 
-like so::
+like so:
 
 .. code-block:: python
 
@@ -384,7 +344,6 @@ like so::
         return Handlers(
            restart_foo_app = Service(name="foo", restarted=True) 
         )
-
 
 Then the restart command would only one if some resource with the designated 'signals' parameter
 indicated some change was neccessary. In the above example, if the configuration file already had
@@ -394,7 +353,7 @@ Next Steps
 ==========
 
 * :ref:`modules`
-* :ref:`plugin_development`
+* :ref:`development`
 * :ref:`api`
 
 

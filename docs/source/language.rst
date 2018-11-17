@@ -1,10 +1,17 @@
+.. _language:
+
 Language
 --------
 
-OpsMop configuration is expressed in a Python DSL.
+OpsMop configuration is expressed in an easy to understand Python DSL.
 
-This documentation works best if you have another tab open. Please reference 
-`the opsmop-demo repository <https://github.com/vespene-io/opsmop-demo/tree/master/content>`_ while reading
+You've hopefully already read :ref:`local` and are ready to see what the language is about.
+
+.. note:
+
+This documentation works best if you have another tab open. 
+
+We suggest you reference `the opsmop-demo repository <https://github.com/vespene-io/opsmop-demo/tree/master/content>`_ while reading
 this chapter, in particular `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ for the most
 minimal language example. Other files in that directory show more advanced language features.
 
@@ -13,20 +20,19 @@ minimal language example. Other files in that directory show more advanced langu
 Policy
 ======
 
-Pull up `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ and skim the source.
+Policies are the top level objects in OpsMop, and describe what :ref:`roles` get applied to a system being configured.
 
-The top-level objects in OpsMop are *Policies*, and a configuration can load in more than one of them.
-It is fine to refer an opsmop python file *as* a policy, even if it instantiates one or more Policy objects.
+Please open `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ and skim the source to see this
+in context.
 
-Since OpsMop is Python, nothing can do anything if we don't import some useful tools. Typically policies contain 
-the following import to load in a wide array of useful OpsMop classes. Use of your own
-objects and imports is 100% encouraged, but often not required::
+Since OpsMop is Python, we must import some classes to use OpsMop. The following import is syntactic sugar to import the
+most commonly used parts of OpsMop:
 
 .. code-block:: python
 
     from opsmop.core.easy import *
 
-All policies contain a main function which return either a Policy object or a list of Policy objects::
+All policies contain a main function which return either a *Policy* object or a list of *Policy* objects::
 
 .. code-block:: python
 
@@ -41,127 +47,78 @@ All policies contain a main function which return either a Policy object or a li
     def main():
         return Hello(say='Congratulations')
 
-A policy constructor *may* take key-value parameters to set variables usable throughout the policy.
+Take note of 'set_variables' and 'set_roles'.  Variables are optional, but roles are not.
+Why? A policy without roles has nothing to do. 
 
-A policy class *may* also define a seperate set_variables() method that returns further variables, perhaps
-fetched from an environment or external system.
-
-A policy class *must* define a set_roles() method, which returns a collection of roles that describe
-the configuration of that policy. Using only one role is acceptable. Why? A policy without roles has
-nothing to do.  Of course, you could be sneaky and define no roles at all. The system would tolerate that.
-But it would be boring.
+Python developers should note that objects in OpsMop are programmed as "*args, **kwargs", which means
+you can pass a list of roles to the Roles() collection.  This means you can dynamically return a list
+of Roles from arbitrary code very easily.
 
 Let's continue.
-
-.. _its_python:
-
-Aside: Info for Python Developers
-=================================
-
-The examples we're showing are 'easy mode'  and are about to show are all constructed in a fairly common way. 
-However, it's important to remember that OpsMop is fully programmable too.
-
-If you want to put your roles in different files, or define them *after* your policy, the system is Python, and does
-not enforce any particular style.  Any packages you may import need to be part of your PYTHONPATH, however.
-You can subclass anything.
-
-Python developers may also wish to note that any Collection objects, like Roles, take Pythonic args,
-which means you can feed lists to them::
-
-.. code-block:: python
-        
-    def set_roles(self):
-        return Roles(*role_list)
-
-Why? OpsMop is a bit of a cyborg system - it is partly for humans, and partly for machines. Unlike
-many other configuration systems, we often expect your policies may programatically deside to
-be different, based on any external system, and they can if you so wish. Code generation is
-simply not neccessary to create dynamically-behaving policies. 
-
-If your 'set_roles' method wants to load up an XML file to decide to build out some roles, that's ok,
-we won't judge. Ok, we will - but you can do it! 
-
-Later in the :ref:`plugin_development` guide we'll talk about extending the rest of OpsMop.
 
 .. _roles:
 
 Roles
 =====
 
-Roles are the reusable core of OpsMop::
+Roles describe what a configuration really does, and are reusable core of OpsMop::
 
 .. code-block:: python
 
     class HelloRole(Role):
 
         def set_variables(self):
-            return dict(program='OpsMop')
+            return dict()
 
         def set_resources(self):
-
-            msg = T("Hello {{ program }} World! {{ say}}!")
-
             return Resources(
-                File(name="/tmp/foo.txt", from_content=msg)
+                File(name="/tmp/foo.txt", from_file="files/foo.cfg")
             )
 
         def set_handlers(self):
             return Handlers()
 
-You can see role instances are instantiated in the "set_roles()" method of the Hello policy above. Roles, like Policies,
-can also take key=value arguments in their constructor to established scoped variables. Also, like Policies,
-roles *may* define a set_variables() method that returns additional variables, potentially sourced from
-external systems.
+Here we are doing something pretty basic, creating a file based on an inline template, and then
+echoing a message.  This is a contrived example.
 
-Roles *must* define a set_resources method, which returns a collection of Resource objects, that actually
-describe what the role will do.
+.. _note:
+    The method 'set_variables()' can always be ommitted.
 
-Technically resources can also be nested, which allows a way to attach parameters to multiple resources in a block(F.os_type). 
-This is covered in some of the content in the example repo, and is not neccessary in most installations. For instance,
-nested resources can be used to implement tight variable scoping, or assign one conditional to multiple resources
-simultaneously.
-
-If you are getting lost, refer back to the example repo and skim it - and seeing it all in context should help it
-sync in.
-
+.. _note:
+    Roles() and Policy() objects also take key=value arguments and you can parameterize them
+    to set variables that way. This is demonstrated in some of the examples in the opsmop-demo repository.
+    
 .. _types:
 
 Types
 =====
 
-The set_resources() method in a role will return a collection of type instances.
+As shown above with "File()", the set_resources() method in a role returns a collection of "Type" instances.
 
-What are type instances?
+What are type instances? 
 
-OpsMop plugins are in two parts: Types and Providers.  Types, like "File"
-describe a configuration intent and can take a variety of parameters::
+OpsMop plugins come in two parts: Types and Providers.  Types, like "File()"
+describe a configuration intent - what we want to do to the system.
 
-.. code-block:: python
-            
-    File(name="/tmp/foo.txt", from_content=msg)
+Providers are implementations of the 'how'.
 
-Similarly::
+Here is another example of a file resource, this time not copying a file, but merely
+adjusting metadata:
 
 .. code-block:: python
 
     File(name="/tmp/foo.txt", owner='root', group='wheel', mode=0x755)
 
-Additionally, common parameters exist, driving such features as conditionals, variable registration, and more.
+Many common parameters exist on all types, driving such features as conditionals, variable registration, and more.
 These will be described in :ref:`advanced`.
-
-The OpsMop policy language works with types, whereas providers are the implementation behind
-those types that actually performs the work - when writing a *Policy* these are not interacted with directly.
-
-So what we are doing right now is saying "the file should look like this", but the behavior is not implemented
-in that "File()" class - it's in the provider code.  This is covered later in :ref:`plugin_development`.
 
 .. _handlers:
 
 Handlers
 ========
 
-The handlers section is just like the regular resources section, except that handlers run only when events change being notified
-by a 'signal' from a resource::
+The handlers section is just like the regular resources section, except that handlers run only when resources
+are changed by OpsMop. Here is a change being notified by a 'signal' from a resource::
 
 .. code-block:: python
 
@@ -175,10 +132,25 @@ by a 'signal' from a resource::
              Service(name='foo', state='restarted')
          )
 
+In the above example, if the file was different on disk than what the template wanted, we would
+restart service 'foo'.
+
+In Summary
+==========
+
+Policies, Roles, Types, and Handlers make up the key concepts of OpsMop.  There are many advanced
+language features available, which you should skim to get a feel of what is possible beyond
+the simple examples here. See :ref:`advanced` next.
+
+If you have not done so already, the 'opsmop-demo' repository is an excellent resource for learning
+the language, as is :ref:`modules`.
+
+If you want to know more about the internals, check out :ref:`development`.
+
 Next Steps
 ==========
 
 * :ref:`modules`
 * :ref:`advanced`
-* :ref:`plugin_development`
+* :ref:`development`
 

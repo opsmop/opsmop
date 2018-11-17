@@ -46,7 +46,7 @@ Each relies on opsmop and other tools in a stackable way and should be extremely
 I Have A Develoment Question?
 -----------------------------
 
-Great! Thanks for the interest! Please check out :ref:`development_guide`!  We would be glad to help you with pull requests, and also feel
+Great! Thanks for the interest! Please check out :ref:`development`!  We would be glad to help you with pull requests, and also feel
 free to stop by the forum listed on :ref:`community` with development questions.
 
 How Do You See Modules Growing?
