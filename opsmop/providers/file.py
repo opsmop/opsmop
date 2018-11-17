@@ -153,7 +153,7 @@ class File(Provider):
 
         if self.should('chown'):
             self.do('chown')
-            # FIXME: move these into something like a FileUtils class
+            # TODO: move these into something like a FileUtils class
             # (eliminating FileTests, so to not repeat this everywhere)
             try:
                 shutil.chown(self.name, user=self.owner)

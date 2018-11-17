@@ -16,8 +16,7 @@ class Scope(object):
             variables = dict()
         assert type(variables) is dict
 
-        # TODO: consistently use underscore _vars for member data throughout
-        # TODO: use more of __slots__ throughout
+
 
         self.parent = parent
         self.level = level

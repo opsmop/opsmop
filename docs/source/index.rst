@@ -4,7 +4,7 @@ OpsMop
 OpsMop is a next-generation, no compromise automation system from `Michael DeHaan <http://michaeldehaan.net>`_.
 
 Use Cases
----------
+=========
 
 * Web-scale configuration management of any Linux/Unix systems
 * Application deployment
@@ -14,7 +14,7 @@ Use Cases
 * Deployment and management of the undercloud
 
 Features
---------
+========
 
 * Fully embraces Python 3
 * Declarative DSL
@@ -31,7 +31,7 @@ Features
 * Exceptional runtime speed
 
 Ethos
------
+=====
 
 Our values:
 
@@ -43,7 +43,7 @@ Our values:
 * Experience
 
 Operating Systems
------------------
+=================
 
 Supported:
 
@@ -52,13 +52,12 @@ Supported:
 * OS X
 
 License
--------
+=======
 
 * Apache2
 
 GitHub
-------
+======
 
-* [opsmop](http://github.com/vespene-io/opsmop)
-* [examples](http://github.com/vespene-io/opsmop-demo)
-
+* :ref:`opsmop <http://github.com/vespene-io/opsmop>`_
+* :ref:`opsmop-demo (examples)` <http://github.com/vespene-io/opsmop-demo>`_

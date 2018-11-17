@@ -1,5 +1,5 @@
 Local
-=====
+-----
 
 The easiest mode of opsmop to use is the local mode.
 

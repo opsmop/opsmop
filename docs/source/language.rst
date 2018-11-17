@@ -1,5 +1,5 @@
 Language
-========
+--------
 
 OpsMop configuration is expressed in a Python DSL.
 

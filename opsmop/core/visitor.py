@@ -55,7 +55,7 @@ class Visitor(object):
         condition = self.policy.when
         roles = self.policy.roles
             
-        # FIXME: conditions are stored as we go, building up a array of conditions in order
+        # TODO: conditions are stored as we go, building up a array of conditions in order
         # this could be simplified by using scopes like with variables.
 
         condition_stack = []

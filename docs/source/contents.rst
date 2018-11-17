@@ -8,7 +8,7 @@
    Local Mode<local>
    Language<language>
    Advanced Language<advanced>
-   Modules<modules>
+   Modules<modules/modules>
    Pull Mode<pull>
    Push/Orchestration Mode<push>
    Development<development>

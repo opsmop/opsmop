@@ -1,8 +1,6 @@
 import sys
 from opsmop.core.callback import BaseCallback
 
-# FIXME: this is moving in the right direction but still needs to get refactored some
-
 INDENT="  "
 
 class CliCallbacks(BaseCallback):

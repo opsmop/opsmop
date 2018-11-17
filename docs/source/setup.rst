@@ -1,5 +1,7 @@
+.. _setup:
+
 Setup
------
+=====
 
 * OpsMop is currently an alpha-stage application
 * The first formal "release" is planned for approximately January 2019

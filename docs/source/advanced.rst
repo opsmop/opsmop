@@ -1,23 +1,27 @@
+.. _advanced:
+
 Language Part 2
-===============
+---------------
 
 After covering the basics of the language in :ref:`language` here are some additional
-advanced features. 
+advanced language features. 
 
-Not every site will need to make use of these, feel free to learn them as you go and
+Not everyone will need to make use of these, feel free to learn them as you go and
 do not feel like you need to understand them or use them all at once.
 
 The language examples will refer to many modules detailed further in the :ref:`modules` section.
-Feel free to jump back and forth.
+Feel free to jump back and forth. The best way to understand these features is to consult
+the 'opsmop-demo' feature on GitHub, and also as you read through :ref:`modules`, you will
+see some of these features used in the examples in context.
 
 .. _method:
 
 Provider Selection
 ==================
 
-Often, a Type may be coded to return a default provider on a specific platform, but this is always
+Often, a *Type* may be coded to return a default *Provider* on a specific platform, but this is always
 overrideable, either with one of the providers that ship with OpsMop or your own. To install a package
-using the default provider for the operating system::
+using the default *Provider*, we don't have to do anything special:
 
 .. code-block:: python
 
@@ -26,7 +30,8 @@ using the default provider for the operating system::
             Package(name="cowsay")
         )
 
-This would usually select "yum", "apt", or "brew" on CentOS, Ubuntu, or OS X, respectively.
+
+This would usually select "yum", "apt", or "brew" on CentOS, Ubuntu, or OS X, repectively.
 
 To specify or force a specific provider::
 
@@ -49,12 +54,10 @@ Expressing that full path is verbose, so it helps to save those strings to a pyt
     
     Package(name="cowsay", method=SPORK)
 
-This is a good reminder that 100% of everything in OpsMop is scriptable and subclassable.
+.. note:
 
-.. note::
-
-    Python developers could also choose to subclass the Type to add in new provider
-    detection logic, but that is purely optional.
+    OpsMop is very new so providers will be growing rapidly for modules.  These are a great
+    first area for contributions if you have needs for one.  See :ref:`development`.
 
 .. _scoping:
 
@@ -62,7 +65,9 @@ Variable Scoping
 ================
 
 We've already talked a little bit about variables, and knowledge of variables weighs in on
-future sections.
+future sections.  OpsMop has a very simple to understand variable system based on the
+concept of scope.  Variables defined at outer scopes are always available further
+down, but changing a variable inside a scope does not effect the value at the outer scope.
 
 In the opsmop-demo repository, `var_scoping.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
 the various variable scopes in OpsMop. 
@@ -72,27 +77,37 @@ the various variable scopes in OpsMop.
 Templates
 =========
 
-Often you will want to inject a variable into a string. The above variable scoping example shows that variables can be set in many places.
+The :ref:`scoping` shows that variables can be set in many places.
+Templates take those variables and inject them into strings.
 
-OpsMop uses Jinja2 for templating, but does not automatically template every string.
+OpsMop uses Jinja2 for templating, which is a powerful templating language that has quite a few capabilities
+beyond simple substitution, conditions, and loops.
 
-Only a few certain utility modules automatically assume their inputs are templates::
+Because we prefer being explicit and predictable, OpsMop does not automatically template every string.
+
+Only a few certain utility modules automatically assume their inputs are templates. One is :ref:`module_echo`:
 
 .. code-block:: python
 
     Echo("My name is {{ name }}")
 
-To explictly template a string:
+To explictly template a string for some other parameter, we use 'T()':
 
 .. code-block:: python
 
     Package(name="foo", version=T("{{ major }}.{{ minor }}"))
 
 The value "T" is a late binding indication that the value should be templated just
-before check-or-apply mode application.
+before check-or-apply mode application. Any variable in the current scope is available to 'T()'.
+However, python variables are not.  To make them available to OpsMop you would need to do:
+
+.. code-block:: python
+
+    Set(foo_version=foo_version),
+    Package(name="foo", version=foo_version)
 
 .. note::
-    Use of an undefined variable in a template will cause an error.
+    Use of an undefined variable in a template will intentionally cause an error.
 
 .. note::
     Because template expressions are late binding, they will push some type-checking that would
@@ -100,6 +115,10 @@ before check-or-apply mode application.
     file was missing, it might not be determined until halfway through the evaluation of a policy::
 
         File(name="/etc/foo.cfg", from_file=T("content/{{ platform }}.cfg"))
+
+    However, if the path was not evaluated with T(""), the fact that the file was missing
+    could be detected far earlier.  Usage of :ref:`conditionals` instead of templated file
+    paths may be preferable to keep the type checking features of OpsMop fully in play.
 
 .. _eval:
 
@@ -113,11 +132,14 @@ Similar to T(), a computation of two variables is doable with Eval::
     Echo(Eval("a + b"))
 
 The difference with Eval() vs "T()" is that Eval can return native python types, whereas T() always
-returns a string.
+returns a string.  Here is a contrived example::
 
+    Set(a=2, b=3),
+    Set(c=Eval('a+b')),
+    Debug(a, b, c)
+   
 .. note::
-    An Eval() call can return any python native type. When used with :ref:`conditions` (below), the
-    return code will be subject to Python truthiness rules to determine if the result is True or False
+    Eval is quite useful with :ref:`conditions`, described below.
 
 .. _conditions:
 
@@ -134,11 +156,13 @@ implemented using Eval() but leaving off Eval is provided as syntactic sugar::
 
     Shell("reboot", when="a > b")
 
+
 This is the same as the overly redundant::
 
 .. code-block:: python
 
     Shell("reboot", when=Eval("a > b"))
+
 
 And while it serves no purpose that couldn't be achieved with a comment, technically this also disables
 a resource::
@@ -148,14 +172,14 @@ a resource::
     Shell("reboot", when=False)
 
 .. note::
-    Bonus: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
+    Development info: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
     subclasses of Deferred if you wish to write any kind of runtime lookup into an external system.
     See :ref:`plugin_development`.
 
-.. warn::
-    Referencing an undefined variable in a condition will result in an error.
+.. note::
+    Referencing an undefined variable in a condition will intentionally result in an error.
 
-.. _nested
+.. _nested:
 
 Nested Scopes
 =============
@@ -179,12 +203,9 @@ Nested Scopes were created for quickly attaching a condition to a large number o
            )
         )
 
-Nested scopes can also be used for variable handling, as demoed in `var_scoping <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_.
 
-.. warning::
-    At this point in OpsMop's development, attempting to use other features in this chapter on a Nested Scope may result in them being ignored - for instance,
-    'ignore_errors' does not apply 'ignore_errors' to all items within a scope, and definitely 'register' will not work. In the future, these will present
-    errors for some fields, where others may become functional.
+Nested scopes can also be used for variable handling, as 
+demoed in `var_scoping <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_.
 
 .. _facts:
 
@@ -205,17 +226,20 @@ Facts are accessed by using the "F" accessor in the policy language, and can be 
 
     Echo("The OS type is {{ F.os_type }}")
 
+
 Or more simply::
 
 .. code-block:: python
 
     Echo(F.os_type)
 
+
 Here is a conditional::
 
 .. code-block:: python
 
-	Echo("I am Linux", when="F.is_linux")
+	Echo("I am Linux", when=F.is_linux)
+
 
 For a full list of available facts see :ref:`facts_list`.
 
@@ -249,6 +273,7 @@ which is described in a later chapter::
             Echo("{{ date.data }})
         )
 
+
 .. note:
     Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module is often easier.
 
@@ -276,6 +301,7 @@ command.
             Echo("line_count.data")    
         )
 
+
 .. _changed_when:
 
 Change Reporting Control
@@ -290,6 +316,7 @@ be overriden as follows:
 .. code-block:: python
 
     Shell("/bin/foo --args", register="x", ignore_errors=True, changed_when="x.rc == 1", notify="some_step")
+
 
 If not using handlers, the change reporting isn't too significant, but it will affect CLI output counts at
 the end of the policy execution.
@@ -308,6 +335,7 @@ mentioned above is technically equivalent to::
     
     Shell("/bin/foo --args", register="x", failed_when=False)
 
+
 However, that's a weird example! In a more practical example, suppose we have a shell command that
 is programmed incorrectly and returns 5 on success::
 
@@ -315,12 +343,14 @@ is programmed incorrectly and returns 5 on success::
 
     Shell("/bin/foo --args", register="x", failed_when="x.rc != 5")
 
+
 Ok, that's ALSO a weird example.  What if we have a shell command that we should consider failed
 if it doesn't contain the word "SUCCESS" in the output?  Easy::
 
 .. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when="x.data.find('SUCCESS') == -1")
+
 
 Find in the above example is a Python method available on string objects, and x.data contains the
 output of any shell command.
@@ -330,6 +360,7 @@ If you find it clearer to read, remember you can assign a conditional test to a 
 .. code-block:: python
 
     Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
+
 
 .. _signals:
 
@@ -343,6 +374,7 @@ changed the system. Resources mark change any time they fulfill an action that t
 
 	File("/etc/foo.conf", from_template="templates/foo.conf.j2", signals="restart foo app")
 
+
 Signals will cause the corresponding handler to fire, for instance, if the Role defines some handlers 
 like so::
 
@@ -352,6 +384,7 @@ like so::
         return Handlers(
            restart_foo_app = Service(name="foo", restarted=True) 
         )
+
 
 Then the restart command would only one if some resource with the designated 'signals' parameter
 indicated some change was neccessary. In the above example, if the configuration file already had
