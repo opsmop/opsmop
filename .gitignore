@@ -7,5 +7,6 @@
 docs/build/
 __pycache__/
 /env/*
+docs/source/modules/*.rst
 *.swp
 
