@@ -7,7 +7,7 @@ from opsmop.core.command import Command
 from opsmop.core.errors import ProviderError
 from opsmop.core.result import Result
 from opsmop.core.template import Template
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 
 DEFAULT_TIMEOUT = 60
 

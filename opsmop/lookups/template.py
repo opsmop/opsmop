@@ -1,4 +1,4 @@
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 from opsmop.core.template import Template as CoreTemplate
 from opsmop.lookups.lookup import Lookup
 

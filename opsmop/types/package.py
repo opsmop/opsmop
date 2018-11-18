@@ -2,7 +2,7 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 
 class Package(Type):
 

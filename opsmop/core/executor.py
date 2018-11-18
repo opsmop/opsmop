@@ -1,5 +1,5 @@
 from opsmop.core.visitor import Visitor
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 from opsmop.core.result import Result
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy

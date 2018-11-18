@@ -1,7 +1,7 @@
 from opsmop.lookups.lookup import Lookup
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 from opsmop.core.template import Template
 
 class Eval(Lookup):

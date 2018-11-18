@@ -14,30 +14,30 @@ An executable demo of facts is coming soon in the 'opsmop-demo' repo.
 Some Examples
 =============
 
-Facts are accessed by using the "F" accessor in the policy language, and can be used anywhere.
+Facts are accessed by using "Facts.foo()" in the policy language, and can be used anywhere.
 The following demos are complimentary with the :ref:`advanced` language guide.
 
 .. code-block:: python
 
-    Echo("The OS type is {{ F.os_type }}")
+    Echo("The OS type is {{ Facts.system() }}")
 
 Or more simply:
 
 .. code-block:: python
 
-    Echo(F.os_type)
+    Echo(Facts.system())
 
 Here is a conditional:
 
 .. code-block:: python
 
-	Echo("I am Linux", when=F.is_linux)
+	Echo("I am Darwin", when=(Facts.system() == "Linux"))
 
 Or inside a Jinja2 template using the :ref:`module_file`:
 
 .. code-block:
 
-    I am {{ F.os_type }}
+    I am {{ Facts.system() }}
 
 List of Available Facts
 =======================

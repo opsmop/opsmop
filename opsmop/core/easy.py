@@ -9,7 +9,7 @@ from opsmop.core.roles import Roles
 from opsmop.core.role import Role
 from opsmop.core.resources import Resources
 from opsmop.core.handlers import Handlers
-from opsmop.core.facts import Facts
+from opsmop.facts.facts import Facts
 
 from opsmop.lookups.eval import Eval 
 from opsmop.lookups.template import T
@@ -25,8 +25,9 @@ from opsmop.types.set import Set
 from opsmop.types.stop import Stop
 from opsmop.types.asserts import Asserts
 from opsmop.types.debug import Debug
+from opsmop.types.debug_facts import DebugFacts
 
 __all__ = [
     'Policy', 'Roles', 'Role', 'Resources', 'Handlers', 'Eval', 'T', 'Facts',
-    'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 'Set', 'Stop', 'Asserts', 'Debug'
+    'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 'Set', 'Stop', 'Asserts', 'Debug', 'DebugFacts'
 ]

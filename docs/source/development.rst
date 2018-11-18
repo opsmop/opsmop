@@ -54,7 +54,7 @@ Once again, if you're wishing to contribute a new provider, and it requires a ne
 Adding Custom Facts
 ===================
 
-The code for facts (see :ref:`facts`) is in `opsmop.core.facts.Fact <https://github.com/vespene-io/opsmop/blob/master/opsmop/core/facts.py>`_
+The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/vespene-io/opsmop/blob/master/opsmop/facts/facts.py>`_
 
 If you write your own fact classes, you should make it available to template namespace by calling set::
 
@@ -106,7 +106,7 @@ A quick reminder, lookups aren't automatically available inside Jinja2, and to d
 Custom Callbacks
 ================
 
-CLI output is driven by a callback plugin, as shown in `ospmop.client.callbacks <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/callbacks.py>`_.
+CLI output is driven by a callback plugin, as shown in `opsmop.client.callbacks <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/callbacks.py>`_.
 
 You can easily customize OpsMop by replacing it with another plugin, potentially a subclass.
 
