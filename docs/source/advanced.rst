@@ -22,7 +22,7 @@ OpsMop encourages random-access learning.
 
 The language examples below will refer to many modules detailed further in the :ref:`modules` section, so 
 feel free to jump back and forth. The best way to understand these features is to consult
-the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo on GitHub, and also as you 
+the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo on GitHub, and also as you 
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
 Many of the examples below are contrived and don't deploy real applications, but are constructed to teach 
@@ -126,7 +126,7 @@ concept of scope.  Variables defined at outer scopes are always available furthe
 down, but changing a variable inside a scope does not effect the value at the outer scope.
 These variables are 'scope-local'.
 
-In the opsmop-demo repository, `var_scoping.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
+In the opsmop-demo repository, `var_scoping.py <https://github.com/opsmop/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
 the various variable scopes in OpsMop. 
 
 Because this is a long example, we'll refer you to GitHub and ask you to read and perhaps run the example. In browsing

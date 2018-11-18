@@ -94,8 +94,8 @@ License
 GitHub
 ======
 
-* `opsmop <http://github.com/vespene-io/opsmop>`_
-* `opsmop-demo (examples) <http://github.com/vespene-io/opsmop-demo>`_
+* `opsmop <http://github.com/opsmop/opsmop>`_
+* `opsmop-demo (examples) <http://github.com/opsmop/opsmop-demo>`_
 
 Forum
 =====

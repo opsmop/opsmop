@@ -37,7 +37,7 @@ also edit the Type() code to surface any new parameters.
 Writing New Types
 =================
 
-All types extend from `opsmop.types.type.Type <https://github.com/vespene-io/opsmop/blob/master/opsmop/types/type.py>`_
+All types extend from `opsmop.types.type.Type <https://github.com/opsmop/opsmop/blob/master/opsmop/types/type.py>`_
 
 The best type to copy when writing your own type would be :ref:`module_shell` or :ref:`module_package`.
 
@@ -54,7 +54,7 @@ Once again, if you're wishing to contribute a new provider, and it requires a ne
 Adding Custom Facts
 ===================
 
-The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/vespene-io/opsmop/blob/master/opsmop/facts/facts.py>`_
+The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/opsmop/opsmop/blob/master/opsmop/facts/facts.py>`_
 
 If you write your own fact classes, you should make it available to template namespace by calling set:
 
@@ -77,7 +77,7 @@ facts to be written in any language. See :ref:`facts`
 Adding Custom Lookups
 =====================
 
-Lookup Values are subclasses of `opsmop.lookups.Lookup <https://github.com/vespene-io/opsmop/blob/master/opsmop/lookups/lookup.py>`_, and are functions 
+Lookup Values are subclasses of `opsmop.lookups.Lookup <https://github.com/opsmop/opsmop/blob/master/opsmop/lookups/lookup.py>`_, and are functions 
 that are lazy-evaluated at check or apply stage.  Ok, it's not exactly true they are functions. They are black-magic metaclass stuff. But eventually
 they are functions!
 
@@ -109,7 +109,7 @@ A quick reminder, lookups aren't automatically available inside Jinja2, and to d
 Custom Callbacks
 ================
 
-CLI output is driven by a callback plugin, as shown in `opsmop.client.callbacks <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/callbacks.py>`_.
+CLI output is driven by a callback plugin, as shown in `opsmop.client.callbacks <https://github.com/opsmop/opsmop/blob/master/opsmop/client/callbacks.py>`_.
 
 You can easily customize OpsMop by replacing it with another plugin, potentially a subclass.
 

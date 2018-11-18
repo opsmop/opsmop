@@ -18,7 +18,7 @@ Forum
 
 The official Opsmop discussion form is hosted `here <https://talk.vespene.io/c/opsmop-general>`.  The purpose of the forum
 is to get help, ask questions, post ideas, coordinate development, and brainstorm features.  While this is a subforum
-of the `Vespene <http://vespene.io>` forum and GitHub, OpsMop and Vespene do not require one another, but are simply
+of the `Vespene <http://vespene.io>` forum, OpsMop and Vespene do not require one another, but are simply
 two projects started by the same person.
 
 In respect of worldwide time zones and the nature of software development, there is no official realtime chat channel.
@@ -30,14 +30,14 @@ will always be the best place to get help.
 GitHub
 ======
 
-OpsMop lives on GitHub `here <https://github.com/vespene-io/opsmop>`_.
+OpsMop lives on GitHub `here <https://github.com/opsmop/opsmop>`_.
 
 Code contributions are very welcome! To submit a pull request to the master branch after reading :ref:`development`.
 Often it may be best to discuss a development idea on the forum before contributing to avoid duplicate efforts.
 
 Of course not all contributions are code.  We're also quite welcome to have documentation improvements.  The documentation
 source lives in the 'docs/source' folder of the main repo, except for module docs, which are auto-generated from content
-in the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo. We're also of course very appreciative of bug reports and helping other users with questions.
+in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo. We're also of course very appreciative of bug reports and helping other users with questions.
 
 Bugs should also be filed directly in GitHub, but if you would like some help or want to discuss a bug more widely, the
 forum is fine for that too. If you have a question such as 'how do I do X?' that's a better topic for the forum

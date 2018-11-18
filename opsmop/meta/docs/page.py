@@ -17,13 +17,13 @@ class Page(object):
         return "`%s%s <%s>`_" % (prefix, title, link)
 
     def example_link(self, name):
-        return "https://github.com/vespene-io/opsmop-demo/blob/master/module_docs/%s.py" % (name)
+        return "https://github.com/opsmop/opsmop-demo/blob/master/module_docs/%s.py" % (name)
 
     def type_link(self, name):
-        return "https://github.com/vespene-io/opsmop/tree/master/opsmop/types/%s.py" % (name)
+        return "https://github.com/opsmop/opsmop/tree/master/opsmop/types/%s.py" % (name)
 
     def provider_link(self, name):
-        return "https://github.com/vespene-io/opsmop/tree/master/opsmop/providers/%s.py" % (name)
+        return "https://github.com/opsmop/opsmop/tree/master/opsmop/providers/%s.py" % (name)
 
     def footer(self, name, top=False):
         buf = ""

@@ -60,8 +60,8 @@ Git Checkout and Dependencies
 
 Checkout both opsmop demo and the demo content::
 
-    git clone https://github.com/vespene-io/opsmop.git
-    git clone https://github.com/vespene-io/opsmop-demo.git 
+    git clone https://github.com/opsmop/opsmop.git
+    git clone https://github.com/opsmop/opsmop-demo.git 
 
 Don't forget about that demo repo!  It's the best way to learn OpsMop.
 

@@ -12,8 +12,8 @@ language, but an idiomatic way of using Python.
 You've hopefully already read ":ref:`local`" to understand what the command line commands are 
 and are ready to see what the language is about.
 
-In another tab, please open `the opsmop-demo repository <https://github.com/vespene-io/opsmop-demo/tree/master/content>`_. In particular, see 
-minimal `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_.  All of these examples are runnable
+In another tab, please open `the opsmop-demo repository <https://github.com/opsmop/opsmop-demo/tree/master/content>`_. In particular, see 
+minimal `hello.py <https://github.com/opsmop/opsmop-demo/blob/master/content/hello.py>`_.  All of these examples are runnable
 on your computer from an OpsMop checkout.
 
 .. _policy:
@@ -23,7 +23,7 @@ Policy
 
 *Policies* are the top level objects in OpsMop.  *Policies* describe what :ref:`roles` get applied to a system being configured.
 
-Read `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ to see this structure in full.
+Read `hello.py <https://github.com/opsmop/opsmop-demo/blob/master/content/hello.py>`_ to see this structure in full.
 Below, we'll talk about a few parts of that file in detail.
 
 Since OpsMop is Python, we must always start by importing some classes. The following import is syntactic sugar to import the

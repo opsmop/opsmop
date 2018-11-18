@@ -17,10 +17,10 @@ As OpsMop grows, :ref:`pull` and :ref:`push` features will also have strong API 
 
 It is probably easiest to simply refer to GitHub to start:
 
-* `api.py <https://github.com/vespene-io/opsmop/blob/master/opsmop/core/api.py>`_
-* `cli.py <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/cli.py>`_
-* `client.callbacks` <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/callbacks.py>`_
-* `bin/opsmop <https://github.com/vespene-io/opsmop/blob/master/bin/opsmop>`_
+* `api.py <https://github.com/opsmop/opsmop/blob/master/opsmop/core/api.py>`_
+* `cli.py <https://github.com/opsmop/opsmop/blob/master/opsmop/client/cli.py>`_
+* `client.callbacks` <https://github.com/opsmop/opsmop/blob/master/opsmop/client/callbacks.py>`_
+* `bin/opsmop <https://github.com/opsmop/opsmop/blob/master/bin/opsmop>`_
 
 From the above links, you should see it is quickly easy to customize the output of the system as well as write
 your new applications.
