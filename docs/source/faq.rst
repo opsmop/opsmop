@@ -1,3 +1,6 @@
+.. image:: opsmop.png
+   :alt: OpsMop Logo
+
 Frequently Asked Questions
 ==========================
 
@@ -32,7 +35,7 @@ This is because the shell commands themselves are already "idempotent" enough, t
 has no effect on the system and will not cause anything to fail.
 
 Are There Going To Be New Language Features?
--------------------------------------------
+--------------------------------------------
 
 Yes, definitely!  However OpsMop strongly values backward compatibility, and will never let you down or hurt you.
 

@@ -1,3 +1,5 @@
+.. image:: opsmop.png
+   :alt: OpsMop Logo
 
 .. toctree::
    :caption: Intro

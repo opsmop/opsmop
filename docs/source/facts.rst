@@ -1,3 +1,6 @@
+.. image:: opsmop.png
+   :alt: OpsMop Logo
+
 .. _facts:
 
 Facts

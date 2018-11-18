@@ -1,5 +1,10 @@
-OpsMop
-------
+.. image:: opsmop.png
+   :alt: OpsMop Logo
+
+It's OpsMop!
+------------
+
+Cleanup on Datacenter Aisle 3!
 
 OpsMop is a next-generation, no-compromise automation system from `Michael DeHaan <http://michaeldehaan.net>`_.
 
@@ -75,7 +80,7 @@ GitHub
 Forum
 =====
 
-* `here <https://talk.vespene.io/c/opsmop-general>`
+* `Join here <https://talk.vespene.io/c/opsmop-general>`_
 
 Twitter
 =======

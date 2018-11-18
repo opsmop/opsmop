@@ -14,6 +14,9 @@ class Index(object):
     def generate(self):
         self.fd = open(self.dest_path, "w")
 
+        self.fd.write(".. image:: ../opsmop.png\n")
+        self.fd.write("   :alt: OpsMop Logo\n\n")
+
         self.fd.write(".. _modules:\n")
         self.fd.write("\n")
         self.fd.write("OpsMop Module Index\n")
