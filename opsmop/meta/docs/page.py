@@ -146,6 +146,10 @@ class Page(object):
                 fd.write("    %s\n" % line)
             fd.write("\n")
 
+        fd.write(self.footer("Demo On GitHub"))
+        fd.write("* %s\n" % self.sphinx_link(self.elink, self.record.name + ".py"))
+        fd.write("\n")
+
         # Links to Type Implementations on GitHub
         fd.write(self.footer("Type Implementations"))
         fd.write("* %s\n" % self.sphinx_link(self.type_link(record.name), record.name, prefix='opsmop.types.'))

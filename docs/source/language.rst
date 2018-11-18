@@ -33,7 +33,7 @@ most commonly used classes:
 
     from opsmop.core.easy import *
 
-If you had written your own types, or wanted to pull in any python library at all, you could also import them here.
+If you had written your own *Types*, or wanted to pull in any python library at all, you could also import them here.
 
 All *Policy* files must contain a 'main()' function which returns either a *Policy* object or a list of *Policy* objects.
 This main function does not need to be surrounded in the usual 'if __name__' pattern commonly found in Python files,
@@ -115,7 +115,7 @@ Here we are doing something pretty basic, copying a file (see :ref:`module_file`
 
 Notice that we define resources in *Roles*, but you can't assign a resource to a *Policy* directly. Opsmop mandates
 the usage of *Roles* as a mechanism of organization, but you can of course still only have one *Role* in a *Policy* you want.
-How fine grained should roles be?  It doesn't matter.
+How fine grained should *Roles* be?  It doesn't matter.
 Most frequently a *Role* would describe an application deployment, but it might also describe something like a common security configuration, 
 setting up a user's account (using parameterized *Roles*), and more. 
 
@@ -130,7 +130,7 @@ demo what this idea might look like, take a look at this:
             role = []
             apps = [ AppOne(), AppTwo() ]
             # these might come from a config file, up to you!
-            users = [ UserRole(name='mpdehaan'), UsesrRole(name='you') ]
+            users = [ UserRole(name='mpdehaan'), UserRole(name='you') ]
             roles.extend(users)
             roles.extend(apps)
             return Roles(roles)
@@ -155,7 +155,7 @@ What are *Types*?
 OpsMop modules are implemented in two parts: *Types* and *Providers*. *Types*, like "File()" above
 describe a configuration intent - what we want to do to the system. 
 
-*Providers* are implementations of the 'how', and work using the parameters passed to the providers.
+*Providers* are implementations of the 'how', and work using the parameters passed to the *Providers*.
 If writing OpsMop DSL language, you will be using *Types*. *Providers* are the beneveloent configuration 
 spirits running behind the scenes. *Types* are what actually make the changes to systems happen.
 
@@ -172,16 +172,16 @@ adjusting metadata:
 Here we are using the same *File* resource as above, but using a few more parameters.
 
 For those interested in :ref:`development`, when you browse the :ref:`modules`, each module page
-will link to the *Type* and *Provider* code (for all providers) on GitHub.  This makes it easy to understand
-what a type and provider does. 
+will link to the *Type* and *Provider* code (for all *Providers*) on GitHub.  This makes it easy to understand
+what a *Type* and *Provider* does. 
 
-While we are new and still refactoring things, we value exceptually clean code, and it is encouraged that types and providers rely on
+While we are new and still refactoring things, we value exceptually clean code, and it is encouraged that *Types* and *Providers* rely on
 other classes and inheritance to keep their implementations especially clean and readable.
 
 It is important to know that not all *Types* have just one *Provider* implementation.  For instance a *Package* could be installed
 by yum, apt, or maybe pip or npm.  For details on how that works, see :ref:`method`.
 
-The :ref:`modules` documentation shows all of the types available in the core distribution.  Currently, this list is small
+The :ref:`modules` documentation shows all of the *Types* available in the core distribution.  Currently, this list is small
 as OpsMop is under early (but extremely rapid) development.  Adding a new *Type* and *Provider* can often be done very quickly
 thanks to the object model behind OpsMop.
 
@@ -202,7 +202,7 @@ For example, if a *Type* talks about a file needing to have certain modes, and t
 the config file, but also adjusting the modes. Replacing a config file is a good example of an event that would need to trigger restarting a *Service*.  That's the whole
 purpose of *Handlers* - causing actions only when changes occur.
 
-If actions are to be taken, all handlers that match the given signaled names will fire
+If actions are to be taken, all *Handlers* that match the given signaled names will fire
 at the end of *Role* evaluation.
 
 This probably makes better sense with an example. Here is a change being notified by a 'signal' from a resource:
@@ -225,7 +225,7 @@ restart service 'foo'. If the file was already correct, the service would not be
 See also :ref:`module_file` and :ref:`module_service`.
 
 .. note::
-    Currently one *Role* cannot define *Handlers* for events signaled by another role.  They are tightly
+    Currently one *Role* cannot define *Handlers* for events signaled by another *Role*.  They are tightly
     namespaced and this is considered a feature.
 
 Variables
@@ -250,7 +250,7 @@ places variables can be set.
 :ref:`facts` are also another way to get dynamic information into the system. Technically, ref:`facts` are not variables, 
 they are really functions - but they are like variables that are always accessible in templates and conditionals. 
 You will see more about facts as you browse the examples in the 'opsmop-demo' repository.  Facts also play a very
-strong role in provider selection, as detailed in :ref:`method`.
+strong role in *Provider* selection, as detailed in :ref:`method`.
 
 .. _templates:
 
