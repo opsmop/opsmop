@@ -26,7 +26,7 @@ the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo on GitHub, a
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
 Many of the examples below are contrived and don't deploy real applications, but are constructed to teach 
-lessons about things such as :ref:`variable_scoping` or :ref:`conditionals`.  Real OpsMop policies
+lessons about things such as :ref:`var_scoping` or :ref:`conditionals`.  Real OpsMop policies
 for deploying an application stack would be a bit longer and would use a larger mixture of modules in concert.
 
 By studying these examples though, you can quickly experiment and try to put

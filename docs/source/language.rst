@@ -216,7 +216,7 @@ Templates
 The most common (but not only) way to use variables in OpsMop are with templates.
 
 Templates take variables and inject them into strings. Because Templates apply to not just
-the :ref:`file` module, but also other parts of OpsMop, they warrant a section in the language guide.
+the :ref:`module_file`, but also other parts of OpsMop, they warrant a section in the language guide.
 
 OpsMop uses `Jinja2 <http://jinja.pocoo.org/docs/>`_ for templating, which is a powerful 
 templating language that has quite a few capabilities beyond simple substitution, conditions, and loops.

@@ -50,6 +50,6 @@ talk about ideas on the forum, and start a new thread for any idea that you like
 Next Steps
 ==========
 
-* ref:`development
+* ref:`development`
 
 

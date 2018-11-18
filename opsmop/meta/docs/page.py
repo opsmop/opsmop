@@ -39,7 +39,6 @@ class Page(object):
     def get_fields(self, common=False):
         module = importlib.import_module("opsmop.types.%s" % self.record.name)
         class_name = self.record.name.title()
-        print("GETTING CLASS=%s" % class_name)
         cls  = getattr(module, class_name)
         try:
             inst = cls()

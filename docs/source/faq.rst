@@ -6,18 +6,31 @@ Frequently Asked Questions
 
 Some common questions
 
+How Did You Get To Be So Awesome?
+---------------------------------
+
+Thanks, Mom!
+
 How Is OpsMop Different From X?
 -------------------------------
+
+Ok, the one question I don't like.  You'll have to look for yourself.
 
 OpsMop contains the features documentated on this web site. The other tool has features documented on the other tool web site. 
 Some of the features are different or work differently!
 
 You might like the language of one thing more than the other. Pick that thing.
 
+If you like where we are going and want to hop on board, we'd love to have you.
+
 Multiple Package Installs
 -------------------------
 
-When installing multiple packages, the package manager can often slow.  For instance, imagine the following::
+Right now, the Package() resource doesn't batch package requests together.
+
+When installing multiple packages, the package manager can often be slow (depending on the platform).  
+
+For instance, imagine the following::
 
     Package(name="foo1", installed=True),
     Package(name="foo2", installed=True),
@@ -31,13 +44,12 @@ OpsMop strongly believes in pragmatism. It is unlikely you will need to signal f
 
 Easy enough.
 
-This is because the shell commands themselves are already "idempotent" enough, that is the running the command again 
-has no effect on the system and will not cause anything to fail.
+The "name" parameter might take an array in the near future, but what's wrong with the shell command?  Nothing, really.
 
 Are There Going To Be New Language Features?
 --------------------------------------------
 
-Yes, definitely!  However OpsMop strongly values backward compatibility, and will never let you down or hurt you.
+Yes, definitely!  Lots! However OpsMop strongly values backward compatibility, and will never let you down or hurt you.
 
 If you have new ideas, see :ref:`community` and share your ideas on the forum. We would be glad to have them, and you
 would like to maybe add them, that would also be great! OpsMop is designed to be a relatively easy to understand
@@ -48,9 +60,10 @@ If you have ideas for new language features, stop by the forum. See :ref:`commun
 Push vs Pull vs Local - What Does OpsMop Do?
 --------------------------------------------
 
-Right now, OpsMop is local only.
+Right now, OpsMop is local only - but not for long.
 
-Pull modes will come out next (soon), followed shortly thereafter by a powerful push-mode orchestrator.
+Pull modes will come out next (soon), followed shortly thereafter by a powerful push-mode orchestrator
+capable of multi-tier application in very specific orderings.
 
 Eveything will be super configurable, rigorously engineered, and very fast.
 
@@ -66,17 +79,18 @@ How Do You See Modules Growing?
 -------------------------------
 
 In order to maintain an extremely high standard of quality, I would hope to see OpsMop stop at around 50 or so modules
-in the core distribution. In some cases, modules may be merged.  Each module can have different implementations, and in
-some cases like Package, I would not hold any limits to accepting modules for every language distribution (pip, npm, etc).
+in the core distribution. In some cases, modules may be merged.  Each module can have different provider implementations, and in
+some cases like Package, I would not hold any limits to accepting modules for every language distribution (pip, npm, etc) on
+providers, just types.
 
 What we end up with is a toolbox that contains what is enough for 95% of the use cases out there, and allow the other 5%
 to be performed easily, either by calling a script or using a custom non-tree module.
 
-Just to ensure strong upkeep, we are unlikely to include modules that are difficult to test, including modules for paid services.  
-However, the API remains fully extensible and does not block such efforts.
+Just to ensure strong upkeep, we are unlikely to include modules that are difficult to test, including modules for paid services
+that we do not use. However, the API remains fully extensible and does not block such efforts.
 
 Where a command line tool exists and is already clear, sometimes we don't want a module. If something can be handled
-by the :ref:`module_template` module, that's the best way to configure something rather than maintaining custom code
+by the :ref:`file` module, that's the best way to configure something rather than maintaining custom code
 designed to do in-place error-prone rearrangement on a configuration file.
 
 An example of this is we don't need a "/sbin/reboot" module because there already is "/sbin/reboot".  Configuration tools
@@ -103,15 +117,16 @@ recommend other solutions (like CloudFormation or Terraform or python scripting 
 Can You Write Modules In Any Language?
 --------------------------------------
 
-You have to use Python 3.
+Nope! You have to use Python 3.
+
+You could technically write a bridge module though, but it's not something we want for the core program, as we think
+there is a very strong reason for everybody collaborating around using the same language.
 
 OpsMop modules take advantage of a lot of features for code reuse.  We also minimize forking to
 maintain execution speed.
 
 This is to not say you couldn't invoke a shell script, or a program in some other language, and record the output
-and return code, which you can still of course do.
-
-We recommend baking Python 3 into any base images if you have image capabilities.
+and return code, which you can still of course do, either. 
 
 How Do I Do (Complicated Thing Without A Module)
 ------------------------------------------------

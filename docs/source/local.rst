@@ -6,11 +6,13 @@
 Local
 -----
 
-The easiest mode of opsmop to use is the local mode.
+The easiest mode of opsmop to use is the local mode command line.  You could technically also use the :ref:`api`, and
+soon there will also be :ref:`pull` and :ref:`push` modes. 
 
-Opsmop uses policy files written in a pure-Python DSL.
+So, as mentioned elsewhere, Opsmop uses policy files written in a pure-Python DSL.  The command line simply
+names that policy file and runs it.
 
-See also :ref:`language`.
+(See also :ref:`language` for the contents of those files)
 
 .. _validate:
 
@@ -21,9 +23,11 @@ Validate checks a policy file for syntax, parameters of invalid types, and missi
 
    opsmop validate path/filename.py
 
-If you checked out the :ref:`demo` policy::
+If you checked out the :ref:`opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo::
 
    opsmop validate opsmop-demo/content/filename.py
+
+Any paths referenced in the policy file will be relative to the directory that executed policy file is in.
 
 .. _check:
 
