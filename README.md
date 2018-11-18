@@ -71,7 +71,7 @@ Apache2
 Author
 ======
 
-Michael DeHaan <michael@michaeldehaan.net>
+Michael DeHaan [<michael@michaeldehaan.net>](https://michaeldehaan.net)
 
 Community and Contributions
 ===========================
@@ -89,12 +89,12 @@ If this project seems interesting to you, we highly recommend joining the OpsMop
 Twitter
 =======
 
-* (@opsmop)[http://twitter.com/opsmop]
-* (@laserllama)[http://twitter.com/laserllama]
+* [@opsmop](http://twitter.com/opsmop)
+* [@laserllama](http://twitter.com/laserllama)
 
 Forum
 =====
 
-Feature ideas, questions, want to share something, or need some help? (Post on the Discourse Forum!)[https://talk.vespene.io/c/opsmop-general].
+Feature ideas, questions, want to share something, or need some help? [Post on the Discourse Forum!](https://talk.vespene.io/c/opsmop-general).
 
 
