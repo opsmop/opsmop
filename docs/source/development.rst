@@ -56,7 +56,7 @@ Adding Custom Facts
 
 The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/vespene-io/opsmop/blob/master/opsmop/facts/facts.py>`_
 
-If you write your own fact classes, you should make it available to template namespace by calling set::
+If you write your own fact classes, you should make it available to template namespace by calling set:
 
 .. code-block:: python
 
@@ -66,6 +66,7 @@ If you write your own fact classes, you should make it available to template nam
              Set(site_facts=AcmeLabsCustomFacts())
              # ...
         )
+
 
 
 A future feature for custom facts in /etc/opsmop/facts.d is also pending development, which will allow string, JSON, or YAML facts as well as executable
@@ -91,15 +92,17 @@ the core distribution (probably then creating an opsmop.lookups package).
 
 Such a plugin could (and probably should) also memoize the value to prevent repeated computations.
 
-A quick reminder, lookups aren't automatically available inside Jinja2, and to do that, use set::
+A quick reminder, lookups aren't automatically available inside Jinja2, and to do that, use set:
 
 .. code-block:: python
+    
     def set_resources(self):
         return Resources(
              # ...
              set(ff01=CustomFeatureFlagLookup('ff01'))
              # ..
         )
+
 
 .. _callbacks:
 
@@ -113,7 +116,7 @@ You can easily customize OpsMop by replacing it with another plugin, potentially
 Using a new callback would require subclassing cli.py and a new bin/opsmop, which is just a thin layer over cli.py
 We can easily consider reading the callback name from an environment variable or a CLI parameter as a feature upgrade.
 
-Future plans for :ref:`pull` and :ref:`push will also feature different types of callback classes or additional callbacks.
+Future plans for :ref:`pull` and :ref:`push` will also feature different types of callback classes or additional callbacks.
 
 .. _roadmap:
 

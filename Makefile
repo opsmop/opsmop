@@ -4,7 +4,7 @@ requirements:
 venv:
 	virtualenv env -p /usr/local/bin/python3
 
-html: cleardocs gendocs sphinx
+html: cleardocs gendocs sphinx docs_publish
 
 cleardocs:
 	(rm -rf docs/build/html)
@@ -16,8 +16,8 @@ sphinx:
 gendocs:
 	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
 
-# docs_publish:
-# 	# cp -a docs/build/html/* ../opsmops-docs.github.io/
+docs_publish:
+	cp -a docs/build/html/* ../opsmops-docs
 
 indent_check:
 	pep8 --select E111 opsmop/

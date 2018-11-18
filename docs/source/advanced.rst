@@ -211,7 +211,7 @@ a resource:
 .. note::
     Referencing an undefined variable in a condition will intentionally result in an error. This may be avoided
     by using `Jinja2 <http://jinja.pocoo.org/docs/>`_ to select defaults. However, you could also just define a default with :ref:`module_set`
-    prior to doing a :ref:`register` call and make things easy. That way, all variables will have defaults
+    prior to doing a 'register' call (see :ref:`registration`) and make things easy. That way, all variables will have defaults
     and you don't have to express the default from within a template.  This tip also works for general templating
     advice.
 

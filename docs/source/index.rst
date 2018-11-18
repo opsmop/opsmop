@@ -19,24 +19,30 @@ Uses
 * Deployment and management of the undercloud
 
 Features
-===========
+========
 
-* Python 3 Declarative DSL
-* A strong API toolkit for both humans and machines
-* Optional imperative capabilities
-* Strong object-oriented  model
-* Formal Type / Provider plugin seperation
-* Formal Plan vs Apply evaluation stages
-* Early validation of configuration checks
-* Implicit ordering with notification events
+* Python 3 DSL
+* Declarative resource model with imperative capabilities
+* Type / Provider plugin seperation
+* Implicit ordering (with handler notification)
+* Formalized "Plan" vs "Apply" evaluation stages
+* Early validation prior to runtime
 * Programatically scoped variables
-* Local configuration
-* Pull configuration with pluggable transports (soon)
-* Push configuration with multi-tier addressing (soon)
-* Exceptional runtime speed
+* Strong object-orientation
 
-Values
-======
+See :ref:`language` and :ref:`advanced`.
+
+Run Modes
+=========
+
+* Seperate validate, check ("dry-run"), and apply modes
+* :ref:`local`
+* :ref:`pull` pluggable transports (soon)
+* :ref:`push` configuration with multi-tier addressing (soon)
+* All aim for exceptional runtime speed
+
+Project Values
+==============
 
 * Minimalism
 * Flexibility
@@ -57,20 +63,28 @@ Supported:
 Status
 ======
 
-Alpha.
+Alpha. OpsMop is in a tech-preview/feedback phase.
 
-OpsMop is in language-preview phase, and we are still refactoring some minor
-parts and working on plugins. Existing modules/plugins are somewhat limited
-and features are not fully implemented in all cases, but the language itself
-is very well evolved.
+We are still refactoring some minor parts and working on plugins. Existing modules/plugins are limited
+and features are not fully implemented in all cases. Still, the language itself is very well evolved
+and close to complete. We love new ideas, so stop by the forum and share your ideas and to talk
+about the things you want to configure with OpsMop. If you would like to get involved with development,
+now is the time to read up on OpsMop, and the floodgates will be open in December!
 
-* We will be open to pull requests and bug reports starting December 1.
-* Work after December 1 will be heavily focused towards modules and plugins, plus small language editions.
+See also: :ref:`development` and :ref:`community`
+
+Schedule
+========
+
+* Open for pull requests and bug reports starting December 1.
+* December will be devoted almost exclusively to plugin development, helping new contributors, and small language tweaks
+* Pull mode likely debuts in December 2018.
 * Documentated language features will be locked in and largely stable by January 2019
-* First tagged stable release in Feburary 2019
+* First 'tagged' stable release in early Feburary 2019, but master branch usage is always encouraged
 
 If you like where this is going, now is the time to join up with thoughts
-and potentially code. See :ref:`community` and :ref:`development`.
+and potentially code. Read over :ref:`community` and :ref:`development` for details 
+and we would be glad to have you!
 
 License
 =======
@@ -91,5 +105,5 @@ Forum
 Twitter
 =======
 
-* `@opsmop <https://twitter.com/opsmop>`
+* `@opsmop <https://twitter.com/opsmop>`_
 

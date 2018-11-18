@@ -6,7 +6,8 @@
 Language
 --------
 
-OpsMop configurations are written in a Python 3 DSL.
+OpsMop configuration policies use a Python 3 DSL, or "Domain Specific Language".  Really this is not a new
+language, but an idiomatic way of using Python.
 
 You've hopefully already read ":ref:`local`" to understand what the command line commands are 
 and are ready to see what the language is about.
@@ -20,23 +21,26 @@ on your computer from an OpsMop checkout.
 Policy
 ======
 
-Policies are the top level objects in OpsMop.  Policies describe what :ref:`roles` get applied to a system being configured.
+*Policies* are the top level objects in OpsMop.  *Policies* describe what :ref:`roles` get applied to a system being configured.
 
 Read `hello.py <https://github.com/vespene-io/opsmop-demo/blob/master/content/hello.py>`_ to see this structure in full.
-Below, we'll talk about a few parts of that file.
+Below, we'll talk about a few parts of that file in detail.
 
-Since OpsMop is Python, we always start by importing some classes. The following import is syntactic sugar to import the
+Since OpsMop is Python, we must always start by importing some classes. The following import is syntactic sugar to import the
 most commonly used classes:
 
 .. code-block:: python
 
     from opsmop.core.easy import *
 
-If you had written your own types, or wanted to pull in *any* python library at all, you could also do this here.
+If you had written your own types, or wanted to pull in any python library at all, you could also import them here.
 
-All policy files must contain a 'main' function which returns either a *Policy* object or a list of *Policy* objects.
-This main function does *NOT* need to be surrounded in the usual 'if __name__' pattern commonly found in Python files,
-nor do you need to call this function.  The opsmop CLI (see :ref:`local`) will call it for you.
+All *Policy* files must contain a 'main()' function which returns either a *Policy* object or a list of *Policy* objects.
+This main function does not need to be surrounded in the usual 'if __name__' pattern commonly found in Python files,
+because you should not be calling this function - the opsmop CLI (see :ref:`local`) and corresponding API 
+will be calling it for you.
+
+Here is a very basic Policy definition:
 
 .. code-block:: python
 
@@ -49,14 +53,20 @@ nor do you need to call this function.  The opsmop CLI (see :ref:`local`) will c
             return Roles(HelloRole())
    
     def main():
-        return Hello(say='Congratulations')
+        return Hello()
 
-Take note of 'set_variables' and 'set_roles'.  Assigning variables in a Policy declaration is optional, but roles are not.
-Why? A policy without roles has nothing to do!  We'll get to :ref:`roles` very shortly.
+
+Take note of 'set_variables' and 'set_roles'.  
+
+*Roles* are the real units of work in OpsMop. *Polices* say what *Roles* are applied, and optionally set some
+*variables*, but *Roles* will do all the work.
+
+Assigning *variables* in a *Policy* declaration is optional, but *Roles* are not.
+Why? A *Policy* without *Roles* has nothing to do!  We'll get to :ref:`roles` very shortly.
 
 Python developers should note that objects in OpsMop have "args, kwargs" constructors, which means
-you can pass a list of roles to the Roles() collection instead of listing them all inside the constructor.  
-This means you can dynamically return a list of Roles from arbitrary code very easily:
+you can pass a list of *Roles* to the Roles() collection instead of listing them all inside the constructor.  
+This means you can dynamically return a list of *Roles* from arbitrary code very easily:
 
 .. code-block:: python
 
@@ -65,19 +75,26 @@ This means you can dynamically return a list of Roles from arbitrary code very e
         return Roles(**roles_list)
 
 That example is critical to the purpose of OpsMop!  While some configuration management systems mostly
-interface with humans writing content for them, any point in OpsMop can be grafted cleverly into software.
-It is a cyborg automation system. So if you wanted to source your roles by talking to another system, you can do that.
+are for humans writing content for them, any point in OpsMop can be grafted cleverly into software.
+It is a cyborg automation system. So if you wanted to source your *Roles* (or :ref:`types`) by talking to another system, you can do that.
 You aren't limited to just using constructs provided by the Opsmop system.
 
-Let's continue.
+Sidenote: If you pass key=value arguments to a *Role* or *Policy*, it has the effect of also creating some variables, and this
+is automatically possible for all *Policies* and *Roles*. Behold: parameterized values!
+
+.. code-block:: python
+
+    HelloRole(a=1, b=2)
+
+Let's continue with more about Roles.
 
 .. _roles:
 
 Roles
 =====
 
-Roles describe what a configuration really does, and are the reusable core of OpsMop.  Let's look at a simple
-role now:
+*Roles* describe what a configuration really does, and are the reusable core of OpsMop. Let's look at a simple
+*Role* now:
 
 .. code-block:: python
 
@@ -94,38 +111,55 @@ role now:
         def set_handlers(self):
             return Handlers()
 
-Here we are doing something pretty basic, copying a file (see :ref:`module_file`). If we wanted to perform any
-actions explicitly when he file changed - and not if it did not change, we could use :ref:`handlers`, which are covered
-just a bit later.
+Here we are doing something pretty basic, copying a file (see :ref:`module_file`).
 
-Notice that we define resources in roles, but you can't assign a resource to a policy any other way. Opsmop mandates
-the usage of roles as a mechanism of organization, but you can of course still only have one role in a policy you want.
+Notice that we define resources in *Roles*, but you can't assign a resource to a *Policy* directly. Opsmop mandates
+the usage of *Roles* as a mechanism of organization, but you can of course still only have one *Role* in a *Policy* you want.
+How fine grained should roles be?  It doesn't matter.
+Most frequently a *Role* would describe an application deployment, but it might also describe something like a common security configuration, 
+setting up a user's account (using parameterized *Roles*), and more. 
 
-Typically a role would describe an application, but it might also describe something like a common security policy, setting
-up a user, and more.  THere are really no required conventions.
+Parameterized *Roles* just involve passing key=value arguments to the *Role* constructor. Just to quickly
+demo what this idea might look like, take a look at this:
 
-.. _note:
+.. code-block:: python
+
+    class HelloPolicy(Policy):
+
+        def set_roles(self):
+            role = []
+            apps = [ AppOne(), AppTwo() ]
+            # these might come from a config file, up to you!
+            users = [ UserRole(name='mpdehaan'), UsesrRole(name='you') ]
+            roles.extend(users)
+            roles.extend(apps)
+            return Roles(roles)
+
+Ok, so we've also introduced another method called 'set_handlers' and haven't explained it.  More on that in a bit. 
+:ref:`handlers` will be introduced a little bit later in this chapter.
+
+.. note:
     The method 'set_variables()' and 'set_handlers()' methods can always be omitted.  The method 'set_resources()' cannot.
-    
+
 .. _types:
 
-Types (Resources Intro)
-=======================
+Types
+=====
 
-As shown above with "File()", the set_resources() method in a role returns a collection of "Type" instances.
-We casually call them Resources, but technically the Policy and Roles are also resources.  Types are something
-more specific.
+As shown above, the set_resources() method on a *Role* returns a collection of resource *Types*.
+We casually call them *Resources*, but technically the *Policy* and *Roles* are also subclasses of
+*Resource*. *Types* are something much more specific.
 
-What are Type instances? 
+What are *Types*? 
 
-OpsMop plugins come in two parts: Types and Providers.  Types, like "File()" above
+OpsMop modules are implemented in two parts: *Types* and *Providers*. *Types*, like "File()" above
 describe a configuration intent - what we want to do to the system. 
 
-Providers are implementations of the 'how', and fulfill the parameters passed to the providers.
-If writing OpsMop language, you will never see a provider.  They are beneveloent configuration 
-spirits running behind the scenes.  They are what actually make the changes.
+*Providers* are implementations of the 'how', and work using the parameters passed to the providers.
+If writing OpsMop DSL language, you will be using *Types*. *Providers* are the beneveloent configuration 
+spirits running behind the scenes. *Types* are what actually make the changes to systems happen.
 
-Here is another example of a file resource, this time not copying a file, but merely
+Here is another example of a File *Type*, this time not copying a file, but merely
 adjusting metadata:
 
 .. code-block:: python
@@ -135,34 +169,43 @@ adjusting metadata:
             File(name="/tmp/foo.txt", owner='root', group='wheel', mode=0x755)
         )
 
-Here we are using the same File resource as above, but using a few more parameters.
+Here we are using the same *File* resource as above, but using a few more parameters.
 
-For those interested in :ref:`development`, the file type is "opsmop.types.file.File" and the implementation
-behind the code is "opsmop.providers.file.File".  While technically the provider code COULD live in the same
-file, for any modules in the core distribution of OpsMop, that never happens.
+For those interested in :ref:`development`, when you browse the :ref:`modules`, each module page
+will link to the *Type* and *Provider* code (for all providers) on GitHub.  This makes it easy to understand
+what a type and provider does. 
 
-Another gotcha is of course that not all types have just one implementation.  For instance a Package could be installed
+While we are new and still refactoring things, we value exceptually clean code, and it is encouraged that types and providers rely on
+other classes and inheritance to keep their implementations especially clean and readable.
+
+It is important to know that not all *Types* have just one *Provider* implementation.  For instance a *Package* could be installed
 by yum, apt, or maybe pip or npm.  For details on how that works, see :ref:`method`.
 
 The :ref:`modules` documentation shows all of the types available in the core distribution.  Currently, this list is small
-as OpsMop is under early (but extremely rapid) development.  Adding a new type and provider can often be done very quickly
+as OpsMop is under early (but extremely rapid) development.  Adding a new *Type* and *Provider* can often be done very quickly
 thanks to the object model behind OpsMop.
 
-When you review the module documentation, you will also see many common parameters exist on all Types, driving such features as conditionals, variable registration, and more.
-These will be described in :ref:`advanced` and also demoed and featured in the :ref:`modules` documentation.
+When you review the module documentation, you will also see many common parameters exist on all *Types*, driving such features as conditionals, variable registration, and more.
+These will be described in :ref:`advanced` and also demoed and featured in the :ref:`modules` documentation.  All :ref:`modules` documentation is actually
+executable in the demo repo, and this will help you understand *Types* and *Providers* as you try them out.
 
 .. _handlers:
 
 Handlers
 ========
 
-Roles can also declare handlers. The Handlers section is just like the regular Resources section, except that handlers run only when resources
-are changed by OpsMop. When OpsMop evaluates a resource, it determines a plan for that resource (in check or apply mode), and then
-executes that plan (if in apply mode). Again, review :ref:`local` for the differences in the CLI invocations for each. 
-If actions are to be taken, all handlers that match the given signaled names will fire
-at the end of role evaluation.
+*Roles* can also declare *Handlers*. The *Handlers* section is just like the regular *Resources* section, except that *Handlers* run only when the system is
+are changed by OpsMop. When OpsMop evaluates a *Type*, it determines a plan for that *Type* (in check or apply mode), and then
+executes that plan (if in apply mode). 
 
-Here is a change being notified by a 'signal' from a resource:
+For example, if a *Type* talks about a file needing to have certain modes, and the config file also has incorrect content, the plan would involve creating 
+the config file, but also adjusting the modes. Replacing a config file is a good example of an event that would need to trigger restarting a *Service*.  That's the whole
+purpose of *Handlers* - causing actions only when changes occur.
+
+If actions are to be taken, all handlers that match the given signaled names will fire
+at the end of *Role* evaluation.
+
+This probably makes better sense with an example. Here is a change being notified by a 'signal' from a resource:
 
 .. code-block:: python
 
@@ -173,7 +216,7 @@ Here is a change being notified by a 'signal' from a resource:
 
      def set_handlers():
          return Handlers(
-             Service(name='foo', state='restarted')
+             Service(name='foo', restarted=True)
          )
 
 In the above example, if the file was different on disk than what the template wanted, we would
@@ -182,24 +225,25 @@ restart service 'foo'. If the file was already correct, the service would not be
 See also :ref:`module_file` and :ref:`module_service`.
 
 .. note::
-    Currently one role cannot define handlers for events signaled by another role.  They are tightly
-    namespaced. 
+    Currently one *Role* cannot define *Handlers* for events signaled by another role.  They are tightly
+    namespaced and this is considered a feature.
 
 Variables
 =========
 
-The method 'set_variables' on a Resource or a Role can define variables, and roles can also be set as parameters
-when instantiating a Role::
+The method 'set_variables' on a *Resource* or a *Role* can define *variables*.
 
     def set_variables(self):
         return dict(a=1, b=2, c=3)
 
-While simply returning a dictionary is fine, it's also possible to consult any external system for loading
-up those variables.  This is, of course, a completely live Python function.  If you prefer to keep your
-variables in CSV or JSON or YAML or XML files - a database - or to fetch them from a REST call, it is always
-up to you.
+We have also shown some examples above of parameterizing *Roles* and *Policies* when they are instantiated.
 
-These variables are best showcased with a more involved example, so know that they exist, read on,
+While simply returning a dict is fine, it's also possible to consult any external system for loading
+up those variables.  This is, of course, a completely live Python program!  If you prefer to keep your
+variables in CSV or JSON or YAML or XML files - a database - or to fetch them from a REST call, it is always
+up to you.  This is why the set_variables() method is a overrideable function and not just a variable assignment.
+
+These variables are best showcased with a more involved example, so now that you know variables are things, read on,
 and in a bit prepare to dig into the example on :ref:`var_scoping`, which goes fully in on all the different
 places variables can be set.
 
@@ -215,13 +259,13 @@ Templates
 
 The most common (but not only) way to use variables in OpsMop are with templates.
 
-Templates take variables and inject them into strings. Because Templates apply to not just
+Templates take *variables* and inject them into strings. Because Templates apply to not just
 the :ref:`module_file`, but also other parts of OpsMop, they warrant a section in the language guide.
 
 OpsMop uses `Jinja2 <http://jinja.pocoo.org/docs/>`_ for templating, which is a powerful 
 templating language that has quite a few capabilities beyond simple substitution, conditions, and loops.
 
-The most basic use of Jinja2 is variable substitution, for instance in a config file it might look like::
+The most basic use of *Jinja2* is variable substitution, for instance in a config file it might look like::
 
     marzlevanes=6
     defrobinicate="{{ defrobnicate }}"
@@ -260,12 +304,13 @@ To explictly template a string for some other parameter, we need to use 'T()':
         )
 
 Any variable in the current scope is available to 'T()'.
-However, python variables are actually not.  To make them available to OpsMop you would need to add
-them to the local scope:
+However, all in-scope python variables are actually not.  To make them available to OpsMop you would need to add
+them to the local scope.  This is also a design-consideration and part of OpsMop wanting to be explicit and unambigious:
 
 .. code-block:: python
 
     def set_resources(self):
+        foo_version="8.67.5309"
         return Resources(
             Set(foo_version=foo_version),
             Package(name="foo", version=foo_version)
@@ -273,7 +318,7 @@ them to the local scope:
 
 .. note::
     Use of an undefined variable in a template will intentionally cause an error.
-    This can be handled by using filters in Jinja2 if you need to supply a default.
+    This can be handled by using filters in *Jinja2* if you need to supply a default.
     This feature, while it may seem annoying, is actually a very good thing - you don't
     want an installation to continue with an improperly configured config file, when
     certain values are mysteriously blank.
@@ -292,7 +337,7 @@ them to the local scope:
 In Summary
 ==========
 
-Policies, Roles, Types, and Handlers - along with Variables and Templates - make up the key concepts of OpsMop. 
+*Policies*, *Roles*, *Types*, and *Handlers* - along with *Variables* and *Templates* - make up the key concepts of OpsMop. 
 
 There are many advanced language features available, which you should skim to get a feel of what is possible beyond
 the simple examples here. See :ref:`advanced` next.

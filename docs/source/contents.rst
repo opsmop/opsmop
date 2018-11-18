@@ -11,7 +11,7 @@
    Language<language>
    Advanced Language<advanced>
    Module Index<modules/modules>
-   Facts List<facts>
+   Facts<facts>
    Pull Mode<pull>
    Push/Orchestration Mode<push>
    FAQ<faq>

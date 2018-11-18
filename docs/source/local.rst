@@ -6,28 +6,13 @@
 Local
 -----
 
-The easiest mode of opsmop to use is the local mode command line.  You could technically also use the :ref:`api`, and
-soon there will also be :ref:`pull` and :ref:`push` modes. 
+The simplest way to use OpsMop to use is with the local command line.  Soon there 
+will also be :ref:`pull` and :ref:`push` modes. 
 
-So, as mentioned elsewhere, Opsmop uses policy files written in a pure-Python DSL.  The command line simply
-names that policy file and runs it.
+Opsmop uses policy files written in a pure-Python DSL.  The command line simply
+loads a policy file and runs it.
 
-(See also :ref:`language` for the contents of those files)
-
-.. _validate:
-
-Validate Mode
-=============
-
-Validate checks a policy file for syntax, parameters of invalid types, and missing files::
-
-   opsmop validate path/filename.py
-
-If you checked out the :ref:`opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo::
-
-   opsmop validate opsmop-demo/content/filename.py
-
-Any paths referenced in the policy file will be relative to the directory that executed policy file is in.
+See :ref:`language` for more about the contents of those files.
 
 .. _check:
 
@@ -35,20 +20,31 @@ Check Mode
 ==========
 
 Check mode runs a policy and reports on actions that should be changed, but does not
-make any changes.  This is often called a 'dry-run' mode, and it is a first-class
-citizen of OpsMop::
+make any changes (use :ref:`apply` to make changes).  This is often called a 'dry-run' mode, 
+and dry-run support is a first-class citizen of OpsMop::
 
    opsmop check opsmop-demo/content/hello.py
+
+.. _validate:
+
+To just look for missing files and bad parameters, without running the full check mode,
+you can also run::
+
+   opsmop validate opsmop-demo/content/hello.py
 
 .. _apply:
 
 Apply Mode
 ==========
 
-Apply mode runs a policy, plans what changes are needed, and also enacts those changes.
-It is an error when the actions taken do not match the plan::
+Apply mode runs a policy, plans what changes are needed, and also runs the policy::
 
-   opsmop apply opsmop-demo/content/hello.py
+    opsmop apply opsmop-demo/content/hello.py
+
+.. note:
+    As a nice feature, OpsMop enforces that planned actions reported in check mode
+    match those ran in apply mode.  This encourages all modules to have
+    have well-implemented dry-run simulations.
 
 Next Steps
 ==========

@@ -63,4 +63,5 @@ class FactsGenerator(object):
 
 Facts = FactsGenerator()
 
-
+if __name__ == "__main__":
+    print(Facts.constants())

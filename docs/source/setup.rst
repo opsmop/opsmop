@@ -6,9 +6,8 @@
 Setup
 =====
 
-* OpsMop is currently an alpha-stage application
-* The first formal "release" is planned for approximately January 2019
-* Following the "master" branch on GitHub is encouraged
+* OpsMop is still new so these instructions describe running from a git checkout only.
+* Versioned releases to PyPi will occur in 2019.
 
 .. _python3:
 
@@ -66,7 +65,7 @@ Checkout both opsmop demo and the demo content::
 
 Don't forget about that demo repo!  It's the best way to learn OpsMop.
 
-Now install python dependencies with pip:
+Now install python dependencies with pip::
 
 	cd opsmop/
 	make requirements
@@ -92,10 +91,8 @@ Setup Problems or Questions?
 ----------------------------
 
 There are lots of new things and some part of the documentation may even be lies!
-Actually no, but we're working on a lot of things.
-
-We'd love to help you out.  Stop by the :ref:`forum` and get to know us.
-
+Actually no, but we're working on a lot of things yet. We'd love to help you out and
+hear about what you want to do. Stop by the :ref:`forum` and get to know us.
 Understanding what you want to do helps us build a better OpsMop.
 
 Next Steps

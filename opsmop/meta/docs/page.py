@@ -27,7 +27,9 @@ class Page(object):
 
     def footer(self, name, top=False):
         buf = ""
-        buf = buf + (name.title() + "\n")
+        if name == name.lower():
+            name = name.title()
+        buf = buf + name + "\n"
         nlen = len(name)
         if not top:
             buf = buf + "-" * nlen
@@ -36,9 +38,14 @@ class Page(object):
         buf = buf + "\n"
         return buf
 
+    def fix_class_name(self, class_name):
+        if '_' in class_name:
+            return "".join([ x.title() for x in class_name.split('_') ])
+        return class_name
+
     def get_fields(self, common=False):
         module = importlib.import_module("opsmop.types.%s" % self.record.name)
-        class_name = self.record.name.title()
+        class_name = self.fix_class_name(self.record.name.title())
         cls  = getattr(module, class_name)
         try:
             inst = cls()
@@ -98,7 +105,8 @@ class Page(object):
 
         # Slug and title
         fd.write(".. _module_%s:\n\n" % self.record.name)
-        fd.write(self.footer(self.record.name.title() + " Module", top=True))
+        display_name = "".join([x.title() for x in self.record.name.split("_")])
+        fd.write(self.footer(display_name + " Module", top=True))
 
         # Description
         fd.write("\n")

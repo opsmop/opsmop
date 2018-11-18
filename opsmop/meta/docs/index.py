@@ -67,6 +67,6 @@ class Index(object):
 
     def gen_rst_link(self, record):
         name = record.name
-        return ":ref:`%s <module_%s>`" % (record.name.title(), record.name)
+        return ":ref:`%s <module_%s>`" % (record.name.title().replace("_",""), record.name)
 
     

@@ -90,7 +90,7 @@ Just to ensure strong upkeep, we are unlikely to include modules that are diffic
 that we do not use. However, the API remains fully extensible and does not block such efforts.
 
 Where a command line tool exists and is already clear, sometimes we don't want a module. If something can be handled
-by the :ref:`file` module, that's the best way to configure something rather than maintaining custom code
+by the :ref:`module_file`, that's the best way to configure something rather than maintaining custom code
 designed to do in-place error-prone rearrangement on a configuration file.
 
 An example of this is we don't need a "/sbin/reboot" module because there already is "/sbin/reboot".  Configuration tools

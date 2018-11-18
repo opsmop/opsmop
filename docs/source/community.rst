@@ -45,7 +45,7 @@ versus a github ticket, and more people will be able to help.
 
 What about feature requests? We don't track feature requests in GitHub because it is often viewed as mean-spirited to close them and sometimes
 opinions change, and closing something doesn't mean we might not want to do something later. Please feel free to 
-talk about ideas on the forum, and start a new thread for any idea that you like!
+talk about ideas on the :ref:`forum`, and start a new thread for any idea that you like!
 
 Next Steps
 ==========
