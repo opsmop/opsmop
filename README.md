@@ -5,7 +5,7 @@ Cleanup on Datacenter Aisle 3!
 
 OpsMop is a next-generation, no-compromise automation system from [Michael DeHaan](http://michaeldehaan.net)
 
-STAY TUNED: Full Online documentation is coming on November 17th.
+STAY TUNED: Full Online documentation is coming on November 18th.
 
 Uses
 ====
