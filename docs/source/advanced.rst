@@ -7,26 +7,27 @@ Language Part 2
 ---------------
 
 Once you have covered the basics of the language in :ref:`language`, there are many more
-additional advanced language features you may be interested in.
+additional language features you may be interested in.
 
 We say these are 'advanced' features not because they are complicated, but just because they
-are optional.  
+are optional.  These are the features that you should learn second, or maybe third, after
+trying out a few modules.
 
 Many simple configurations in OpsMop may simply use modules like
 :ref:`module_service`, :ref:`module_package`, and :ref:`module_file`, and 
-will not need all of these features, but it is also very likely that every OpsMop
-configuration will use at least some of these.
+will not need all of these features, but it is also likely that every OpsMop
+configuration will want to use at least some of the features explained below.
 
 OpsMop encourages random-access learning.
 
-The language examples below will refer to many modules detailed further in the :ref:`modules` section.
-Feel free to jump back and forth. The best way to understand these features is to consult
+The language examples below will refer to many modules detailed further in the :ref:`modules` section, so 
+feel free to jump back and forth. The best way to understand these features is to consult
 the `opsmop-demo <https://github.com/vespene-io/opsmop-demo>`_ repo on GitHub, and also as you 
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
-Some of these examples below are contrived and don't deploy real applications, but are constructed to teach 
+Many of the examples below are contrived and don't deploy real applications, but are constructed to teach 
 lessons about things such as :ref:`variable_scoping` or :ref:`conditionals`.  Real OpsMop policies
-for deploying an application stack would be longer and use a larger mixture of modules.
+for deploying an application stack would be a bit longer and would use a larger mixture of modules in concert.
 
 By studying these examples though, you can quickly experiment and try to put
 them together in your own :ref:`policy` configurations.
@@ -39,21 +40,23 @@ the tool and be able to easily construct your own.
 Provider Selection
 ==================
 
+We've discussed Types a bit already.
+
 When we talk about things like "File()", "Service()", or "Package()" in OpsMop, we call them resources,
 but really resources come in two parts - Types and Providers.
 
-Often, :ref:`types` may be coded to return a default *Provider* on a specific platform.  Sometimes
-types have only one implementation. The File() resource has only one implementation but there will be
+Often, :ref:`types` may be coded to return only one provider.  Other modules may choose a default based
+on the operating sysstem. As an example, the File() resource has only one implementation but there will be
 many different implementations for Package().
 
-Providers are the implementation code that make changes expressed in a Type.  The Type just defines
+Providers are the implementation code that make system changes as expressed in a Type.  The Type just defines
 the request.
 
 To install a package using the default *Provider*, we don't have to do anything special:
 
 .. code-block:: python
 
-    def resources(self):
+    def set_resources(self):
         return Resources(
             Package(name="cowsay")
         )
@@ -66,16 +69,25 @@ To specify or force a specific provider:
 
 .. code-block:: python
     
-    def resources(self):
+    def set_resources(self):
         return Resources(
             Package(name="pygments", method="pip")
         )
 
-To specify a provider OpsMop doesn't know about, it's still possible to select one out of tree:
+NOTE that at this point in OpsMop's development, we have a lot of providers to add for packages yet.
+This makes a great point of contribution, so if you are interested, see the :ref:`community` section.
+
+Ok, so that's how to pick a stock provider.
+
+It's also possible to use a provider that OpsMop doesn't ship with, perhaps one that you wrote for
+some of your own internal services:
 
 .. code-block:: python
 
-    Package(name="cowsay", method="your.custom.provider.spork")
+    def set_resources(self):
+        return Resources(
+            Package(name="cowsay", method="your.custom.provider.spork")
+        )
 
 Expressing that full path for the provider name is verbose (and subject to typos), so it helps to save those strings to a python constant
 to improve readability.
@@ -120,8 +132,6 @@ the various variable scopes in OpsMop.
 Because this is a long example, we'll refer you to GitHub and ask you to read and perhaps run the example. In browsing
 the source, you will understand more about what is possible with variable scopes.
 
-
-
 .. _eval:
 
 Eval
@@ -131,16 +141,25 @@ Similar to T(), a computation of two variables is doable with Eval:
 
 .. code-block:: python
 
-    Echo(Eval("a + b"))
+    def set_resources(self):
+        return Resources(
+            Set(a=2, b=3),
+            Echo(Eval("a + b"))
+        )
 
 The difference with Eval() vs "T()" is that Eval can return native python types, whereas T() always
 returns a string.  Here is a contrived example:
 
 .. code-block:: python
 
-    Set(a=2, b=3),
-    Set(c=Eval('a+b')),
-    Debug(a, b, c)
+    def set_resources(self):
+        return Resources(
+            Set(a=2, b=3),
+            Set(c=Eval('a+b')),
+            Debug(a, b, c)
+        )
+
+In the above example, 'c' would be set to the number 5, not the string "5" (or worse, the string "23")
 
 Where would you use this directly? Probably not very often. 
 
@@ -159,20 +178,26 @@ implemented using :ref:`eval` but leaving off Eval is provided as syntactic suga
 
 .. code-block:: python
 
+    # ...    
     Shell("reboot", when="a > b")
+    # ...
 
 This is the same as the overly redundant:
 
 .. code-block:: python
 
+    # ...
     Shell("reboot", when=Eval("a > b"))
+    # ...
 
 And while it serves no purpose that couldn't be achieved with a comment, technically this also disables
 a resource:
 
 .. code-block:: python
 
+    # ...
     Shell("reboot", when=False)
+    # ...
 
 .. note::
     Development info: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
@@ -294,7 +319,7 @@ happened, and that's a good practice.
 Failure Status Overrides
 ========================
 
-NOTE: this is a pending feature - this feature will be released shortly.
+NOTE: this is a pending feature - this feature will be released shortly
 
 By default if a command returns a fatal error, the program will halt at this step.  This is not
 always good, as sometimes, failure should depend on something other than that error status.
@@ -326,7 +351,8 @@ package variable and use it this way:
 
     Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
 
-Because OpsMop is python it is very easy to do those things, and we recommend it.
+Because OpsMop is python it is very easy to do those things, and we recommend it assinging to variables
+for clarity when possible.
 
 Next Steps
 ==========
