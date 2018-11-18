@@ -85,7 +85,7 @@ html_theme_path = [ "_themes", ]
 # documentation.
 #
 html_theme_options = {
-   'analytics_id' : 'UA-127828570-1',
+   'analytics_id' : 'UA-127828570-2',
    'navigation_depth' : 2,
    'titles_only' : False
 }
