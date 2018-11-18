@@ -1,6 +1,6 @@
 # TODO: refactor
 
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.lookup import Lookup
 
 class Field(object):
 
@@ -97,10 +97,8 @@ class Field(object):
         Verify an object is of a given type or can be serialized INTO that type.
         """
 
-        from opsmop.core.eval import Eval
-
         vt = type(v)
-        if issubclass(vt, Eval):
+        if issubclass(vt, Lookup):
             # this will be computed later in the provider
             return
         if self.allow_none and v is None:
@@ -147,7 +145,7 @@ class Field(object):
             elif type(v) == dict:
                 self._type_check_dict(obj, k, v)
 
-        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Deferred):
+        elif (v is not None) and (not issubclass(vt, self.kind)) and not issubclass(vt, Lookup):
             # we requested a simple type check, but don't care about contents if the contents are supposed to be a dict or list
             # an Eval type also gets to slide by (and may POSSIBLY have fun at runtime)
             raise Exception("%s, field %s: value(%s) is not (%s) but (%s)" % (obj, k, v, self.kind, vt))

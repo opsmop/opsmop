@@ -1,10 +1,10 @@
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.lookup import Lookup
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.facts import Facts
 from opsmop.core.template import Template
 
-class Eval(Deferred):
+class Eval(Lookup):
 
     """
     when=Eval("a > b")

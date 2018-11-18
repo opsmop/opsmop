@@ -57,11 +57,17 @@ Supported:
 Status
 ======
 
-Alpha. 
+Alpha.
+
+OpsMop is in language-preview phase, and we are still refactoring some minor
+parts and working on plugins. Existing modules/plugins are somewhat limited
+and features are not fully implemented in all cases, but the language itself
+is very well evolved.
 
 * We will be open to pull requests and bug reports starting December 1.
-* Documentated language features locked in by January 2019
-* Tagged release in Feburary 2019
+* Work after December 1 will be heavily focused towards modules and plugins, plus small language editions.
+* Documentated language features will be locked in and largely stable by January 2019
+* First tagged stable release in Feburary 2019
 
 If you like where this is going, now is the time to join up with thoughts
 and potentially code. See :ref:`community` and :ref:`development`.

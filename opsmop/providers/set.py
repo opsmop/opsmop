@@ -1,6 +1,6 @@
 from opsmop.providers.provider import Provider
 from opsmop.core.template import Template
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.lookup import Lookup
 
 class Set(Provider):
 
@@ -11,7 +11,7 @@ class Set(Provider):
     def copy_variables(self):
         temp_items = dict()
         for (k,v) in self.extra_variables.items():
-            if issubclass(type(v), Deferred):
+            if issubclass(type(v), Lookup):
                 temp_items[k] = v.evaluate(self.resource)
             else:
                 temp_items[k] = v

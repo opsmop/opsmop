@@ -200,8 +200,8 @@ a resource:
     # ...
 
 .. note::
-    Development info: Both Eval() and T() are implementations of the class "Deferred", and you can write your own
-    subclasses of Deferred if you wish to write any kind of runtime lookup into an external system.
+    Development info: Both Eval() and T() are implementations of the class "Lookup", and you can write your own
+    subclasses of Lookup if you wish to write any kind of runtime lookup into an external system.
     See :ref:`development`.
 
 .. note::

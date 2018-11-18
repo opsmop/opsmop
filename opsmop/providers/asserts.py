@@ -1,5 +1,5 @@
 from opsmop.providers.provider import Provider
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.lookup import Lookup
 from opsmop.core.template import Template
 
 class Asserts(Provider):
@@ -18,7 +18,7 @@ class Asserts(Provider):
         failed = False
         for expr in self.evals:
             result = None
-            if issubclass(type(expr), Deferred):
+            if issubclass(type(expr), Lookup):
                 result = expr.evaluate(self.resource)
             elif type(expr) == str:
                 result = Template().native_eval(expr, self.resource)

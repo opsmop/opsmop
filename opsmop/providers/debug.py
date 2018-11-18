@@ -1,5 +1,5 @@
 from opsmop.providers.provider import Provider
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.lookup import Lookup
 
 class Debug(Provider):
 
@@ -31,7 +31,7 @@ class Debug(Provider):
 
         for (k, expr) in self.evals.items():
             actual = expr
-            if issubclass(type(expr), Deferred):
+            if issubclass(type(expr), Lookup):
                  actual = expr.evaluate(self.resource)
             self.echo("%s => %s" % (k, actual))
           

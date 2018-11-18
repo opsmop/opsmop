@@ -6,29 +6,31 @@
 Development Guide
 -----------------
 
-There are lots of ways to customize OpsMop.  You might also want to add some changes upstream.
-
-This guide will discuss some customizations that you wish to make at your own site
-and not distribute, as well as other ways where you might wish to contribute back to OpsMop with a pull request.
+There are lots of ways to customize OpsMop - especially so because the language is all Python.  You might also want to add some changes upstream.
+This guide will hopefully help you out in that quest! If you have any development questions, you are also welcome to stop by the :ref:`forum`.
 
 .. _new_providers:
 
 Adding New Providers
 ====================
 
+Suppose you wanted to make opsmop be able to install a new kind of package or handle a new OS init system.  To do this, you would
+need to implement a new provider.
+
 All providers extend from opsmop.types.provider.Provider.
 
 The best provider to copy when writing your own provider would be looking at the providers for
  :ref:`module_shell` or :ref:`module_package` - they are both simple and illustrative.
 
-See :ref:`method` for how to pick a provider inside  your policy file, rather than relying on the default.
+See :ref:`method` for how to pick a provider inside  your policy file, rather than relying on the default.  By supplying the method
+parameter, you can easily attach any provider class to an existing type.
 
-If you need to add extra parameters to a type you will possibly want to write your own new type and use that in your policy
-file instead of the stock ones loaded by "easy.py".
+Should you want to make your new provider the default for a particular OS though, that requires a tiny amount more work -
+subclassing the Type itself.  (See :ref:`new_types`)
 
-However, if adding a new provider of general interest via pull request to our GitHub, it is usually acceptable
-to add new parameters - though we'll probably want to discuss what they should be to avoid too many provider
-specific arguments.
+If you just want to add new parameters to support a new provider you are adding, it is usually acceptable to add those parameters
+to the Type itself - and if you are adding a new provider via a github pull request, it naturally makes sense that you would
+also edit the Type() code to surface any new parameters.
 
 .. _new_types:
 
@@ -45,6 +47,8 @@ their own types, we recommend :ref:`module_package` or :ref:`module_service`.
 If writing new types, you will need to import these types into your policy file. The "easy.py" shortcut shown in most examples in the 'opsmop-demo' directory
 only import this one file.
 
+Once again, if you're wishing to contribute a new provider, and it requires a new parameter, please include both in the same pull request.
+
 .. _custom_facts:
 
 Adding Custom Facts
@@ -52,28 +56,50 @@ Adding Custom Facts
 
 The code for facts (see :ref:`facts`) is in `opsmop.core.facts.Fact <https://github.com/vespene-io/opsmop/blob/master/opsmop/core/facts.py>`_
 
-The facts accessed by the Deferred Lookup "F" can be supplemented by writing your own lookup class, per :ref:`lookups`. Unfortunately
-those custom facts cannot be easily injected into the template namespace without first assigning them using :ref:`module_set`.
+If you write your own fact classes, you should make it available to template namespace by calling set::
 
-A future feature for custom facts in /etc/opsmop/facts.d is pending development, which will allow JSON facts as well as executable
-facts to be written in any language.
+.. code-block:: python
+
+    def set_resources(self):
+        return Resources(
+             # ...
+             Set(site_facts=AcmeLabsCustomFacts())
+             # ...
+        )
+
+
+A future feature for custom facts in /etc/opsmop/facts.d is also pending development, which will allow string, JSON, or YAML facts as well as executable
+facts to be written in any language. See :ref:`facts`
 
 .. _lookups:
 
-Adding Custom Deferred Lookups
-==============================
+Adding Custom Lookups
+=====================
 
-Deferred Values are subclasses of `opsmop.core.deferred.Deferred <https://github.com/vespene-io/opsmop/blob/master/opsmop/core/deferred.py>`_, and are functions that are lazy-evaluated at check or apply stage.
+Lookup Values are subclasses of `opsmop.lookups.Lookup <https://github.com/vespene-io/opsmop/blob/master/opsmop/lookups/lookup.py>`_, and are functions 
+that are lazy-evaluated at check or apply stage.  Ok, it's not exactly true they are functions. They are black-magic metaclass stuff. But eventually
+they are functions!
 
-Examples of core Deferred Lookups include Eval() and T() for :ref:`templates`.
+They are also easy to write, and you don't need to know anything about Python metaclasses to do it.
 
-Each statement can be passed to numerous values and is not evaluated until the provider "check" stage, allowing access to full
-variable scopes.
+Take a look at any of the subclasses in the 'opsmop.lookups' directory.
 
-An example of a custom type might be a 'Etcd' or 'Consul' or even DNS record lookup plugin - and something like this would be something we'd gladly include in
+Examples of core Lookups include Eval() for string evaluation and T() for :ref:`templates`.
+
+An example of a future custom type might be a 'Etcd' or 'Consul' or even DNS record lookup plugin - and something like this would be something we'd gladly include in
 the core distribution (probably then creating an opsmop.lookups package).
 
-Such a deferred plugin could also memoize the value to prevent repeated inefficient computations.
+Such a plugin could (and probably should) also memoize the value to prevent repeated computations.
+
+A quick reminder, lookups aren't automatically available inside Jinja2, and to do that, use set::
+
+.. code-block:: python
+    def set_resources(self):
+        return Resources(
+             # ...
+             set(ff01=CustomFeatureFlagLookup('ff01'))
+             # ..
+        )
 
 .. _callbacks:
 
@@ -82,14 +108,12 @@ Custom Callbacks
 
 CLI output is driven by a callback plugin, as shown in `ospmop.client.callbacks <https://github.com/vespene-io/opsmop/blob/master/opsmop/client/callbacks.py>`_.
 
-This plugin is currently not user replaceable without writing a new version of cli.py and bin/opsmop but we can easily
-consider reading the callback name from an environment variable as a feature upgrade.
+You can easily customize OpsMop by replacing it with another plugin, potentially a subclass.
 
-Other Extensibility
-===================
+Using a new callback would require subclassing cli.py and a new bin/opsmop, which is just a thin layer over cli.py
+We can easily consider reading the callback name from an environment variable or a CLI parameter as a feature upgrade.
 
-Additionally, when :ref:`push` and :ref:`pull` are implemented, these features will be implemented by mutliple different
-types of plugins, for flexibility in storage, transport, output, and reporting.  More on these later!
+Future plans for :ref:`pull` and :ref:`push will also feature different types of callback classes or additional callbacks.
 
 .. _roadmap:
 
@@ -97,7 +121,10 @@ Roadmap
 =======
 
 While OpsMop has a fluid roadmap, at this stage of development TODO.md is illustrative of some near-term features.
-If you have questions (or would like to help with something specific, stop by the forum!)
+We want the best ideas at the moment to win, and a lot of our development time will also be devoted to shepherding
+incoming pull requests and ideas from folks like yourself.
+
+If you have questions (or would like to help with something specific, stop by the :ref:`forum`.
 
 See Also
 ========

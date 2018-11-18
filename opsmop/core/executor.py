@@ -4,8 +4,8 @@ from opsmop.core.result import Result
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy
 from opsmop.core.scope import Scope
-from opsmop.core.eval import Eval
-from opsmop.core.deferred import Deferred
+from opsmop.lookups.eval import Eval
+from opsmop.lookups.lookup import Lookup
 
 class Executor(object):
 
@@ -98,7 +98,7 @@ class Executor(object):
             if type(cond) == str:
                 if not Eval(cond).evaluate(resource):
                     return False
-            elif issubclass(type(cond), Deferred):
+            elif issubclass(type(cond), Lookup):
                 if not cond.evaluate(resource):
                     return False
             elif not cond:
