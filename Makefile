@@ -17,7 +17,7 @@ gendocs:
 	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
 
 docs_publish:
-	cp -a docs/build/html/* ../opsmops-docs
+	cp -a docs/build/html/* ../opsmop-docs/
 
 indent_check:
 	pep8 --select E111 opsmop/
