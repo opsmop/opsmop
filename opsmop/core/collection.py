@@ -102,6 +102,7 @@ class Collection(Resource):
             self._claim(items)
             proceed = self._check_conditions(items, context, apply)
             if not proceed:
+                context.on_resource(items, False)
                 context.on_skipped(items)
                 return
             else:
@@ -111,6 +112,7 @@ class Collection(Resource):
             self._claim(items)
             proceed = self._check_conditions(items, context, apply)
             if not proceed:
+                context.on_resource(items, False)
                 context.on_skipped(items)
                 return
             else:
@@ -121,6 +123,7 @@ class Collection(Resource):
                 self._claim(x)
                 proceed = self._check_conditions(x, context, apply)
                 if not proceed:
+                    context.on_resource(x, False)
                     context.on_skipped(x)
                 else:
                     if issubclass(type(x), Collection):
@@ -133,6 +136,7 @@ class Collection(Resource):
                 self._claim(v)
                 proceed = self._check_conditions(v, context, apply)
                 if not proceed:
+                    context.on_resource(v, False)
                     context.on_skipped(v)
                 else:
                     if issubclass(type(v), Collection):
