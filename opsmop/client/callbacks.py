@@ -89,6 +89,7 @@ class CliCallbacks(BaseCallback):
         self.fatal()
 
     def on_skipped(self, skipped):
+        self.on_resource(skipped, False)
         self.i3("skipped")
 
     def on_resource(self, resource, is_handler):

@@ -26,6 +26,6 @@ class Template(object):
 
     def native_eval(self, msg, resource):
         msg = "{{ %s }}" % msg
-        j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
+        j2 = NativeEnvironment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)
         context = self._get_context(resource)
         return j2.render(context)

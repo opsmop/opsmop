@@ -8,7 +8,8 @@ facts:
 * site facts (/etc/opsmop/facts.d). In opsmop facts are functions so this is easy.
 
 core platform:
-* rename 'method' to 'provider' in the language
+* if a basic list is passed in to any object like Resources() or returned from set_resources, auto-convert it to a collection.
+* if a resource has a name, always show it at the start of each step
 * much better errors from template code - not full tracebacks
 * better asserts if things like set_resources does not return a Resources(), ditto for set_roles
 * add 'with' - takes a real variable or an Eval()
@@ -18,9 +19,7 @@ core platform:
 * fix (small bugs with) nested scopes in the variable system
 * changed_when, failed_when
 * make conditionals human readable in callbacks - show test & evaluated value
-* when traversing parents with child objects, evaluate the condition on the parent before returning the children (Visitor.py) - eliminate the condition_stack code 
-  this may cause some minor problems when the condition on the child object depends on a set variable, so we should always return the children in *CHECK* mode
-  traversal and filter them in *APPLY* mode traversal.  This means the visitor needs to understand check vs apply.
+
 
 modules:
 * Still allow some way for Set('') to also do global scope.  Maybe Global()

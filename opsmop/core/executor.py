@@ -1,4 +1,3 @@
-from opsmop.core.visitor import Visitor
 from opsmop.facts.facts import Facts
 from opsmop.core.result import Result
 from opsmop.core.context import Context
@@ -6,6 +5,7 @@ from opsmop.core.policy import Policy
 from opsmop.core.scope import Scope
 from opsmop.lookups.eval import Eval
 from opsmop.lookups.lookup import Lookup
+from opsmop.core.collection import Collection
 
 class Executor(object):
 
@@ -55,14 +55,20 @@ class Executor(object):
 
         results = []
         context = None
+
         for policy in self._policies:
+
             context = Context(callbacks=self._callbacks)
+
             for cb in self._callbacks:
                 cb.context = context
+            
             self.run_policy(policy=policy, context=context, check=check, apply=apply)
             results.append(context)
-        if context:
+
+        if len(results):
             context.on_all_policies_complete()
+
         return results
 
     def run_policy(self, policy=None, context=None, check=False, apply=False):
@@ -70,55 +76,41 @@ class Executor(object):
         assert issubclass(type(policy), Policy)
         assert issubclass(type(context), Context)
 
+        policy.init_scope(context)
+
+        # FIXME: refactor signal handling through context, as also with condition_stack
         signals = []
 
-        visitor = Visitor(policy=policy, context=context)
+        def validate(resource):
+            return resource.validate
 
-        for resource in visitor.walk_resources():
-            resource.validate()
+        roles = policy.get_children('')
+        policy.walk_children(items=roles, context=context, mode='resources', fn=validate, check=check, apply=apply)
+        policy.walk_children(items=roles, context=context, mode='handlers', fn=validate, check=check, apply=apply)
 
-        for resource in visitor.walk_handlers():
-            resource.validate()
-
-        for resource in visitor.walk_resources():
-            self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply)
-            
-        for resource in visitor.walk_handlers():
-            if resource.handles in signals:
-                self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply, handlers=True)
+        if (check or apply):
+            def execute_resource(resource):
+                return self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply)
+            policy.walk_children(items=roles, context=context, mode='resources', fn=execute_resource, check=check, apply=apply)
+            def execute_handler(handler):
+                return self.execute_resource(resource=handler, context=context, signals=signals, check=check, apply=apply, handlers=True)
+            policy.walk_children(items=roles, context=context, mode='handlers', fn=execute_handler, check=check, apply=apply)
 
         context.on_complete(policy)
 
-
-    def conditions_true(self, context, resource):
-        assert resource is not None
-        stack = resource.condition_stack
-        context.on_conditions(stack)
-        for cond in stack:
-            if type(cond) == str:
-                if not Eval(cond).evaluate(resource):
-                    return False
-            elif issubclass(type(cond), Lookup):
-                if not cond.evaluate(resource):
-                    return False
-            elif not cond:
-                return False
-
-        return True
-
-
+    # FIXME: REFACTOR: scope code will simplify this
     def execute_resource(self, resource=None, context=None, check=False, apply=False, handlers=False, signals=None):
         
+
         assert resource is not None
         assert context is not None
+
+        if issubclass(type(resource), Collection):
+            return
 
         context.on_resource(resource, handlers)
 
         if not check and not apply:
-            return
-
-        if not self.conditions_true(context, resource):
-            context.on_skipped(resource)
             return
 
         # print(type(resource))
@@ -142,7 +134,7 @@ class Executor(object):
             assert result is not None
             assert issubclass(type(result), Result)
 
-            if provider.register is not None:
+            if resource.register is not None:
                 va = dict()
                 va[provider.register] = result
                 context.on_update_variables(va)

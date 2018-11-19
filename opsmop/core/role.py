@@ -2,10 +2,11 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
+from opsmop.core.collection import Collection
 from opsmop.core.resources import Resources
 from opsmop.core.handlers import Handlers
 
-class Role(Resource):
+class Role(Collection):
 
     """
     A role is a collection of resources, handlers, and variables.  A Site policy can
@@ -35,6 +36,15 @@ class Role(Resource):
 
     def set_handlers(self):
         return Handlers()
+
+    def _on_walk(self, context):
+        context.on_role(self)
+
+    def get_children(self, mode):
+        if mode == 'resources':
+            return self.resources
+        elif mode == 'handlers':
+            return self.handlers
 
     def __str__(self):
         return "Role: %s" % self.__class__.__name__

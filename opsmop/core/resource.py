@@ -15,6 +15,9 @@ class Resource(object):
         self._field_spec.find_unexpected_keys(self)
         self._field_spec.load_parameters(self)
 
+    def set_scope(self, scope):
+        self._scope = scope
+
     def split_common_kwargs(self, kwargs):
         common = dict()
         original = dict()
@@ -25,42 +28,50 @@ class Resource(object):
                 original[k] = v
         return (original, common)
 
-    def child_scope(self, resource):
-        my_scope = resource.scope()
-        kid_scope = self._scope.deeper_scope_for(resource)
-        resource._scope = kid_scope
-        return kid_scope
-
     def scope(self):
+        assert self._scope is not None
         return self._scope
 
     def set_variables(self):
         """ A method that can be defined on any resource class to provide extra variables to templating """
         return dict()
 
+    def get_children(self, method=None):
+        return None
+
+    def validate(self):
+        pass
+
     def update_variables(self, variables):
         """
         This is called by the executor.  It mixes in variables from higher scopes
         allowing local variables to win.
         """
-        self._scope.update_variables(variables)
+        self.scope().update_variables(variables)
 
     def update_parent_variables(self, variables):
-        self._scope.update_parent_variables(variables)
+        self.scope().update_parent_variables(variables)
 
     def get_variables(self):
-        variables = self._scope.variables()
-        return variables
+        return self.scope().variables()
 
     def deeper_scope(self):
-        return self._scope.deeper()
+        return self.scope().deeper()
 
-    def set_condition_stack(self, stack):
-        """ Used by executor code to assign a stack of conditions, all of which must be true to plan or apply the resource """
-        self.condition_stack = stack
+    def conditions_true(self, context):
 
-    def get_condition_stack(self):
-        conditions = self.condition_stack[:]
-        if self.when:
-            conditions.append(self.when)
-        return conditions
+        from opsmop.lookups.eval import Eval 
+        from opsmop.lookups.lookup import Lookup
+
+        when = self.when
+        if when is None:
+            return True
+        if type(when) == str:
+            res = Eval(self.when).evaluate(self)
+            return res
+        elif issubclass(type(cond), Lookup):
+            return cond.evaluate(self)
+        else:
+            return cond
+        
+

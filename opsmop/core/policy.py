@@ -5,12 +5,18 @@ from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.core.role import Role
 from opsmop.core.scope import Scope
+from opsmop.core.collection import Collection
 
-class Policy(Resource):
+class Policy(Collection):
 
     def __init__(self, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
+
+    def init_scope(self, context):
+        self.set_scope(Scope.for_top_level(self))
+        self.context = context
+        self.update_variables(self.variables)
 
     def fields(self):
         return Fields(
@@ -25,6 +31,9 @@ class Policy(Resource):
         
     def set_roles(self):
         raise Exception("Policy class must implement set_roles")
+
+    def get_children(self, mode):
+        return self.roles
 
 
 
