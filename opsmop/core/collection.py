@@ -40,6 +40,14 @@ class Collection(Resource):
             conditions.append(obj.when)
         parent.child_scope(obj)
 
+    def add(self, what):
+        if type(what) == list:
+            self.items.extend(what)
+        else:
+            assert issubclass(type(what), Resource)
+            self.items.append(what)
+
+
     def _claim(self, resource):
         """
         Used by walk_children, this marks each object as being a child of the parent scope
