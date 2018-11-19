@@ -109,6 +109,13 @@ class Executor(object):
             return
 
         context.on_resource(resource, handlers)
+        if resource.handles is not None:
+            if resource.handles in signals:
+                pass
+            else:
+                context.on_skipped(resource)
+                return
+
 
         if not check and not apply:
             return
@@ -116,7 +123,7 @@ class Executor(object):
         # print(type(resource))
         provider = resource.provider()
         provider.set_context(context)
-
+        
         context.on_plan(provider)
 
         if not provider.skip_plan_stage():
