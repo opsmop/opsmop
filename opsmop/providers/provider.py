@@ -7,7 +7,6 @@ from opsmop.core.command import Command
 from opsmop.core.errors import ProviderError
 from opsmop.core.result import Result
 from opsmop.core.template import Template
-from opsmop.facts.facts import Facts
 
 DEFAULT_TIMEOUT = 60
 
@@ -137,9 +136,6 @@ class Provider(object):
 
     def set_context(self, value):
         self._context = value
-
-    def facts(self):
-        return Facts()
 
     def template(self, msg):
         return Template().from_string(msg, self)

@@ -69,18 +69,7 @@ class Collection(Resource):
         # TODO: use constants
         return self.items
 
-    def _check_conditions(self, resource, context, apply=False):
-        try:
-            res = resource.conditions_true(context)
-            return res
-        except jinja2.exceptions.UndefinedError:
-            # allow templates to fail in check mode only
-            if not apply:
-                raise
-            else:
-                return True
-
-    def walk_children(self, items=None, context=None, mode=None, check=False, apply=False, fn=None):
+    def walk_children(self, items=None, context=None, mode=None, check=False, apply=False, fn=None, handlers=False):
 
         """
         A relatively complex iterator used by Executor() code.
@@ -108,50 +97,45 @@ class Collection(Resource):
        
         if issubclass(items_type, Collection):
             self._claim(items)
-            proceed = self._check_conditions(items, context, apply)
-            if not proceed:
-                context.on_resource(items, False)
-                context.on_skipped(items)
-                return
+            proceed = items.conditions_true(context)
+            if proceed:
+                return items.walk_children(items=items.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
             else:
-                items.walk_children(items=items.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
+                context.on_skipped(items)
 
         elif issubclass(items_type, Resource):
             self._claim(items)
-            proceed = self._check_conditions(items, context, apply)
-            if not proceed:
-                context.on_resource(items, False)
-                context.on_skipped(items)
-                return
-            else:
+            proceed = items.conditions_true(context)
+
+            if proceed:
                 return fn(items)
+            else:
+                context.on_skipped(items)
 
         elif items_type == list:
             for x in items:        
                 self._claim(x)
-                proceed = self._check_conditions(x, context, apply)
-                if not proceed:
-                    context.on_resource(x, False)
-                    context.on_skipped(x)
-                else:
+                proceed = x.conditions_true(items, context)
+                if proceed:
                     if issubclass(type(x), Collection):
                         x.walk_children(items=x.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
                     else:
                         fn(x)
+                else:
+                    context.on_skipped(items)
 
         elif items_type == dict:
             for (k,v) in items.items():
                 self._claim(v)
-                proceed = self._check_conditions(v, context, apply)
-                if not proceed:
-                    context.on_resource(v, False)
-                    context.on_skipped(v)
-                else:
+                proceed = v.conditions_true(context)
+                if proceed:
                     if issubclass(type(v), Collection):
                         items.walk_children(items=v.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
                     else:
                         v.handles = k
                         fn(v)
+                else:
+                    context.on_skipped(items)
 
 
 

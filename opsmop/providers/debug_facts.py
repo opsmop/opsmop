@@ -1,6 +1,5 @@
 from opsmop.providers.provider import Provider
 from opsmop.lookups.lookup import Lookup
-from opsmop.facts.facts import Facts
 
 class DebugFacts(Provider):
 
@@ -15,9 +14,26 @@ class DebugFacts(Provider):
  
     def apply(self):
         
-        fact_output = Facts.constants()
+        # fact_instances return a dictionary of fact
+        # instances such as:
+        # dict(
+        #     UserFacts: UserFacts
+        #     Platform: Platform
+        #     FileTest: FileTest
+        # )
 
-        for (k,v) in Facts.constants().items():
-            self.echo("%s = %s" % (k, v))
+        context = self.resource.fact_context()
+
+        for (k,v) in context.items():
+
+            # for each fact instance, print a header
+            # and then show the contant facts in
+            # each (the facts that don't take)
+            # parameters
+
+            self.echo("---")
+            self.echo("%s" % k)
+            for (k2, v2) in v.constants().items():
+                self.echo("  %s() => %s" % (k2, v2))
           
         return self.ok()

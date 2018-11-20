@@ -1,4 +1,3 @@
-from opsmop.facts.facts import Facts
 from opsmop.core.result import Result
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy
@@ -84,24 +83,50 @@ class Executor(object):
         def validate(resource):
             return resource.validate
 
+        context.on_validate()
         roles = policy.get_children('')
-        policy.walk_children(items=roles, context=context, mode='resources', fn=validate, check=check, apply=apply)
-        policy.walk_children(items=roles, context=context, mode='handlers', fn=validate, check=check, apply=apply)
 
-        if (check or apply):
-            def execute_resource(resource):
-                return self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply)
-            policy.walk_children(items=roles, context=context, mode='resources', fn=execute_resource, check=check, apply=apply)
-            def execute_handler(handler):
-                return self.execute_resource(resource=handler, context=context, signals=signals, check=check, apply=apply, handlers=True)
-            policy.walk_children(items=roles, context=context, mode='handlers', fn=execute_handler, check=check, apply=apply)
+        for role in roles.items:
+
+            role.pre()
+
+            if not role.conditions_true(context):
+                continue
+
+            policy._claim(role)
+
+            # TEMPORARILY DISABLE VALIDATE MODE BECAUSE IT IS TOO SQUEAKY
+            #role.walk_children(items=role.get_children('resources'), context=context, mode='resources', fn=validate, check=check, apply=apply)
+            #role.walk_children(items=role.get_children('handlers'), context=context, mode='handlers', fn=validate, check=check, apply=apply)
+
+            if (check or apply):
+            
+                context.on_begin()
+
+                def execute_resource(resource):
+                    resource.pre()
+                    result = self.execute_resource(resource=resource, context=context, signals=signals, check=check, apply=apply)
+                    resource.post()
+                    return result
+                role.walk_children(items=role.get_children('resources'), context=context, mode='resources', fn=execute_resource, check=check, apply=apply)
+
+                context.on_begin_handlers()
+
+                def execute_handler(handler):
+                    handler.pre()
+                    result = self.execute_resource(resource=handler, context=context, signals=signals, check=check, apply=apply, handlers=True)
+                    handler.post()
+                    return result
+                role.walk_children(items=role.get_children('handlers'), context=context, mode='handlers', fn=execute_handler, check=check, apply=apply)
+
+            role.post()
 
         context.on_complete(policy)
 
-    # FIXME: REFACTOR: scope code will simplify this
+    # FIXME: can be broken into smaller functions
+
     def execute_resource(self, resource=None, context=None, check=False, apply=False, handlers=False, signals=None):
         
-
         assert resource is not None
         assert context is not None
 
@@ -120,7 +145,6 @@ class Executor(object):
         if not check and not apply:
             return
 
-        # print(type(resource))
         provider = resource.provider()
         provider.set_context(context)
         
@@ -133,6 +157,8 @@ class Executor(object):
 
         if apply:
 
+            if not provider.skip_plan_stage() and len(provider.actions_planned) == 0:
+                return
             context.on_apply(provider)
             result = provider.apply()
             if not handlers:

@@ -6,6 +6,10 @@ from opsmop.core.resource import Resource
 from opsmop.core.role import Role
 from opsmop.core.scope import Scope
 from opsmop.core.collection import Collection
+from opsmop.core.common import memoize
+from opsmop.facts.platform import Platform
+from opsmop.facts.user_facts import UserFacts
+from opsmop.facts.filetests import FileTests
 
 class Policy(Collection):
 
@@ -34,6 +38,15 @@ class Policy(Collection):
 
     def get_children(self, mode):
         return self.roles
+
+    @memoize
+    def fact_context(self):
+        return dict(
+            Platform = Platform,
+            FileTest = FileTests,
+            UserFacts = UserFacts
+        )
+
 
 
 

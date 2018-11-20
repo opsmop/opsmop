@@ -6,7 +6,6 @@ from opsmop.facts.facts import Facts
 
 class Type(Resource):
 
-
     def validate(self):
         raise NotImplementedError
 

@@ -14,6 +14,8 @@ class File(Type):
     def __init__(self, name=None, **kwargs):
         self.setup(name=name, **kwargs)
 
+    # FIXME: we need to split the file and directory provider code
+
     def fields(self):
         return Fields(
             self,
@@ -29,6 +31,9 @@ class File(Type):
             # types to share the File provider implementation. This may go away so use that instead.
             directory = Field(kind=bool, default=False, help=None, internal=True),
             overwrite = Field(kind=bool, default=True, help="replace existing files"),
+            # same comment as with directory
+            # FIXME: probably should split the providers actually
+            recursive = Field(kind=bool, default=False, help=None, internal=True)
         )
 
     def validate(self):

@@ -2,7 +2,7 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
-from opsmop.facts.facts import Facts
+from opsmop.facts.platform import Platform
 
 class Package(Type):
 
@@ -33,4 +33,4 @@ class Package(Type):
         raise ValidationError("unsupported provider: %s" % method)
 
     def default_provider(self):
-        return Facts.default_package_manager()
+        return Platform.default_package_manager()

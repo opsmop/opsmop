@@ -1,1 +1,2 @@
+PyYAML
 jinja2>=2.10

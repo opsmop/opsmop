@@ -1,4 +1,6 @@
 
+# NOTE: this interface is subject to change
+
 class Context(object):
 
     def __init__(self, callbacks=None):
@@ -73,3 +75,12 @@ class Context(object):
 
     def on_evaluation_failed(self, expr):
         self._run_callbacks('on_evaluation_failed', expr)
+
+    def on_begin(self):
+        self._run_callbacks('on_begin')
+
+    def on_begin_handlers(self):
+        self._run_callbacks('on_begin_handlers')
+
+    def on_validate(self):
+        self._run_callbacks('on_validate')

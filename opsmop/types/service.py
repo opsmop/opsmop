@@ -3,7 +3,7 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.types.type import Type
-from opsmop.facts.facts import Facts
+from opsmop.facts.platform import Platform
 
 class Service(Type):
 

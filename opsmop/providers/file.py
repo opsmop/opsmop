@@ -9,7 +9,14 @@ import os
 
 # FIXME: the file provider is a little (lot) long at the moment because it contains code to support
 # copies, templates, mode changes, and more.  It  needs to be broken into
-# smaller parts.
+# smaller parts - still one provider, but use more helper classes
+
+# FIXME: make use of FileTests
+
+# FIXME: we need to split the file and directory provider code
+# not all of these parameters are needed for directory
+
+# FIXME: modes don't work.
 
 class File(Provider):
 
@@ -149,6 +156,8 @@ class File(Provider):
 
         if self.should('chmod'):
             self.do('chmod')
+            # FIXME: implement recursive support for directories.
+            # FIXME: if the input is a string, convert to Octal, otherwise if int assume Octal
             os.chmod(self.name, self.mode)
 
         if self.should('chown'):

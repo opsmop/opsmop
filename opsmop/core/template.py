@@ -1,16 +1,14 @@
 from jinja2 import Environment, BaseLoader, FileSystemLoader, StrictUndefined
 from jinja2.nativetypes import NativeEnvironment
-from opsmop.facts.facts import Facts
 from opsmop.core.resource import Resource
 
 class Template(object):
 
-    def _get_context(self, resource, recursive_stop=None):
-
-        self._variables = resource.get_variables()
-        self._variables["Facts"] = Facts
-
-        return self._variables
+    def _get_context(self, resource):
+        context = resource.template_context()
+        variables = resource.get_variables()
+        variables.update(context)
+        return variables
 
     def from_string(self, msg, resource):
         j2 = Environment(loader=BaseLoader, undefined=StrictUndefined).from_string(msg)

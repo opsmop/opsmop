@@ -6,6 +6,13 @@
 Facts
 -----
 
+FIXME: ALL OF THIS IS OUT OF DATE AND NEEDS TO BE RE-WRITTEN
+
+Platform
+UserFacts
+FileTests
+
+
 Facts are truths about the system where OpsMop is being run, and are usable in templates and conditionals.  
 To view most of the available facts and their values, see :ref:`module_debug_facts`, though a listing of available facts
 is also included below.
