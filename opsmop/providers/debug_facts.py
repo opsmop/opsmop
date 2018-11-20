@@ -32,8 +32,9 @@ class DebugFacts(Provider):
             # parameters
 
             self.echo("---")
-            self.echo("%s" % k)
+            self.echo("Facts Class: %s" % k)
             for (k2, v2) in v.constants().items():
-                self.echo("  %s() => %s" % (k2, v2))
-          
+                self.echo("  %s => %s" % (k2, v2))
+            self.echo("note: other methods may exist that take parameters")
+
         return self.ok()

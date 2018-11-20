@@ -100,8 +100,9 @@ class CliCallbacks(BaseCallback):
         self.i5("| %s" % expr)
         self.fatal()
 
-    def on_skipped(self, skipped):
+    def on_skipped(self, skipped, is_handler=False):
         if self.phase != 'validate':
+            self.on_resource(skipped, is_handler=is_handler)
             self.i3("skipped")
 
     def on_begin(self):
@@ -132,16 +133,14 @@ class CliCallbacks(BaseCallback):
 
         self.i1("")
 
+
         role = resource.role()
 
         self.count = self.count + 1
         self.banner(f"{self.count} :: {role.__class__.__name__} :: {resource}")
         self.i1("")
-
-        #self.i1("")
-        #self.count = self.count + 1
         if is_handler:
-            self.i3("handler was signalled")
+            self.i3("handler")
 
     def on_flagged(self, flagged):
         self.i3("flagged: %s" % flagged)

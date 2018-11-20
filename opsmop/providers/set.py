@@ -15,7 +15,7 @@ class Set(Provider):
                 temp_items[k] = v.evaluate(self.resource)
             else:
                 temp_items[k] = v
-            self.echo("%s = %s" % (k,v))
+            self.echo("%s = %s" % (k,temp_items[k]))
         self.resource.update_parent_variables(temp_items)
 
     def verb(self):

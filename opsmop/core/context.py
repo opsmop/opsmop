@@ -55,8 +55,8 @@ class Context(object):
         if result.fatal:
             self._run_callbacks('on_fatal', result)
 
-    def on_skipped(self, value):
-        self._run_callbacks('on_skipped', value)
+    def on_skipped(self, value, is_handler=False):
+        self._run_callbacks('on_skipped', value, is_handler)
 
     def on_flagged(self, value):
         self._run_callbacks('on_flagged', value)

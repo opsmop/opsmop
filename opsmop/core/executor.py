@@ -138,7 +138,7 @@ class Executor(object):
             if resource.handles in signals:
                 pass
             else:
-                context.on_skipped(resource)
+                context.on_skipped(resource, is_handler=handlers)
                 return
 
 

@@ -101,7 +101,7 @@ class Collection(Resource):
             if proceed:
                 return items.walk_children(items=items.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
             else:
-                context.on_skipped(items)
+                context.on_skipped(items, is_handler=handlers)
 
         elif issubclass(items_type, Resource):
             self._claim(items)
@@ -110,7 +110,7 @@ class Collection(Resource):
             if proceed:
                 return fn(items)
             else:
-                context.on_skipped(items)
+                context.on_skipped(items, is_handler=handlers)
 
         elif items_type == list:
             for x in items:        
@@ -122,7 +122,7 @@ class Collection(Resource):
                     else:
                         fn(x)
                 else:
-                    context.on_skipped(items)
+                    context.on_skipped(items, is_handler=handlers)
 
         elif items_type == dict:
             for (k,v) in items.items():
@@ -135,7 +135,7 @@ class Collection(Resource):
                         v.handles = k
                         fn(v)
                 else:
-                    context.on_skipped(items)
+                    context.on_skipped(items, is_handler=handlers)
 
 
 

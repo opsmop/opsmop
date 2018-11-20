@@ -152,10 +152,10 @@ class Resource(object):
         if type(when) == str:
             res = Eval(self.when).evaluate(self)
             return res
-        elif issubclass(type(cond), Lookup):
-            return cond.evaluate(self)
+        elif issubclass(type(when), Lookup):
+            return when.evaluate(self)
         else:
-            return cond
+            return when
 
     def role(self):
 
