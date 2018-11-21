@@ -19,7 +19,7 @@ It is probably easiest to simply refer to GitHub to start:
 
 * `api.py <https://github.com/opsmop/opsmop/blob/master/opsmop/core/api.py>`_
 * `cli.py <https://github.com/opsmop/opsmop/blob/master/opsmop/client/cli.py>`_
-* `client.callbacks` <https://github.com/opsmop/opsmop/blob/master/opsmop/client/callbacks.py>`_
+* `callbacks <https://github.com/opsmop/opsmop/blob/master/opsmop/client/callbacks.py>`_
 * `bin/opsmop <https://github.com/opsmop/opsmop/blob/master/bin/opsmop>`_
 
 From the above links, you should see it is quickly easy to customize the output of the system as well as write

@@ -12,6 +12,7 @@
    Advanced Language<advanced>
    Module Index<modules/modules>
    Facts<facts>
+   API<api>
    Pull Mode<pull>
    Push/Orchestration Mode<push>
    FAQ<faq>
