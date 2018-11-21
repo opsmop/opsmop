@@ -96,8 +96,8 @@ class Executor(object):
             policy._claim(role)
 
             # TEMPORARILY DISABLE VALIDATE MODE BECAUSE IT IS TOO SQUEAKY
-            #role.walk_children(items=role.get_children('resources'), context=context, mode='resources', fn=validate, check=check, apply=apply)
-            #role.walk_children(items=role.get_children('handlers'), context=context, mode='handlers', fn=validate, check=check, apply=apply)
+            role.walk_children(items=role.get_children('resources'), context=context, mode='resources', fn=validate, check=check, apply=apply)
+            role.walk_children(items=role.get_children('handlers'), context=context, mode='handlers', fn=validate, check=check, apply=apply)
 
             if (check or apply):
             
@@ -131,7 +131,7 @@ class Executor(object):
         assert context is not None
 
         if issubclass(type(resource), Collection):
-            # don't print anything for collections
+            # don't do anything for collections
             return
 
 
@@ -184,7 +184,8 @@ class Executor(object):
 
         if provider.has_changed():
             if resource.signals:
-                context.on_flagged(signals)
                 signals.append(resource.signals)
+                context.on_flagged(resource.signals)
+
 
 
