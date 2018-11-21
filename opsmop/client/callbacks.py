@@ -101,7 +101,7 @@ class CliCallbacks(BaseCallback):
         self.fatal()
 
     def on_skipped(self, skipped, is_handler=False):
-        if self.phase != 'validate' and not is_handler:
+        if self.phase != 'validate' and not is_handler and issubclass(type(skipped), Type):
             self.i3("skipped")
 
     def on_begin(self):
@@ -165,9 +165,6 @@ class CliCallbacks(BaseCallback):
         # TODO: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
         # TODO: further, run_callbacks in Context() should catch any exceptions from *ALL* callbacks and re-raise
         sys.exit(1)
-
-    def on_all_policies_complete(self):
-        pass
 
     def on_update_variables(self, variables):
         self.i3("registered:")

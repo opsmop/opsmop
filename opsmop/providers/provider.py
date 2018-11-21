@@ -113,6 +113,18 @@ class Provider(object):
         """ shortcut to return a failed result from .apply() """
         return Result(provider=self, fatal=True, message=msg)
 
+    def has_planned_actions(self):
+        """
+        Were any actions planned during plan stage?
+        """
+        return len(self.actions_planned)
+
+    def handle_registration(self, context=None, result=None):
+        va = dict()
+        va[self.register] = result
+        context.on_update_variables(va)
+        self.resource.update_parent_variables(va)
+
     def commit_to_plan(self):
         """ used in executor code to move the list of planned actions in to the list that self.should() will check """
         self.actions = self.actions_planned

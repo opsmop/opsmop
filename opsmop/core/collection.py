@@ -48,7 +48,7 @@ class Collection(Resource):
             self.items.append(what)
 
 
-    def _claim(self, resource):
+    def attach_child_scope_for(self, resource):
         """
         Used by walk_children, this marks each object as being a child of the parent scope
         """
@@ -66,10 +66,10 @@ class Collection(Resource):
         """
         Returns child objects, mode may be 'resources' or 'handlers'
         """
-        # TODO: use constants
         return self.items
 
-    def walk_children(self, items=None, context=None, mode=None, check=False, apply=False, fn=None, handlers=False):
+    # TODO: break into smaller functions
+    def walk_children(self, items=None, context=None, which=None, mode=None, fn=None, handlers=False):
 
         """
         A relatively complex iterator used by Executor() code.
@@ -81,12 +81,10 @@ class Collection(Resource):
         check/apply - whether check and apply mode are running
         fn - the function to call on each object
         """
-
-        # TODO: break into smaller functions
-
+        assert which in [ 'resources', 'handlers' ]
+        assert mode in [ 'validate', 'check', 'apply' ]
         assert items is not None
         assert context is not None
-        assert mode in [ 'resources', 'handlers' ]
         assert fn is not None
 
         self._on_walk(context)
@@ -96,15 +94,15 @@ class Collection(Resource):
             return
        
         if issubclass(items_type, Collection):
-            self._claim(items)
+            self.attach_child_scope_for(items)
             proceed = items.conditions_true(context)
             if proceed:
-                return items.walk_children(items=items.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
+                return items.walk_children(items=items.get_children(mode), mode=mode, which=which, context=context, fn=fn)
             else:
                 context.on_skipped(items, is_handler=handlers)
 
         elif issubclass(items_type, Resource):
-            self._claim(items)
+            self.attach_child_scope_for(items)
             proceed = items.conditions_true(context)
 
             if proceed:
@@ -114,11 +112,11 @@ class Collection(Resource):
 
         elif items_type == list:
             for x in items:        
-                self._claim(x)
+                self.attach_child_scope_for(x)
                 proceed = x.conditions_true(items, context)
                 if proceed:
                     if issubclass(type(x), Collection):
-                        x.walk_children(items=x.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
+                        x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:
                         fn(x)
                 else:
@@ -126,11 +124,11 @@ class Collection(Resource):
 
         elif items_type == dict:
             for (k,v) in items.items():
-                self._claim(v)
+                self.attach_child_scope_for(v)
                 proceed = v.conditions_true(context)
                 if proceed:
                     if issubclass(type(v), Collection):
-                        items.walk_children(items=v.get_children(mode), mode=mode, context=context, fn=fn, check=check, apply=apply)
+                        items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:
                         v.handles = k
                         fn(v)

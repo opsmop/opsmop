@@ -36,6 +36,9 @@ class Policy(Collection):
     def set_roles(self):
         raise Exception("Policy class must implement set_roles")
 
+    def get_roles(self):
+        return self.roles
+
     def get_children(self, mode):
         return self.roles
 

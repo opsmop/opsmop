@@ -171,9 +171,9 @@ class Resource(object):
         else:
             return parent.role()
 
-    def all_handlers(self):
+    def all_handles(self):
         """
-        Handlers could be nested in collections, if so, find the handlers names that apply to this resource.
+        Handles could be nested in collections, if so, find the handlers names that apply to this resource.
         """
         result = []
         ptr = self

@@ -7,7 +7,19 @@ class Context(object):
 
         assert type(callbacks) == list
         self._callbacks = callbacks
+        self._signals = []
+        for cb in self._callbacks:
+            cb.set_context(self)
 
+    def add_signal(self, signal):
+        self._signals.append(signal)
+
+    def has_seen_any_signal(self, signals):
+        for x in self._signals:
+            if x in signals:
+                return True
+        return False
+            
     def _run_callbacks(self, cb_method, *args):
         """ 
         Run a named callback method against all attached callback classes, in order.
@@ -16,6 +28,8 @@ class Context(object):
             c.set_context(self)
             attr = getattr(c, cb_method)
             attr(*args)
+
+
 
     def on_apply(self, provider):
         self._run_callbacks('on_apply', provider)
@@ -63,9 +77,6 @@ class Context(object):
 
     def on_complete(self, value):
         self._run_callbacks('on_complete', value)
-
-    def on_all_policies_complete(self):
-        self._run_callbacks('on_all_policies_complete')
 
     def on_conditions(self, value):
         self._run_callbacks('on_conditions', value)
