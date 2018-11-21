@@ -94,6 +94,7 @@ class File(Provider):
         if self.mode and (not exists or not (FileTests.mode(self.name) == self.mode)):
             self.needs('chmod')
 
+    # ---------------------------------------------------------------
 
     def apply(self):
         """
