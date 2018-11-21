@@ -73,10 +73,10 @@ class Type(Resource):
         self._context = value
 
     def template(self, msg):
-        return Template().from_string(msg, self)
+        return Template.from_string(msg, self)
 
     def template_file(self, path):
-        return Template().from_file(path, self)
+        return Template.from_file(path, self)
 
     def __str__(self):
         # FIXME: if we run a version of the fields copy code on this object instead

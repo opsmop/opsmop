@@ -15,7 +15,7 @@ class Eval(Lookup):
         self.expr = expr
 
     def evaluate(self, resource):
-        return Template().native_eval(self.expr, resource)
+        return Template.native_eval(self.expr, resource)
 
     def __str__(self):
         return "Eval: <'%s'>" % self.expr

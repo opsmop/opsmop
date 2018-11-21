@@ -15,6 +15,8 @@ class CliCallbacks(BaseCallback):
     Improvements are welcome.
     """
 
+    __slots__ = [ 'dry_run', 'role', 'last_role', 'phase', 'count' ]
+
     def __init__(self):
         super()
         self.dry_run = False

@@ -49,7 +49,7 @@ class File(Provider):
     def _should_replace_using_template(self):
         if not self.f_exists:
             return True
-        evaluated = Template().from_file(self.from_template, self.resource)
+        evaluated = Template.from_file(self.from_template, self.resource)
         contents = Path(self.name).read_text()
         return evaluated != contents
     
@@ -143,7 +143,7 @@ class File(Provider):
 
         elif self.should('copy_template'):
             self.do('copy_template')
-            template_data = Template().from_file(self.from_template, self.resource)
+            template_data = Template.from_file(self.from_template, self.resource)
             data = open(self.name, "w")  
             data.write(template_data)
             data.close()

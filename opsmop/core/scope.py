@@ -3,7 +3,7 @@ class Scope(object):
 
     """ Scope is used to prepare variable stacks during the executor phase to implement variable scoping rules """
 
-
+    __slots__ = [ '_parent', '_level', '_resource', '_variables' ]
 
     def __init__(self, variables=None, level=0, parent=None, resource=None):
 
@@ -11,7 +11,7 @@ class Scope(object):
             variables = dict()
 
         self._parent = parent
-        self.level = level
+        self._level = level
         self._resource = resource
         self._variables = variables
 
@@ -41,7 +41,7 @@ class Scope(object):
         return top_scope._resource
         
     def deeper_scope_for(self, resource):
-        return Scope(variables=self._variables.copy(), level=self.level+1, parent=self, resource=resource)
+        return Scope(variables=self._variables.copy(), level=self._level+1, parent=self, resource=resource)
 
     def ancestors(self):
         parent = self.parent()
@@ -86,4 +86,4 @@ class Scope(object):
         root.update_variables(variables)
 
     def __str__(self):
-        return "<Scope resource=%s, level=%s, parent=%s, variables=%s>" % (self._resource, self.level, self.parent(), self._variables)
+        return "<Scope resource=%s, level=%s, parent=%s, variables=%s>" % (self._resource, self._level, self.parent(), self._variables)

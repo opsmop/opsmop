@@ -20,7 +20,7 @@ class Echo(Provider):
     def apply(self):
         
         self.cowsay = shutil.which('cowsay')
-        txt = Template().from_string(self.msg, self.resource)
+        txt = Template.from_string(self.msg, self.resource)
 
         if self.cowsay and os.environ.get('MOO'):
             cmd = COWSAY.format(msg=txt)

@@ -22,7 +22,7 @@ class Asserts(Provider):
             if issubclass(type(expr), Lookup):
                 result = expr.evaluate(self.resource)
             elif type(expr) == str:
-                result = Template().native_eval(expr, self.resource)
+                result = Template.native_eval(expr, self.resource)
             else:
                 restult = expr
             self.echo("%s => %s" % (expr, result))

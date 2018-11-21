@@ -16,7 +16,7 @@ class Template(Lookup):
         self.expr=expr
 
     def evaluate(self, resource):
-        return CoreTemplate().from_string(self.expr, resource)
+        return CoreTemplate.from_string(self.expr, resource)
 
     def __str__(self):
         return "T: <'%s'>" % self.expr
