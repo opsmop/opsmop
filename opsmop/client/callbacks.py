@@ -54,11 +54,6 @@ class CliCallbacks(BaseCallback):
         if big:
             self.i1(sep)
 
-    def on_conditions(self, conditions):
-        if len(conditions) > 0:
-            self.i3("conditions:")
-            self.i5(str(conditions))
-
     def on_command_echo(self, echo):
         if echo == "":
             return
@@ -69,7 +64,7 @@ class CliCallbacks(BaseCallback):
 
     def on_execute_command(self, command):
         if command.echo:
-           self.i5("# %s" % command.cmd)
+            self.i5("# %s" % command.cmd)
 
     def on_plan(self, provider):
         self.provider = provider
@@ -104,24 +99,17 @@ class CliCallbacks(BaseCallback):
         for x in actions_taken:
             self.i5("| %s" % str(x))
 
-
     def on_result(self, result):
         self.i3(str(result))
 
     def on_command_result(self, result):
         self.i5("= %s" % result)
-        # pay attention to self.context.category and 
-
-    def on_evaluation_failed(self, expr):
-        self.i3("conditional evaluation error, unable to evaluate expression:")
-        self.i5("| %s" % expr)
-        self.fatal()
 
     def on_skipped(self, skipped, is_handler=False):
         if self.phase != 'validate' and not is_handler and issubclass(type(skipped), Type):
             self.i3("skipped")
 
-    def on_begin(self):
+    def on_begin_role(self, role):
         self.phase = 'resource'
 
     def on_validate(self):
@@ -131,27 +119,10 @@ class CliCallbacks(BaseCallback):
         self.phase = 'handlers'
 
     def on_resource(self, resource, is_handler):
-
         if self.phase == 'validate':
             return
-
-        if issubclass(type(resource), Role):
-            self.i1("")
-            if self.phase == 'resource':
-                self.banner("Processing Resources: %s" % resource, big=True)
-            elif self.phase == 'handlers':
-                self.banner("Processing Handlers: %s" % resource, big=True)
-            self.i1("")
-            return
-
-        if not issubclass(type(resource), Type):
-            return
-
         self.i1("")
-
-
         role = resource.role()
-
         self.count = self.count + 1
         self.banner(f"{self.count} :: {role.__class__.__name__} :: {resource}")
         self.i1("")

@@ -41,8 +41,6 @@ class Context(object):
             attr = getattr(c, cb_method)
             attr(*args)
 
-
-
     def on_apply(self, provider):
         self._run_callbacks('on_apply', provider)
 
@@ -90,17 +88,11 @@ class Context(object):
     def on_complete(self, value):
         self._run_callbacks('on_complete', value)
 
-    def on_conditions(self, value):
-        self._run_callbacks('on_conditions', value)
-
     def on_update_variables(self, variables):
         self._run_callbacks('on_update_variables', variables)
 
-    def on_evaluation_failed(self, expr):
-        self._run_callbacks('on_evaluation_failed', expr)
-
-    def on_begin(self):
-        self._run_callbacks('on_begin')
+    def on_begin_role(self, role):
+        self._run_callbacks('on_begin_role', role)
 
     def on_begin_handlers(self):
         self._run_callbacks('on_begin_handlers')

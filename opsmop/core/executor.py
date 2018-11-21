@@ -154,7 +154,7 @@ class Executor(object):
         """
         # tell the context we are processing resources now, which may change their behavior
         # of certain methods like on_resource()
-        context.on_begin()
+        context.on_begin_role(role)
         def execute_resource(resource):
             # execute each resource through plan() and if needed apply() stages, but before and after
             # doing so, run any user pre() or post() hooks implemented on that object.
