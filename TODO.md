@@ -39,10 +39,8 @@ testing:
 * Baseline for unit test infrastructure, ideally with mocked providers.
 
 generalized refactoring
-* executor needs to be cleaned up a fair amount
 * callbacks need to be cleaned up, which are not needed anymore?  Which can be simplified?
 * consistently use underscore _vars for member data throughout
-* more of __slots__ throughout
 * cleanup field.py
 
 code docs
