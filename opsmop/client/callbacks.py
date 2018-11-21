@@ -101,8 +101,7 @@ class CliCallbacks(BaseCallback):
         self.fatal()
 
     def on_skipped(self, skipped, is_handler=False):
-        if self.phase != 'validate':
-            self.on_resource(skipped, is_handler=is_handler)
+        if self.phase != 'validate' and not is_handler:
             self.i3("skipped")
 
     def on_begin(self):

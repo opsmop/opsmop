@@ -1,20 +1,20 @@
 Bug queue and PRs will be open by December.  TODO list (shorter term ideas/priorities):
 
-docs generator
-* module docs generator / docs
+docs
+* document all the new facts structure
+* in content/ examples, break them up to show things are more programmable
+* document should_process_when, pre, post on the roles class
 
 facts:
+* fix FileTests - now it is just a stub
 * flesh out OS facts
-* site facts (/etc/opsmop/facts.d). In opsmop facts are functions so this is easy.
+* better error handling for /etc/opsmop/facts.d
 
 core platform:
+* show parameters per executed type
 * if a basic list is passed in to any object like Resources() or returned from set_resources, auto-convert it to a collection.
-* if a resource has a name, always show it at the start of each step
 * much better errors from template code - not full tracebacks
 * better asserts if things like set_resources does not return a Resources(), ditto for set_roles
-* add 'with' - takes a real variable or an Eval()
-* rename 'register' to 'save'
-* allow 'save' to take a 'save_value=Eval()'
 * validators.py should use common file test class
 * fix (small bugs with) nested scopes in the variable system
 * changed_when, failed_when
@@ -22,11 +22,12 @@ core platform:
 
 
 modules:
+* split directory and file apart again
+* finish out testing File module, Service:brew and Package:brew
+* finish out package/service modules for main OSes
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
 * add a 'sudo' parameter to shell which just does sudo -u
 * when the Debug() module is called with no arguments it should show all variables in scope.
-* finish out testing File module, Service:brew and Package:brew
-* finish out package/service modules for main OSes
 * make FileUtils a seperate class in common, simply file type/provider code lots
 * Shell module should allow File's easy copy behavior to transfer scripts
 * File should be able to fetch URLs
@@ -38,12 +39,11 @@ testing:
 * Baseline for unit test infrastructure, ideally with mocked providers.
 
 generalized refactoring
+* executor needs to be cleaned up a fair amount
+* callbacks need to be cleaned up, which are not needed anymore?  Which can be simplified?
 * consistently use underscore _vars for member data throughout
 * more of __slots__ throughout
 * cleanup field.py
-* eliminate filetest.py / overhaul file module
-* cleanup executor.py some
-* cleanup the visitor and scope code, which is a little self-referential in resource.py
 
 code docs
 * Apache2 license headers

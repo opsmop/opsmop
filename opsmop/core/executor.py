@@ -131,16 +131,18 @@ class Executor(object):
         assert context is not None
 
         if issubclass(type(resource), Collection):
+            # don't print anything for collections
             return
 
-        context.on_resource(resource, handlers)
-        if resource.handles is not None:
-            if resource.handles in signals:
-                pass
-            else:
+
+        if handlers:
+            handlers = resource.all_handlers()
+            matched = set(handlers).intersection(set(signals))
+            if not len(matched):
                 context.on_skipped(resource, is_handler=handlers)
                 return
 
+        context.on_resource(resource, handlers)
 
         if not check and not apply:
             return

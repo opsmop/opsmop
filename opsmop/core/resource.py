@@ -157,15 +157,31 @@ class Resource(object):
         else:
             return when
 
+    def parent(self):
+        parent_scope = self.scope().parent()
+        if parent_scope is None:
+            return None
+        return parent_scope.resource()
+
     def role(self):
-
         from opsmop.core.role import Role
-
-        parent = self.scope().parent().resource()
+        parent = self.parent()
         if issubclass(type(parent), Role):
             return parent
         else:
             return parent.role()
+
+    def all_handlers(self):
+        """
+        Handlers could be nested in collections, if so, find the handlers names that apply to this resource.
+        """
+        result = []
+        ptr = self
+        while ptr is not None:
+            if ptr.handles:
+                result.append(ptr.handles)
+            ptr = ptr.parent()
+        return result
 
 
     def pre(self):
