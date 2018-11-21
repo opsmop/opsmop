@@ -89,7 +89,7 @@ class File(Provider):
                         self.needs('copy_template')
                 elif self.from_file:
                     if self._should_replace_using_file():
-                       self.needs('copy_file')
+                        self.needs('copy_file')
                 elif self.from_content:
                     if self._should_replace_using_content():
                         self.needs('copy_content')
