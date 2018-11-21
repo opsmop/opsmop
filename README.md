@@ -5,7 +5,7 @@ Cleanup on Datacenter Aisle 3!
 
 OpsMop is a next-generation, no-compromise automation system from [Michael DeHaan](http://michaeldehaan.net)
 
-Full Documentation: [docs.opsmop.io](http://docs.opmop.io)
+Full Documentation: [docs.opsmop.io](http://docs.opsmop.io)
 
 Uses
 ====
