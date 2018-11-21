@@ -37,5 +37,3 @@ class Brew(Package):
         if which:
             return self.run(which)
         return self.ok()
-        
-

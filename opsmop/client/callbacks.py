@@ -1,7 +1,8 @@
 import sys
+
 from opsmop.core.callback import BaseCallback
-from opsmop.types.type import Type
 from opsmop.core.role import Role
+from opsmop.types.type import Type
 
 # NOTE: this interface is subject to change
 
@@ -190,5 +191,3 @@ class CliCallbacks(BaseCallback):
     def _indent(self, level, msg):
         spc = INDENT * level
         print("%s%s" % (spc, msg))
-
-

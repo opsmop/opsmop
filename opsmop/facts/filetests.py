@@ -1,6 +1,7 @@
-from opsmop.facts.facts import Facts
-from pathlib import Path
 import os
+from pathlib import Path
+
+from opsmop.facts.facts import Facts
 
 # TODO: there are a LOT of facts to add yet!  We are just starting out
 # in particular we also want to add /etc/opsmop/facts.d
@@ -19,4 +20,3 @@ class FileTestFacts(Facts):
         return os.path.isfile(fname) and os.access(fname, os.X_OK)
 
 FileTests = FileTestFacts()
-

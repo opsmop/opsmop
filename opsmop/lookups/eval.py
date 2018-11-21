@@ -1,7 +1,8 @@
-from opsmop.lookups.lookup import Lookup
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.template import Template
+from opsmop.lookups.lookup import Lookup
+
 
 class Eval(Lookup):
 
@@ -18,7 +19,3 @@ class Eval(Lookup):
 
     def __str__(self):
         return "Eval: <'%s'>" % self.expr
-
-
-
-    

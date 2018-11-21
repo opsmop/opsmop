@@ -1,8 +1,9 @@
-from opsmop.core.resource import Resource
-from opsmop.lookups.lookup import Lookup
-from opsmop.core.template import Template
 from opsmop.core.fields import Fields
+from opsmop.core.resource import Resource
+from opsmop.core.template import Template
 from opsmop.facts.facts import Facts
+from opsmop.lookups.lookup import Lookup
+
 
 class Type(Resource):
 

@@ -154,4 +154,3 @@ class Provider(object):
 
     def template_file(self, path):
         return Template().from_file(path, self)
-

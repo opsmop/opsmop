@@ -1,9 +1,10 @@
+import glob
+import os
+
 from opsmop.meta.docs.exparser import Record
 from opsmop.meta.docs.index import Index
 from opsmop.meta.docs.page import Page
 
-import glob
-import os
 
 class Generator(object):
 
@@ -30,5 +31,3 @@ class Generator(object):
         print("rendering index for (%s) records" % len(records))
         Index(records, self.dest_dir).generate()
         print("done")
-    
-

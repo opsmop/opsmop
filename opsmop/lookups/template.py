@@ -1,6 +1,7 @@
 from opsmop.core.template import Template as CoreTemplate
 from opsmop.lookups.lookup import Lookup
 
+
 class Template(Lookup):
 
     """

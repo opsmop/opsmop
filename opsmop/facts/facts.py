@@ -6,4 +6,3 @@ class Facts(object):
 
     def invalidate(self):
         pass
-

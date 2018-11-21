@@ -1,5 +1,6 @@
 from opsmop.providers.package.package import Package
 
+
 class Yum(Package):
 
     """
@@ -11,5 +12,3 @@ class Yum(Package):
 
     def apply(self):
         raise NotImplementedError()
-
-        

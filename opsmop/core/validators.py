@@ -1,5 +1,7 @@
-from opsmop.core.errors import ValidationError
 import os
+
+from opsmop.core.errors import ValidationError
+
 
 class Validators(object):
 
@@ -18,4 +20,3 @@ class Validators(object):
         path = os.path.expandvars(os.path.expanduser(path))
         if not os.path.exists(path):
             raise ValidationError(self.resource, "path does not exist: %s" % path)
-            

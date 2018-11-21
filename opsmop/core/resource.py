@@ -1,5 +1,6 @@
 from opsmop.core.fields import COMMON_FIELDS
 
+
 class Resource(object):
 
     def __init__(self,  *args, **kwargs):
@@ -194,5 +195,3 @@ class Resource(object):
         user hook. called after executing a resource in Executor code
         """
         pass
-        
-

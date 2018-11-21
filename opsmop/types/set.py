@@ -4,6 +4,7 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
 
+
 class Set(Type):
 
     def __init__(self, *args, **kwargs):

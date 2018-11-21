@@ -40,4 +40,3 @@ class Result(object):
             return "ok%s%s" % (rc_msg, msg)
         else:
             return "fatal%s%s" % (rc_msg, msg)
-

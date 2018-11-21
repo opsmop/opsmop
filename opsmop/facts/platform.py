@@ -1,7 +1,7 @@
+import platform
+
 from opsmop.core.common import memoize
 from opsmop.facts.facts import Facts
-
-import platform
 
 # TODO: there are a LOT of facts to add yet!  We are just starting out
 # contributions are very welcome

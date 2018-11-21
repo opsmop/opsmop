@@ -1,6 +1,8 @@
-from jinja2 import Environment, BaseLoader, FileSystemLoader, StrictUndefined
+from jinja2 import BaseLoader, Environment, FileSystemLoader, StrictUndefined
 from jinja2.nativetypes import NativeEnvironment
+
 from opsmop.core.resource import Resource
+
 
 class Template(object):
 

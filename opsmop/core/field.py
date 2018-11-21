@@ -2,6 +2,7 @@
 
 from opsmop.lookups.lookup import Lookup
 
+
 class Field(object):
 
     """
@@ -177,9 +178,3 @@ class Field(object):
         except:
             print("failed to set: %s=%s on %s" % (k, v, type(obj)))
             raise
-
-
-
-        
- 
-        

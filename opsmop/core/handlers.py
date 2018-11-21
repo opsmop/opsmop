@@ -1,10 +1,11 @@
 
 
-from opsmop.core.resource import Resource
 from opsmop.core.collection import Collection
-from opsmop.core.resources import Resources
-from opsmop.core.fields import Fields
 from opsmop.core.field import Field
+from opsmop.core.fields import Fields
+from opsmop.core.resource import Resource
+from opsmop.core.resources import Resources
+
 
 class Handlers(Resources):
 

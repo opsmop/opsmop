@@ -30,10 +30,3 @@ class ProviderError(OpsMopError):
         self.provider = provider
         self.resource = provider.resource
         self.msg = msg
-
-
-
-
-
-
-

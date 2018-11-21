@@ -1,8 +1,9 @@
 
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.types.type import Type
 from opsmop.facts.platform import Platform
+from opsmop.types.type import Type
+
 
 class Package(Type):
 

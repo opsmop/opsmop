@@ -165,6 +165,3 @@ texinfo_documents = [
 ]
 
 # ----
-
-
-

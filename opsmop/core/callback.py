@@ -7,4 +7,3 @@ class BaseCallback(object):
 
     def context(self):
         return self._context
-

@@ -1,6 +1,7 @@
-from opsmop.providers.provider import Provider
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
+from opsmop.providers.provider import Provider
+
 
 class Set(Provider):
 
@@ -29,7 +30,3 @@ class Set(Provider):
         # we run this again so that any registered variables can be erased if so desired
         self.copy_variables()
         return self.ok()
-
-
-        
-

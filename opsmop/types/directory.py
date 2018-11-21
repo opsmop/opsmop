@@ -3,6 +3,7 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.file import File
 
+
 class Directory(File):
 
     """

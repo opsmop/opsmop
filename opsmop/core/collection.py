@@ -1,9 +1,11 @@
 
+import jinja2
+
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.core.scope import Scope
-import jinja2
+
 
 class Collection(Resource):
 
@@ -124,8 +126,3 @@ class Collection(Resource):
                         fn(v)
                 else:
                     context.on_skipped(items, is_handler=handlers)
-
-
-
-
-

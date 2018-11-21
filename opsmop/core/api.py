@@ -1,8 +1,9 @@
 
-from opsmop.core.executor import Executor
-
 import os
 from runpy import run_path
+
+from opsmop.core.executor import Executor
+
 
 class Api(object):
 
@@ -71,6 +72,3 @@ class Api(object):
         executor = Executor(policies=self._policies, callbacks=self._callbacks)
         contexts = executor.apply()
         return contexts
-
-    
-

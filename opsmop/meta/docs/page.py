@@ -1,8 +1,9 @@
-import os
-import importlib
 import collections
+import importlib
+import os
 
 from opsmop.core.fields import Fields
+
 
 class Page(object):
 

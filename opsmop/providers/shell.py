@@ -1,5 +1,6 @@
-from opsmop.providers.provider import Provider
 from opsmop.core.filetests import FileTests
+from opsmop.providers.provider import Provider
+
 
 class Shell(Provider):
 
@@ -18,4 +19,3 @@ class Shell(Provider):
 
         result = self.run(self.cmd, timeout=self.timeout, echo=True)
         return self.ok(data=result)
-        

@@ -1,10 +1,11 @@
-import subprocess
-import shutil
-import os
 import io
+import os
+import shutil
+import subprocess
 
 from opsmop.core.common import memoize
 from opsmop.core.result import Result
+
 
 class Command(object):
 

@@ -2,6 +2,7 @@
 
 from opsmop.providers.provider import Provider
 
+
 class Package(Provider):
 
     def _get_version(self):
@@ -18,5 +19,3 @@ class Package(Provider):
             self.needs('latest')
         elif self.version and self.version != version:
             self.needs('upgrade')
-
-        

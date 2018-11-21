@@ -1,5 +1,6 @@
 from opsmop.core.collection import Collection
 
+
 class Roles(Collection):
 
     """

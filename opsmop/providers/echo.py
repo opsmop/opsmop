@@ -1,7 +1,8 @@
+import os
+import shutil
+
 from opsmop.core.template import Template
 from opsmop.providers.provider import Provider
-import shutil
-import os
 
 COWSAY = "cowsay '{msg}'"
 

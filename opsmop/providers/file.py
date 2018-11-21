@@ -1,11 +1,11 @@
-from opsmop.providers.provider import Provider
-from opsmop.core.filetests import FileTests
-from opsmop.core.template import Template
-from opsmop.core.errors import ProviderError
+import os
+import shutil
 from pathlib import Path
 
-import shutil
-import os
+from opsmop.core.errors import ProviderError
+from opsmop.core.filetests import FileTests
+from opsmop.core.template import Template
+from opsmop.providers.provider import Provider
 
 # FIXME: the file provider is a little (lot) long at the moment because it contains code to support
 # copies, templates, mode changes, and more.  It  needs to be broken into
@@ -177,6 +177,3 @@ class File(Provider):
                 return self.fatal("chgrp failed")
 
         return self.ok()
-
-        
-

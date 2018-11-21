@@ -1,5 +1,6 @@
 from opsmop.providers.provider import Provider
 
+
 class Service(Provider):
     
     """

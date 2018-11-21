@@ -1,10 +1,11 @@
 
+from opsmop.core.collection import Collection
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.core.resource import Resource
-from opsmop.core.collection import Collection
-from opsmop.core.resources import Resources
 from opsmop.core.handlers import Handlers
+from opsmop.core.resource import Resource
+from opsmop.core.resources import Resources
+
 
 class Role(Collection):
 
@@ -48,4 +49,3 @@ class Role(Collection):
 
     def __str__(self):
         return "Role: %s" % self.__class__.__name__
-

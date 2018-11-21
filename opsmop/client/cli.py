@@ -1,9 +1,11 @@
 
 import sys
-# import argparse
 
 from opsmop.client.callbacks import CliCallbacks
 from opsmop.core.api import Api
+
+# import argparse
+
 
 USAGE = """
 |
@@ -52,11 +54,3 @@ class Cli(object):
    
         print("")
         sys.exit(0)
- 
-        
-
-
-        
-
-
-

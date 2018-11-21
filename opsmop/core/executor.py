@@ -1,10 +1,10 @@
-from opsmop.core.result import Result
+from opsmop.core.collection import Collection
 from opsmop.core.context import Context
 from opsmop.core.policy import Policy
+from opsmop.core.result import Result
 from opsmop.core.scope import Scope
 from opsmop.lookups.eval import Eval
 from opsmop.lookups.lookup import Lookup
-from opsmop.core.collection import Collection
 
 # ---------------------------------------------------------------
 
@@ -308,7 +308,3 @@ class Executor(object):
 
         # if anything has changed, let the callbacks know about it
         self.signal_changes(provider=provider, resource=resource, context=context)
-
-
-
-

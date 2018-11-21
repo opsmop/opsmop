@@ -1,15 +1,16 @@
 
 
+from opsmop.core.collection import Collection
+from opsmop.core.common import memoize
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.core.role import Role
 from opsmop.core.scope import Scope
-from opsmop.core.collection import Collection
-from opsmop.core.common import memoize
+from opsmop.facts.filetests import FileTests
 from opsmop.facts.platform import Platform
 from opsmop.facts.user_facts import UserFacts
-from opsmop.facts.filetests import FileTests
+
 
 class Policy(Collection):
 
@@ -49,7 +50,3 @@ class Policy(Collection):
             FileTest = FileTests,
             UserFacts = UserFacts
         )
-
-
-
-

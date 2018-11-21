@@ -1,4 +1,5 @@
 import sys
+
 from opsmop.meta.docs.generator import Generator
 
 # automatic documentation generator
@@ -14,5 +15,3 @@ if __name__ == '__main__':
     dest_dir = sys.argv[2]
     
     Generator(examples_dir=examples_dir, dest_dir=dest_dir).go()
-
-

@@ -15,4 +15,3 @@ def memoize(func):
             cache[key] = func(*args, **kwargs)
         return cache[key]
     return memoized_func
-
