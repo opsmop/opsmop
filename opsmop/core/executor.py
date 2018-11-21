@@ -196,15 +196,17 @@ class Executor(object):
         # callbacks, such as on_echo()
         provider.set_context(context)
 
-        if not provider.skip_plan_stage():
-            # tell the context object we are about to run the plan stage.
-            context.on_plan(provider)
-            # compute the plan
-            provider.plan()
-            context.on_planned_actions(provider, provider.actions_planned)
-            # copy the list of planned actions into the 'to do' list for the apply method
-            # on the provider
-            provider.commit_to_plan()
+        if provider.skip_plan_stage():
+            return provider
+        
+        # tell the context object we are about to run the plan stage.
+        context.on_plan(provider)
+        # compute the plan
+        provider.plan()
+        context.on_planned_actions(provider, provider.actions_planned)
+        # copy the list of planned actions into the 'to do' list for the apply method
+        # on the provider
+        provider.commit_to_plan()
 
         return provider
 
