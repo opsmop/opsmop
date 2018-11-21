@@ -1,5 +1,3 @@
-
-
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type

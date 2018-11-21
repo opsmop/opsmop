@@ -4,7 +4,6 @@ from opsmop.core.collection import Collection
 from opsmop.core.common import memoize
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.core.resource import Resource
 from opsmop.core.role import Role
 from opsmop.core.scope import Scope
 from opsmop.facts.filetests import FileTests

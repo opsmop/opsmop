@@ -1,14 +1,12 @@
-from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.core.template import Template
 from opsmop.facts.facts import Facts
 from opsmop.lookups.lookup import Lookup
 
-
 class Type(Resource):
 
     def validate(self):
-        raise NotImplementedError
+        pass
 
     def provider(self):
         """
@@ -56,12 +54,6 @@ class Type(Resource):
             if issubclass(type(value), Lookup):
                 value = value.evaluate(provider.resource)
             setattr(provider, k, value)
-
-    def validate(self):
-        # raise ValidationError on any problems with the fields
-        # the opsmop.core.validators.Validators class is helpful
-        # see opsmop.types.file for an example.
-        return
 
     def facts(self):
         return Facts()

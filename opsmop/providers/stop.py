@@ -1,8 +1,4 @@
-import os
-import shutil
-
 from opsmop.providers.provider import Provider
-
 
 class Stop(Provider):
 

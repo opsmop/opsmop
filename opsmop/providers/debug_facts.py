@@ -1,6 +1,4 @@
-from opsmop.lookups.lookup import Lookup
 from opsmop.providers.provider import Provider
-
 
 class DebugFacts(Provider):
 

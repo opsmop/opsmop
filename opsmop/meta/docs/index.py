@@ -31,7 +31,6 @@ class Index(object):
 
             self.fd.write("%s" % category.title())
             clen = len(category)
-            line = "-" * clen
             self.fd.write("\n")
             self.fd.write("-" * clen)
             self.fd.write("\n")
@@ -67,5 +66,4 @@ class Index(object):
         return [ r for r in records if r.category == category ]
 
     def gen_rst_link(self, record):
-        name = record.name
         return ":ref:`%s <module_%s>`" % (record.name.title().replace("_",""), record.name)

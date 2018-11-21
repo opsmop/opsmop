@@ -1,10 +1,5 @@
-# opsmop/providers/__init__.py
-
-import traceback
-
 from opsmop.core.action import Action
 from opsmop.core.command import Command
-from opsmop.core.errors import ProviderError
 from opsmop.core.result import Result
 from opsmop.core.template import Template
 

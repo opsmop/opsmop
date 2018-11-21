@@ -1,10 +1,7 @@
-
-from opsmop.core.errors import ValidationError
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.validators import Validators
 from opsmop.types.type import Type
-
 
 class File(Type):
 

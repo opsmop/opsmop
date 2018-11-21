@@ -1,6 +1,4 @@
-from opsmop.core.filetests import FileTests
 from opsmop.providers.provider import Provider
-
 
 class Shell(Provider):
 

@@ -24,7 +24,7 @@ class Asserts(Provider):
             elif type(expr) == str:
                 result = Template.native_eval(expr, self.resource)
             else:
-                restult = expr
+                result = expr
             self.echo("%s => %s" % (expr, result))
             if not result:
                 failed = True

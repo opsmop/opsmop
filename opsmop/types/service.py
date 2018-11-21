@@ -1,10 +1,8 @@
-
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.core.resource import Resource
-from opsmop.facts.platform import Platform
 from opsmop.types.type import Type
-
+from opsmop.facts.platform import Platform
+from opsmop.core.errors import ValidationError
 
 class Service(Type):
 
@@ -34,4 +32,4 @@ class Service(Type):
         raise ValidationError("unsupported provider: %s" % method)
 
     def default_provider(self):
-        return Facts.default_service_manager()
+        return Platform.default_service_manager()

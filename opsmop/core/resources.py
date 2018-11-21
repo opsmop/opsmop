@@ -1,9 +1,4 @@
-
-
-
 from opsmop.core.collection import Collection
-from opsmop.core.resource import Resource
-
 
 class Resources(Collection):
 

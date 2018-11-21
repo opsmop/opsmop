@@ -1,7 +1,4 @@
-# opsmop/providers/package/__init__.py
-
 from opsmop.providers.provider import Provider
-
 
 class Package(Provider):
 
@@ -17,5 +14,5 @@ class Package(Provider):
             self.needs('uninstall')
         elif self.latest:
             self.needs('latest')
-        elif self.version and self.version != version:
+        elif self.version and self.version != current_version:
             self.needs('upgrade')

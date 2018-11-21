@@ -1,9 +1,7 @@
 import glob
 import subprocess
-
 import yaml
 
-from opsmop.core.common import memoize
 from opsmop.facts.facts import Facts
 from opsmop.facts.filetests import FileTests
 

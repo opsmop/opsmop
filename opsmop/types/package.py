@@ -1,9 +1,8 @@
-
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.facts.platform import Platform
 from opsmop.types.type import Type
-
+from opsmop.core.errors import ValidationError
 
 class Package(Type):
 

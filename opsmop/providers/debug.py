@@ -16,7 +16,6 @@ class Debug(Provider):
     def apply(self):
         
         variables = self.resource.get_variables()
-        dump_variables = dict()
 
         len1 = len(self.variable_names)
         len2 = len(self.evals.items())

@@ -2,7 +2,6 @@ import os
 
 from opsmop.core.errors import ValidationError
 
-
 class Validators(object):
 
     def __init__(self, resource):

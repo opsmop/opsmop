@@ -1,8 +1,5 @@
-from opsmop.core.field import Field
-from opsmop.core.fields import Fields
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
-
 
 class Eval(Lookup):
 
