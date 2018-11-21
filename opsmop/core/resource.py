@@ -130,6 +130,12 @@ class Resource(object):
         """
         self.scope().update_parent_variables(variables)
 
+    def role(self):
+        """
+        What's my role?
+        """
+        return self.scope().role()
+
     def get_variables(self):
         """
         Return the variables at the current scope.  Used in conditional evaluation
@@ -171,14 +177,6 @@ class Resource(object):
         if parent_scope is None:
             return None
         return parent_scope.resource()
-
-    def role(self):
-        from opsmop.core.role import Role
-        parent = self.parent()
-        if issubclass(type(parent), Role):
-            return parent
-        else:
-            return parent.role()
 
     def all_handles(self):
         """

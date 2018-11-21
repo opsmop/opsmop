@@ -60,7 +60,7 @@ class Collection(Resource):
         """
         my_scope = self.scope()
         kid_scope = my_scope.deeper_scope_for(resource)
-        resource.set_scope(kid_scope) # ?
+        resource.set_scope(kid_scope)
 
     def _on_walk(self, context):
         """

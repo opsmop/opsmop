@@ -16,7 +16,7 @@ class Scope(object):
 
     """ Scope is used to prepare variable stacks during the executor phase to implement variable scoping rules """
 
-    __slots__ = [ '_parent', '_level', '_resource', '_variables' ]
+    __slots__ = [ '_parent', '_level', '_resource', '_variables', '_role', '_root', '_ancestors' ]
 
     def __init__(self, variables=None, level=0, parent=None, resource=None):
 
@@ -27,6 +27,24 @@ class Scope(object):
         self._level = level
         self._resource = resource
         self._variables = variables
+        self._role = None
+        self._root = None
+
+        from opsmop.core.policy import Policy
+        from opsmop.core.role import Role
+
+        if issubclass(type(resource), Role):
+            self._role = resource
+        elif self._parent and self._parent._role:
+            self._role = self._parent._role
+
+        if issubclass(type(resource), Policy):
+            self._root = resource
+            self._ancestors = [ ]
+        elif self._parent:
+            self._root = self._parent._root
+            self._ancestors = self._parent._ancestors[:]
+            self._ancestors.append(self._parent)
 
         # load the resource variables into the scope
         # set_variables method on the object win out over keyword args
@@ -38,6 +56,9 @@ class Scope(object):
 
     def parent(self):
         return self._parent
+
+    def role(self):
+        return self._role
 
     @classmethod
     def for_top_level(cls, resource):
@@ -57,21 +78,10 @@ class Scope(object):
         return Scope(variables=self._variables.copy(), level=self._level+1, parent=self, resource=resource)
 
     def ancestors(self):
-        parent = self.parent()
-        ancestors = [ ]
-        while parent is not None:
-            ancestors.insert(0, parent)
-            parent = parent.parent()
-        return ancestors
+        return self._ancestors
 
     def root_scope(self):
-        parent = self.parent()
-        if parent is None:
-            return self
-        while parent is not None:
-            if parent is None:
-                return self
-            parent = self.parent()
+        return self._root
 
     def variables(self):
         scopes = self.ancestors()
