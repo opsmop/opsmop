@@ -134,8 +134,7 @@ class Resource(object):
         """
         return self.scope().deeper()
 
-    # FIXME: this runtime flag is not used here, remove it
-    def conditions_true(self, context, runtime=False):
+    def conditions_true(self, context):
         """
         Called by Executor code to decide if a resource is processable.
         """

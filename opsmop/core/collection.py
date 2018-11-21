@@ -68,7 +68,6 @@ class Collection(Resource):
         """
         return self.items
 
-    # TODO: break into smaller functions
     def walk_children(self, items=None, context=None, which=None, mode=None, fn=None, handlers=False):
 
         """
@@ -77,15 +76,10 @@ class Collection(Resource):
         
         items - the kids to start the iteration with
         context - a Context() object for callback tracking
-        mode - 'resources' or 'handlers'
-        check/apply - whether check and apply mode are running
+        which - 'resources' or 'handlers'
+        mode - 'validate', 'check', or 'apply'
         fn - the function to call on each object
         """
-        assert which in [ 'resources', 'handlers' ]
-        assert mode in [ 'validate', 'check', 'apply' ]
-        assert items is not None
-        assert context is not None
-        assert fn is not None
 
         self._on_walk(context)
         items_type = type(items)
@@ -93,7 +87,7 @@ class Collection(Resource):
         if items is None:
             return
        
-        if issubclass(items_type, Collection):
+        if issubclass(items_type, Collection):            
             self.attach_child_scope_for(items)
             proceed = items.conditions_true(context)
             if proceed:
@@ -103,9 +97,7 @@ class Collection(Resource):
 
         elif issubclass(items_type, Resource):
             self.attach_child_scope_for(items)
-            proceed = items.conditions_true(context)
-
-            if proceed:
+            if items.conditions_true(context):
                 return fn(items)
             else:
                 context.on_skipped(items, is_handler=handlers)
@@ -113,8 +105,7 @@ class Collection(Resource):
         elif items_type == list:
             for x in items:        
                 self.attach_child_scope_for(x)
-                proceed = x.conditions_true(items, context)
-                if proceed:
+                if x.conditions_true(context):
                     if issubclass(type(x), Collection):
                         x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:
@@ -125,8 +116,7 @@ class Collection(Resource):
         elif items_type == dict:
             for (k,v) in items.items():
                 self.attach_child_scope_for(v)
-                proceed = v.conditions_true(context)
-                if proceed:
+                if v.conditions_true(context):
                     if issubclass(type(v), Collection):
                         items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:
