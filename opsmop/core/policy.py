@@ -21,6 +21,7 @@ from opsmop.core.scope import Scope
 from opsmop.facts.filetests import FileTests
 from opsmop.facts.platform import Platform
 from opsmop.facts.user_facts import UserFacts
+from opsmop.facts.chaos import Chaos
 
 class Policy(Collection):
 
@@ -58,5 +59,6 @@ class Policy(Collection):
         return dict(
             Platform = Platform,
             FileTest = FileTests,
-            UserFacts = UserFacts
+            UserFacts = UserFacts,
+            Chaos = Chaos
         )

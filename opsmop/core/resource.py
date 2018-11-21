@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from opsmop.core.fields import COMMON_FIELDS
+import jinja2
 
 class Resource(object):
 
@@ -149,7 +150,7 @@ class Resource(object):
         """
         return self.scope().deeper()
 
-    def conditions_true(self, context):
+    def conditions_true(self, context, validate=False):
         """
         Called by Executor code to decide if a resource is processable.
         """
@@ -164,10 +165,22 @@ class Resource(object):
         if when is None:
             return True
         if type(when) == str:
-            res = Eval(self.when).evaluate(self)
+            try:
+                return Eval(self.when).evaluate(self)
+            except jinja2.exceptions.UndefinedError:
+                if not validate:
+                    raise
+                # this value may need to late bind, we'll catch it later
+                return True
             return res
         elif issubclass(type(when), Lookup):
-            return when.evaluate(self)
+            try:
+                return when.evaluate(self)
+            except jinja2.exceptions.UndefinedError:
+                if not validate:
+                    raise
+                # this value may need to late bind, we'll catch it later
+                return True
         else:
             return when
 

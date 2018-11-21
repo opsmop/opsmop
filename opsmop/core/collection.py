@@ -92,10 +92,12 @@ class Collection(Resource):
  
         if items is None:
             return
+
+        validate = (mode == 'validate')
        
         if issubclass(items_type, Collection):            
             self.attach_child_scope_for(items)
-            proceed = items.conditions_true(context)
+            proceed = items.conditions_true(context, validate=validate)
             if proceed:
                 return items.walk_children(items=items.get_children(mode), mode=mode, which=which, context=context, fn=fn)
             else:
@@ -103,7 +105,7 @@ class Collection(Resource):
 
         elif issubclass(items_type, Resource):
             self.attach_child_scope_for(items)
-            if items.conditions_true(context):
+            if items.conditions_true(context, validate=validate):
                 return fn(items)
             else:
                 context.on_skipped(items, is_handler=handlers)
@@ -111,7 +113,7 @@ class Collection(Resource):
         elif items_type == list:
             for x in items:        
                 self.attach_child_scope_for(x)
-                if x.conditions_true(context):
+                if x.conditions_true(context, validate=validate):
                     if issubclass(type(x), Collection):
                         x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:
@@ -122,7 +124,7 @@ class Collection(Resource):
         elif items_type == dict:
             for (k,v) in items.items():
                 self.attach_child_scope_for(v)
-                if v.conditions_true(context):
+                if v.conditions_true(context, validate=validate):
                     if issubclass(type(v), Collection):
                         items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn)
                     else:

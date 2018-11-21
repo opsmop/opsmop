@@ -46,6 +46,6 @@ class Debug(Provider):
             actual = expr
             if issubclass(type(expr), Lookup):
                 actual = expr.evaluate(self.resource)
-            self.echo("%s => %s" % (k, actual))
+            self.echo("%s ~> %s" % (k, actual))
           
         return self.ok()

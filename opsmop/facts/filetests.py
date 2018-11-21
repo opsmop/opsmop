@@ -67,9 +67,9 @@ class FileTestFacts(Facts):
                 m.update(block)
         return m.hexdigest()
 
-    def checksum_string(self, msg):
+    def string_checksum(self, msg):
         m = hashlib.sha256()
-        m.update(msg)
+        m.update(msg.encode())
         return m.hexdigest()
 
     def same_contents(self, a, b):

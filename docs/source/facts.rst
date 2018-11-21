@@ -7,31 +7,26 @@ Facts
 -----
 
 OpsMop has several ways to learn about the running system.  These are collectively known as
-'Facts'. Unlike some other systems, OpsMop facts are partitioned by category. Users can write
-their own 'Facts' classes, or use one of the many included ones:
+'Facts'. 
+
+Users can write their own 'Facts' classes, or use one of the many included ones:
 
 * Platform
 * UserFacts
 * FileTests
 
-All facts can be used in :ref:`conditionals` as well as templates.  For example, to attach a fact-based 
-conditional to a resource, you can do this.
+All facts can be used in :ref:`conditionals`, :ref:`hooks` as well as :ref:`templates` - in fact, they are just Python
+instances with functions, so you can use them anywhere.  
+
+Here's a basic example from :ref:`platform`:
 
 .. code-block:: python
 
     def set_resources(self):
+        darwin = (Platform.system() == "Darwin")
         return Resources(
-            Echo("Hi Darwin", when="Platform.system() == 'Darwin'")
-        )
-
-If you don't mind a conditional test being evaluated too early, which is usually the case for :ref:`platform`, this is cleaner:
-
-.. code-block: python
-
-    def set_resources(self):
-        is_darwin = (Platform.system() == 'Darwin')
-        return Resources(
-            Echo("Hi Darwin", when=is_darwin)
+            Echo("My platform is {{ Plaform.system() }}"),
+            Echo("This is OS X.", when=darwin)
         )
 
 Or as we showcased in :ref:`hooks`, it's also easy to attach a conditional to a whole *Role*, or even a *Policy*.  For most
@@ -46,12 +41,6 @@ use cases, we definitely prefer this format:
 
         # ...
 
-And finally, any template can easily access a *Fact* as well:
-
-.. code-block:
-
-    {{ Platform.system() }}
-
 .. _platform:
 
 Platform
@@ -62,11 +51,33 @@ Platform Facts tell you something about the OS or Machine you are running on.
 More platform facts will be added frequently, and also make easy first pull requests.
 See :ref:`development` if you are interested in adding something.
 
-.. note:
+.. list-table::
+   :header-rows: 1
 
-   Some functions thrown into platform are random values, more useful for Chaos
-   Engineering, and should probably be moved into a new fact class called 'Chaos'.
-   This will be done soon.
+   * - Function
+     - Description
+   * - default_package_provider()
+     - used internally by the Package type
+   * - default_service_provider()
+     - used internally by the Package type
+   * - release()
+     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
+   * - system()
+     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
+   * - version()
+     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
+
+We've already included some examples above, and the rest should be self explanatory.
+See :ref:`debugging_facts` if you are trying to match up values while writing your *Policy* files.
+
+Chaos
+=====
+
+Chaos facts are intended for use in Chaos Engineering. They return random values, allowing
+you to randomly perform steps, or sometimes even randomly misconfigure your systems. 
+
+While we're not responsible for anything you do with OpsMop, we would like to remind you now that 
+with great power comes great responsibility.
 
 .. list-table::
    :header-rows: 1
@@ -74,19 +85,29 @@ See :ref:`development` if you are interested in adding something.
    * - Function
      - Description
    * - choice(a,b,c,d,e)
-     - randomly returns one of the parameters. Useful for chaos.
-   * - default_package_provider()
-     - used internally by the Package type
-   * - default_service_provider()
-     - used internally by the Package type
+     - randomly returns one of the parameters
    * - random()
-     - returns a float between 0 and 1. Useful for chaos.
-   * - release()
-     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
-   * - system()
-     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
-   * - version()
-     - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
+     - returns a float between 0 and 1
+
+Example:
+
+.. code-block:: python
+
+    class FooRole(Role):
+
+        def should_process_when(self):
+            return (Chaos.random() < 0.25)
+
+        def set_resources(self):
+            # ...
+
+Or in a Jinja2 template::
+
+    {% if Chaos.random() < 0.33 %}
+    blocksize=4091 # misconfigured! whooohoo, sneaky
+    {% else %}
+    blocksize=4092
+    {% endif %}
 
 .. _file_tests:
 
@@ -95,8 +116,8 @@ FileTests
 
 FileTest facts let you ask questions about files and directories.
 
-Most of these are functions that take one or more path names and return booleans.
-If that isn't the case, it is noted in the description.
+These are functions that take one or more path names and return booleans, strings,
+or integers.
 
 .. list-table::
    :header-rows: 1
@@ -122,32 +143,82 @@ If that isn't the case, it is noted in the description.
    * - checksum_string(s)
      - Return the sha1sum of a string (bonus)
 
+Example:
+
+.. code-block:: python
+
+    class LinuxSetup(Role):
+
+        def should_process_when(self):
+            return (Platform.system() != "Darwin")
+
+        def set_resources(self):
+            # ...
+
+Example:
+
+.. code-block:: python
+
+    class Foo(Role):
+
+
+        def set_resources(self):
+            darwin = (Platform.system() == "Darwin")
+            return Resources(
+                # ...
+                Echo("this only runs on OS X", when=darwin)
+                #..
+            )
+
+Example (Jinja2 template):
+
+.. code_block:: python
+
+    class Foo(Role):
+
+        def set_resources(self):
+            return Resources(
+                File("/etc/foo.cfg", from_template="templates/foo.cfg.j2"),
+            )
+
+.. code-block::
+
+    # This file is programatically generated by OpsMop: templates/foo.confg.j2
+
+    example_config_file=made_up
+    parameters=imaginary
+
+    {% if Platform.system() == 'Darwin' %}
+    asdf=1234
+    {% else %}
+    asdf=5678
+    {% endif %}
+    
+    jklm=101010101010
+
 .. note::
     Pretty much all of the FileTest facts take parameters, which means they
-    can't be debugged by :ref:`module_debug_facts`. See :ref:`debugging_facts` for how
-    to debug these facts with echo if you need to.
+    can't be debugged by :ref:`module_debug_facts`. Using them in a template
+    or Echo statement can be a good way to debug if you need to.
 
 .. _user_facts:
 
 UserFacts
 =========
 
-UserFacts are easy user-customizable facts that you can use *WITHOUT* making new Python classes.
-
-Do you want to easily inject your own information about your system into OpsMop conditionals and
-templates?
-
-UserFacts are generated by scanning files in /etc/opsmop/facts.d/.
+UserFacts are easily user-customizable facts that you can use *WITHOUT* making new Python classes.
+They are generated by scanning files in /etc/opsmop/facts.d/.
 
 If a file is not executable, the file will be interpreted as a dictionary in either JSON
 or YAML format.
 
 If the file is executable, the file will be evaluated, and the output will be evaluated
-as a dictionary in either JSON or YAML format.
+as a dictionary in either JSON or YAML format.  The program, in this case, can be written
+in any language at all.
 
-For an example of this, see `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`.
+For a full demo of this, see `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`.
 
-UserFacts are calculated only once per run, for efficiency.  The example includes an invalidate() call
+UserFacts are usually calculated only once per run, for efficiency.  The example includes an invalidate() call
 if you want to learn how to re-evaluate the facts.
 
 To test UserFacts, see :ref:`debugging_facts`.
