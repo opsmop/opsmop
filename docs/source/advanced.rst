@@ -25,11 +25,11 @@ feel free to jump back and forth. The best way to understand these features is t
 the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo on GitHub, and also as you 
 read through :ref:`modules`, you will see some of these features used in the examples in context.
 
-Many of the examples below are contrived and don't deploy real applications, but are constructed to teach 
+Many of the examples are contrived and don't deploy real applications, but are constructed to teach 
 lessons about things such as :ref:`var_scoping` or :ref:`conditionals`.  Real OpsMop policies
 for deploying an application stack would be a bit longer and would use a larger mixture of modules in concert.
 
-By studying these examples though, you can quickly experiment and try to put
+By studying these arbitrary examples though, you can quickly experiment and try to put
 them together in your own :ref:`policy` configurations.
 
 OpsMop does not believe you should need an extremely large library of example configurations, we want you to learn
@@ -215,65 +215,57 @@ a resource:
     and you don't have to express the default from within a template.  This tip also works for general templating
     advice.
 
-.. _nested:
+.. _nested_scopes:
 
 Nested Scopes
 =============
 
-Nested Scopes created a quickly way of adding :ref:`conditionals` to a large number of resources:
-
-.. code-block:: python
-
-    def set_resources():
-        return Resources(
-           Resources(
-               Shell("echo /tmp/motd"),
-               Shell("uptime"),
-               Shell("date"),
-               when='F.is_linux()'
-           ),
-           Resources(
-               Echo("nope"),
-               Echo("skipping this too"),
-               when='not F.is_linux()'
-           )
-        )
-
-
-Nested scopes can also be used for variable handling, as 
-demoed in 'var_scoping' in the opsmop-demo repository.
+Resources in OpsMop can be nested, to attach variables at different scopes.  This is best demoed by 
+`var_scoping.py <https://github.com/opsmop/opsmop-demo/blob/master/content/var_scoping.py>`_ which is a very
+arbitrary demo but shows how it is done.
 
 .. _registration:
 
 Registration
 ============
 
-The value of one command may be saved and fed into the output of another. 
+The value of one command can easily be saved and fed into the output of another. 
 
-This value is entered into local scope, and can be saved into global scope using SetGlobal(), 
-which is described in a later chapter:
+This value is entered into local scope:
 
 .. code-block:: python
 
     def resources(self):
-        return Resources(
+        resources = Resources()
+        resources.add([
             Shell('date', register='date'),
             Debug('date'),
             Echo("{{ date.rc }}"),
             Echo("{{ date.data }})
-        )
+        ])
+        return resources
 
 Registration works well with coupled with :ref:`conditionals`, :ref:`failed_when` and :ref:`changed_when`.
 Some of these examples are shown in the 'opsmop-demo' repo.
 
 .. note:
-    Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module is 
-    better.
+   In the documentation documentation occasionally we use "resources.add()" to build up the Resources lists
+   or Roles lists in steps. This is simply a reminder that they are constructed programatically and you
+   are not limited by creating them all at once. You can always pick whatever style you prefer.
 
 .. note:
-    Depending on resource, the value "rc" or "data" may be None. Register is most commonly
-    used with shell commands. Providing methods on the returned result to provide
-    access to the 'changed or not' status may occur in a later version.
+    Using Echo to show templates on the screen is a useful debug technique, but the :ref:`module_debug` module 
+    is often easier.  Echo makes more sense for specific messages like "we're about to take down the
+    fence power in the velociraptor exhibit".
+
+.. note:
+    Registration is most commonly used with shell commands. Most resources will probably not have very interesting 
+    return data to use with 'register'.
+
+.. note:
+    There is no way to use Set() or register right now to copy a variable into global scope, which means
+    registration only works for tasks at the same level of depth. A solution should be provided in the
+    near future.
 
 .. _ignore_errors:
 
@@ -298,7 +290,8 @@ command.  This is demoed in the :ref:`module_shell` documentation.
 Change Reporting Control
 ========================
 
-NOTE: this is a pending feature - this feature will be released shortly.
+.. note::
+   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
 
 A resource will mark itself as containing changes if it performs any actions to the system.
 These changes are used to decide whether to notify :ref:`handlers`.
@@ -319,45 +312,106 @@ happened, and that's a good practice.
 Failure Status Overrides
 ========================
 
-NOTE: this is a pending feature - this feature will be released shortly
+.. note::
+   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
 
 By default if a command returns a fatal error, the program will halt at this step.  This is not
 always good, as sometimes, failure should depend on something other than that error status.
 
-For instance, the following is equivalent to :ref:`ignore_errors`:
+At the most basic level, 'failed_when' is equivalent to 'ignore_errors':
 
 .. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when=False)
 
-However, that's a weird example! In a more practical example, suppose we have a shell command that
-is programmed incorrectly and returns 5 on success:
+In a more practical example, suppose we have a shell command that is programmed incorrectly and 
+returns 5 on success. To deal with that, we might do this:
 
 .. code-block:: python
 
     Shell("/bin/foo --args", register="x", failed_when="x.rc != 5")
 
-Ok, that's ALSO a weird example.  What if we have a shell command that we should consider failed
-if it doesn't contain the word "SUCCESS" in the output?  Easy:
+What if we have a shell command that we should consider failed if it doesn't contain the word "SUCCESS" in the output?
+We might do this:
 
 .. code-block:: python
     
     Shell("/bin/foo --args", register="x", failed_when="not 'SUCCESS' in data")
 
-It may also be clearer to save the conditional string to a class or
+It may also be clearer to save that conditional string to a class or
 package variable and use it this way:
 
 .. code-block:: python
 
-    Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
+    SUCCESS_IN_OUTPUT = "not 'SUCCESS' in data"
+    # ...
+    def set_resources(self):
+        # ...
+        Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
+        # ...
 
-Because OpsMop is python it is very easy to do those things, and we recommend it assinging to variables
-for clarity when possible.
+.. note::
+
+    Because OpsMop is pure Python it is very easy to assign variables, so when possible do so
+    to increase readability.
+
+.. _hooks:
+
+Hooks
+=====
+
+Every single object in the OpsMop language may define some special methods. These are most useful on *Roles* and *Policies*
+but can also be used on any *Type* instance if you subclass the Type.
+
+.. _hooks_post:
+
+post()
+~~~~~~
+
+This method is called after a resource is evaluated.
+
+This is demoed in `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`_ to
+demonstrate invalidating the facts cache (see :ref:`facts`) in between role executions.
+
+Both pre and post can do literally anything you want.
+
+The return values are ignored.
+
+.. _hooks_pre:
+
+pre()
+~~~~~
+
+The opposite of post().
+
+A pre method would be called prior to evaluating a role in either check or apply mode. 
+
+The most trivial use of pre might be to print a quick message when entering a role, without relying on :ref:`module_echo`.
+
+
+.. _hooks_should_execute_when:
+
+should_execute_when()
+~~~~~~~~~~~~~~~~~~~~~
+
+This is powerful. This method is called to decide whether a resource should be executed at all. 
+
+In the example `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`
+we cleverly use should_execute_when() to implement feature flags - a given *Role* skips entirely when a fact is not set.
+This is also an easy way to make a role that only runs on a certain platform.  Thus OS specific parts of a multi-OS deployment
+can be split up into different roles, while still retaining common roles in other parts.
+
+(See also :ref:`facts`).
+
+.. note:
+
+    While could attach a "when" condition to a role when instantiating it (see :ref:`conditionals`), should_execute_when() is perhaps a more readable way to do it.
 
 Next Steps
 ==========
 
 * :ref:`modules`
+* :ref:`facts`
 * :ref:`development`
 * :ref:`api`
 

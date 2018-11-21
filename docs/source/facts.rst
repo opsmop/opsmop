@@ -6,30 +6,72 @@
 Facts
 -----
 
-FIXME: ALL OF THIS IS OUT OF DATE AND NEEDS TO BE RE-WRITTEN
+OpsMop has several ways to learn about the running system.  These are collectively known as
+'Facts'. Unlike some other systems, OpsMop facts are partitioned by category. Users can write
+their own 'Facts' classes, or use one of the many included ones:
+
+* Platform
+* UserFacts
+* FileTests
+
+All facts can be used in :ref:`conditionals` as well as templates.  For example, to attach a fact-based 
+conditional to a resource, you can do this.
+
+.. code-block:: python
+
+    def set_resources(self):
+        return Resources(
+            Echo("Hi Darwin", when="Platform.system() == 'Darwin'")
+        )
+
+If you don't mind a conditional test being evaluated too early, which is usually the case for :ref:`platform`, this is cleaner:
+
+.. code-block: python
+
+    def set_resources(self):
+        is_darwin = (Platform.system() == 'Darwin')
+        return Resources(
+            Echo("Hi Darwin", when=is_darwin)
+        )
+
+Or as we showcased in :ref:`hooks`, it's also easy to attach a conditional to a whole *Role*, or even a *Policy*.  For most
+use cases, we definitely prefer this format:
+
+.. code-block: python
+
+    class FooRole(Role):
+
+        def should_process_when(self):
+            return Platform.system() != "Darwin"
+
+        # ...
+
+And finally, any template can easily access a *Fact* as well:
+
+.. code-block:
+
+    {{ Platform.system() }}
+
+.. _platform:
 
 Platform
-UserFacts
-FileTests
+========
 
+Platform Facts tell you something about the OS or Machine you are running on.
 
-Facts are truths about the system where OpsMop is being run, and are usable in templates and conditionals.  
-To view most of the available facts and their values, see :ref:`module_debug_facts`, though a listing of available facts
-is also included below.
+More platform facts will be added frequently, and also make easy first pull requests.
+See :ref:`development` if you are interested in adding something.
 
-Alternatively from the shell::
+.. note:
 
-     python -m opsmop.facts.facts
-
-List of Available Facts
-=======================
-
-More facts will be added frequently.
+   Some functions thrown into platform are random values, more useful for Chaos
+   Engineering, and should probably be moved into a new fact class called 'Chaos'.
+   This will be done soon.
 
 .. list-table::
    :header-rows: 1
 
-   * - Name
+   * - Function
      - Description
    * - choice(a,b,c,d,e)
      - randomly returns one of the parameters. Useful for chaos.
@@ -46,75 +88,117 @@ More facts will be added frequently.
    * - version()
      - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
 
-It is possible not all facts are documented, always run the :ref:`module_debug_facts` example to check the facts available
-on your platform. Again please remember that facts that take parameters, such as 'choice', do not appear in the DebugFacts
-output.
+.. _file_tests:
 
-Fact Examples
-=============
+FileTests
+=========
 
-Facts are accessed by calling functions on the instance variable "Facts", like "Facts.foo()", and can be used anywhere.
+FileTest facts let you ask questions about files and directories.
 
-The following demos are complimentary with the :ref:`advanced` language guide.
+Most of these are functions that take one or more path names and return booleans.
+If that isn't the case, it is noted in the description.
 
-.. code-block:: python
+.. list-table::
+   :header-rows: 1
 
-    def set_resources(self):
-        return Resources(
-            Echo("The OS type is {{ Facts.system() }}")
-        )
+   * - Function
+     - Description
+   * - exists(f)
+     - Does the path exist? - True/False
+   * - executable(f)
+     - Is the path executable? - True/False
+   * - is_file(f)
+     - Is the path a file? - True/False
+   * - is_directory(f) 
+     - Is the path a directory? - True/False
+   * - mode(f)
+     - Return the numeric mode of the path, ex: 0o770
+   * - user(f)
+     - Return the owner user of the path
+   * - group(f)
+     - Return the owner group of the path
+   * - checksum(f)
+     - Return the sha1sum of the path
+   * - checksum_string(s)
+     - Return the sha1sum of a string (bonus)
 
-Or more simply:
+.. note::
+    Pretty much all of the FileTest facts take parameters, which means they
+    can't be debugged by :ref:`module_debug_facts`. See :ref:`debugging_facts` for how
+    to debug these facts with echo if you need to.
 
-.. code-block:: python
+.. _user_facts:
 
-    def set_resources(self):
-        return Resources(
-            Echo(Facts.system())
-        )
+UserFacts
+=========
 
-Or just to use the DebugFacts module and print them out:
+UserFacts are easy user-customizable facts that you can use *WITHOUT* making new Python classes.
 
-.. code-block:: python
+Do you want to easily inject your own information about your system into OpsMop conditionals and
+templates?
 
-    def set_resources(self):
-        return Resources(
-            DebugFacts()
-        )
+UserFacts are generated by scanning files in /etc/opsmop/facts.d/.
 
-To use a Fact in a conditional:
+If a file is not executable, the file will be interpreted as a dictionary in either JSON
+or YAML format.
 
-.. code-block:: python
+If the file is executable, the file will be evaluated, and the output will be evaluated
+as a dictionary in either JSON or YAML format.
 
-	Echo("Not Darwin", when=(Facts.system() != "Darwin"))
+For an example of this, see `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`.
 
-Or inside a Jinja2 template, anywhere in OpsMop, you can also use Facts as you would expect:
+UserFacts are calculated only once per run, for efficiency.  The example includes an invalidate() call
+if you want to learn how to re-evaluate the facts.
 
-.. code-block:
+To test UserFacts, see :ref:`debugging_facts`.
 
-    I am {{ Facts.system() }}
+Access looks like this:
 
+.. code-block: python::
+
+   UserFacts.variable_name
+
+In Python, nested array and dictionary values look normal:
+
+.. code-block: python::
+
+   UserFacts.variable_name.sub_element[2]
+
+In Jinja2, you can of course also use '.'::
+
+   UserFacts.variable_name.sub_element[2]
+
+.. note:
+
+   Pro-tip: if you want your *Policies* to react dynamically to the configuration of the system, you may
+   think about writing a dynamic fact that queries cloud tags. This could be inefficient if you have a lot
+   of instances.  Consider having your deployment process drop a file into /etc/opsmop/facts.d instead.
+
+.. _debugging_facts:
+
+Debuging Facts
+==============
+
+For modules other than FileTest, here's a quick way to show Fact values::
+
+     python -m opsmop.facts.platform
+     python -m opsmop.facts.user_facts
+
+Alternatively see :ref:`module_debug_facts` to show the same things while running a *Policy*.
 
 Custom Facts
 ============
 
-While you cannot create your own facts per se, a custom '/etc/opsmop/facts.d' feature will be provided in the near
-future. Once complete, each file in 'facts.d' will be loaded into a fact value, accessible as::
+If you don't want to use :ref:`user_facts`, you can also write your own fact classes.  This is a little more
+involved, but still easy.
 
-    F.site_facts('factname')
+You will need to extend opsmop.core.policy.Policy to inject the new facts into the Template namespace *IF* you want
+to surface those Fact classes in the Jinja2 template environment.  Then, in your policy files, always use your
+new base class, like AcmeCorpPolicy, instead of the Policy object that ships with OpsMop.
 
-This will then look for a file /etc/opsmop/facts.d/factname
+You will also want to make sure you import the Facts so you can use them in conditionals in addition to templates.
 
-If the fact is valid JSON or YAML, it will be returned as a complex data structure.  If the fact is an executable
-file, the response from that file will be interepreted as JSON.  Otherwise, the value will be returned as a string.
-
-In this way, facts can be implemented in any language.
-
-.. note:
-   Cloud Tip! It may be tempting to write a fact that asks AWS for instance tags, but if you are in a truly immutable
-   system, you can also just bake /etc/opsmop/site.d/ facts into your images, which is faster and will not
-   hit any rate caps. You can then write policy that is conditional on what your images are, without querying the
-   cloud to ask.
+See also :ref:`development`.
 
 Want To Add New Facts?
 ======================
