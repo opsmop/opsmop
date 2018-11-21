@@ -18,10 +18,6 @@ from opsmop.types.type import Type
 
 class Echo(Type):
 
-    """
-    Represents a debug statement
-    """
-
     def __init__(self, msg, *args, **kwargs):
         self.setup(msg=msg, **kwargs)
 

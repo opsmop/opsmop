@@ -14,11 +14,10 @@
 
 import os
 from pathlib import Path
+import stat
+import hashlib
 
 from opsmop.facts.facts import Facts
-
-# TODO: there are a LOT of facts to add yet!  We are just starting out
-# in particular we also want to add /etc/opsmop/facts.d
 
 class FileTestFacts(Facts):
     
@@ -32,5 +31,53 @@ class FileTestFacts(Facts):
     
     def executable(self, fname):
         return os.path.isfile(fname) and os.access(fname, os.X_OK)
+    
+    def is_file(self, fname):
+        if not self.exists(fname):
+            return None
+        return Path(fname).is_file()
+    
+    def is_directory(self, fname):
+        if not self.exists(fname):
+            return None
+        return Path(fname).is_dir()
+
+    def mode(self, fname):
+        if not self.exists(fname):
+            return None
+        lstat = Path(fname).lstat()
+        return stat.S_IMODE(lstat.st_mode)
+    
+    def owner(self, fname):
+        if not self.exists(fname):
+            return None
+        return Path(fname).owner()
+    
+    def group(self, fname):
+        if not self.exists(fname):
+            return None
+        return Path(fname).group()
+
+    def checksum(self, fname, blocksize=65535):
+        m = hashlib.sha256()
+        with open(fname, "rb") as f:
+            block = f.read(blocksize)
+            while len(block) > 0:
+                block = f.read(blocksize)
+                m.update(block)
+        return m.hexdigest()
+
+    def checksum_string(self, msg):
+        m = hashlib.sha256()
+        m.update(msg)
+        return m.hexdigest()
+
+    def same_contents(self, a, b):
+        if not self.exists(b):
+            return False
+        m = hashlib.sha256()
+        c1 = self.checksum(a)
+        c2 = self.checksum(b)
+        return (c1 == c2)        
 
 FileTests = FileTestFacts()

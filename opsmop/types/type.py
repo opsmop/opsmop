@@ -14,7 +14,6 @@
 
 from opsmop.core.resource import Resource
 from opsmop.core.template import Template
-from opsmop.facts.facts import Facts
 from opsmop.lookups.lookup import Lookup
 
 class Type(Resource):
@@ -24,12 +23,7 @@ class Type(Resource):
 
     def provider(self):
         """
-        Given a facts instance, obtain the provider used to provide actions
-        on behalf of the resource.  Return the provider instance.
-
-        If a module wishes to enable the 'provider=' method, it can define
-        a 'provider' method that returns a class for each provider
-        name in addition to the required 'default_provider' method.
+        Given a facts instance, obtain the provider used to fulfill the resource. 
         """
 
         cls = None
@@ -43,13 +37,16 @@ class Type(Resource):
         self.resolve_provider_fields(inst)
         return inst
 
+    # ---------------------------------------------------------------
+
     def get_provider(self, provider):
         return None
 
+    # ---------------------------------------------------------------
+
     def copy_fields_to_provider(self, provider):
         """
-        Transfer fields like self.name or self.owner or ... whatever ... to the provider to make provider code simpler.
-        Rather than having to do self.resource.name/owner/whatever within the provider
+        Transfer fields like self.name or self.owner or the provider object.
         """
 
         if self._field_spec is None:
@@ -61,6 +58,8 @@ class Type(Resource):
                 value = getattr(self, k)
                 setattr(provider, k, value)
 
+    # ---------------------------------------------------------------
+
     def resolve_provider_fields(self, provider):
 
         for (k, spec) in self._field_spec.fields.items():
@@ -69,24 +68,30 @@ class Type(Resource):
                 value = value.evaluate(provider.resource)
             setattr(provider, k, value)
 
-    def facts(self):
-        return Facts()
+    # ---------------------------------------------------------------
 
     def context(self):
         return self._context
 
+    # ---------------------------------------------------------------
+
     def set_context(self, value):
         self._context = value
+
+    # ---------------------------------------------------------------
 
     def template(self, msg):
         return Template.from_string(msg, self)
 
+    # ---------------------------------------------------------------
+
     def template_file(self, path):
         return Template.from_file(path, self)
 
+    # ---------------------------------------------------------------
+
     def __str__(self):
-        # FIXME: if we run a version of the fields copy code on this object instead
-        # of the provider we won't have to do self.kwargs here.
+        # we use kwargs here because the member variables might not be set up yet
         str_name = ""
         if 'name' in self.kwargs:
             str_name = self.__class__.__name__ + ": %s" % self.kwargs['name']

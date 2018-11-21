@@ -92,8 +92,7 @@ class Resource(object):
         Get the facts available inside templating for this resource.
         To keep things simple, we just ask the Policy.
         """
-        policy = self.policy()
-        return policy.fact_context()
+        return self.policy().fact_context()
 
     def get_children(self, method=None):
         """
@@ -189,7 +188,6 @@ class Resource(object):
                 result.append(ptr.handles)
             ptr = ptr.parent()
         return result
-
 
     def pre(self):
         """

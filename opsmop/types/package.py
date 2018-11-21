@@ -20,10 +20,6 @@ from opsmop.core.errors import ValidationError
 
 class Package(Type):
 
-    """
-    Represents a software package
-    """
-
     def __init__(self, name=None, **kwargs):
         self.setup(name=name, **kwargs)
 

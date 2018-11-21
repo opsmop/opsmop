@@ -19,7 +19,7 @@ from opsmop.types.type import Type
 class Shell(Type):
 
     """
-    Represents a command to (maybe) be run
+    Represents a command to be run
     """
 
     def __init__(self, cmd=None, **kwargs):

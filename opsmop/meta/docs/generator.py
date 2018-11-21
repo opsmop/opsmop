@@ -27,8 +27,7 @@ class Generator(object):
 
     def find_files(self):
         path = os.path.join(self.examples_dir, "*.py")
-        files = glob.glob(path)
-        return files
+        return glob.glob(path)
 
     def go(self):
         files = self.find_files()
