@@ -7,7 +7,7 @@ class Result(object):
 
     __slots__ = [ 'rc', 'provider', 'resource', 'data', 'fatal', 'message', 'data' ]
 
-    def __init__(self, provider=None, changed=True, message=None, rc=None, data=None, fatal=False):
+    def __init__(self, provider, changed=True, message=None, rc=None, data=None, fatal=False):
 
         """
         A result can be constructed with many parameters, most of which have reasonable defaults:
@@ -18,7 +18,6 @@ class Result(object):
         data - the output of a CLI command, or any structured data for use with 'register'
         fatal - a flag that indicates the result should probably end the program, but it is up to the callback code
         """
-        assert provider is not None
         self.provider = provider
         self.resource = provider.resource
         self.rc = rc

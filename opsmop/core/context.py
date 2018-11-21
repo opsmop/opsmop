@@ -5,7 +5,6 @@ class Context(object):
 
     def __init__(self, callbacks=None):
 
-        assert type(callbacks) == list
         self._callbacks = callbacks
         self._signals = []
         for cb in self._callbacks:

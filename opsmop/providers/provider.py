@@ -71,7 +71,7 @@ class Provider(object):
             fatal = False
         if timeout is None:
             timeout = self.get_default_timeout()
-        return Command(cmd, provider=self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal)
+        return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal)
 
     def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False):
         """ Common helper code for test and run """
@@ -107,11 +107,11 @@ class Provider(object):
 
     def ok(self, data=None):
         """ shortcut to return an ok result from .apply() """
-        return Result(provider=self, data=data)
+        return Result(self, data=data)
 
     def fatal(self, msg):
         """ shortcut to return a failed result from .apply() """
-        return Result(provider=self, fatal=True, message=msg)
+        return Result(self, fatal=True, message=msg)
 
     def has_planned_actions(self):
         """

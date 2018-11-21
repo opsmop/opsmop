@@ -7,13 +7,8 @@ class Scope(object):
 
     def __init__(self, variables=None, level=0, parent=None, resource=None):
 
-        assert resource is not None
-
         if variables is None:
             variables = dict()
-        assert type(variables) is dict
-
-
 
         self._parent = parent
         self.level = level
@@ -33,7 +28,6 @@ class Scope(object):
 
     @classmethod
     def for_top_level(cls, resource):
-        assert resource is not None
         return cls(variables=resource.variables, level=0, parent=None, resource=resource)
 
     def top_level_scope(self):
@@ -44,13 +38,9 @@ class Scope(object):
 
     def top_level_resource(self):
         top_scope = self.top_level_scope()
-        assert top_scope is not None
-        result = top_scope._resource
-        assert result is not None
-        return result
+        return top_scope._resource
         
     def deeper_scope_for(self, resource):
-        assert resource is not None
         return Scope(variables=self._variables.copy(), level=self.level+1, parent=self, resource=resource)
 
     def ancestors(self):
@@ -83,7 +73,6 @@ class Scope(object):
         """
         Resources setting/registering variables should always update the scope one level up.
         """
-        assert self.parent() is not None
         self.parent().update_variables(variables)
 
     def update_variables(self, variables):

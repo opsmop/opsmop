@@ -17,7 +17,7 @@ class Command(object):
 
     __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env' ]
 
-    def __init__(self, cmd, provider=None, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False):
+    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False):
 
         """
         Constructs but does not execute a command.
@@ -31,9 +31,8 @@ class Command(object):
         fatal: whether any errors should fail the resource execution
         loud: whether to ignore 'quiet' preferences for just the output (but not command name or return codes)
         """
-        assert provider is not None
-        self.provider = provider
         self.cmd = cmd
+        self.provider = provider
         self.timeout = timeout
         self.loud = loud
         self.echo = echo
@@ -116,9 +115,9 @@ class Command(object):
         res = None
         rc = process.returncode
         if rc != 0:
-            res = Result(provider=self.provider, rc=rc, data=output, fatal=self.fatal)
+            res = Result(self.provider, rc=rc, data=output, fatal=self.fatal)
         else:
-            res = Result(provider=self.provider, rc=rc, data=output, fatal=False)
+            res = Result(self.provider, rc=rc, data=output, fatal=False)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
         context.on_command_result(res)
         return res

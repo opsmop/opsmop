@@ -43,7 +43,6 @@ class Resource(object):
         Without a scope object, it is impossible to compute variables for use in template
         and conditional evaluation, hence the assert.
         """
-        assert self._scope is not None
         return self._scope
 
     def top_level_resource(self):
@@ -64,10 +63,7 @@ class Resource(object):
         """
         Find the policy object at the top of the object tree.
         """
-        from opsmop.core.policy import Policy
-        policy = self.top_level_resource()
-        assert issubclass(type(policy), Policy)
-        return policy
+        return self.top_level_resource()
 
     def template_context(self):
         """

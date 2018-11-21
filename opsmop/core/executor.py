@@ -86,11 +86,6 @@ class Executor(object):
         """
         Runs one specific policy in VALIDATE, CHECK, or APPLY mode
         """
-        
-        assert issubclass(type(policy), Policy)
-        assert issubclass(type(context), Context)
-        assert mode in [ 'validate', 'check', 'apply' ]
-
         # assign a new top scope to the policy object.
         policy.init_scope(context)
 
@@ -235,7 +230,6 @@ class Executor(object):
             
         # all Provider apply() methods need to return Result objects or raise
         # exceptions
-        assert result is not None
         assert issubclass(type(result), Result)
 
         # the 'register' feature saves results into variable scope
@@ -278,12 +272,6 @@ class Executor(object):
         This handles the plan/apply intercharge for a given resource in the resource tree.
         It is called recursively via walk_children to run against all resources.
         """
-        
-        assert resource is not None
-        assert context is not None
-        assert mode in [ CHECK, APPLY, VALIDATE ]
-        assert handlers in [ True, False ]
-
         # we only care about processing leaf node objects
         if self.is_collection(resource):
             return
