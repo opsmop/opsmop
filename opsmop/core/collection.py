@@ -1,11 +1,6 @@
-
-import jinja2
-
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
-from opsmop.core.scope import Scope
-
 
 class Collection(Resource):
 
@@ -36,11 +31,6 @@ class Collection(Resource):
             self,
             items = Field(kind=list, of=Resource),
         )
-
-        conditions = conditions[:]
-        if obj.when:
-            conditions.append(obj.when)
-        parent.child_scope(obj)
 
     def add(self, what):
         if type(what) == list:
