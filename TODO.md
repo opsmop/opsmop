@@ -1,7 +1,10 @@
 Bug queue and PRs will be open by December.  TODO list (shorter term ideas/priorities):
 
 core platform:
-* show parameters per executed type
+* if a resource is just a string, infer that it is an Echo resource
+* which using the Echo resource, switch off all output but the Echo
+* the TOML bundle idea from the forum?
+* show parameters per executed type in CLI output
 * if a basic list is passed in to any object like Resources() or returned from set_resources, auto-convert it to a collection.
 * much better errors from template code - not full tracebacks
 * better asserts if things like set_resources does not return a Resources(), ditto for set_roles
@@ -11,7 +14,7 @@ core platform:
 
 modules:
 * finish out testing File module, Service:brew and Package:brew
-* finish out package/service modules for main OSes (Debian, CentOS to start)
+* finish out package/service modules for main OSes (Debian/Ubuntu, CentOS to start)
 * Still allow some way for Set('') to also do global scope.  Maybe Global()
 * add a 'sudo' parameter to shell which just does sudo -u
 * Shell module should allow File's easy copy behavior to transfer scripts
