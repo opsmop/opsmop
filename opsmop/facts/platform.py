@@ -14,6 +14,7 @@
 
 import platform
 import os
+import shutil
 
 from opsmop.core.common import memoize
 from opsmop.facts.facts import Facts
@@ -50,6 +51,7 @@ class PlatformFacts(Facts):
         # patches welcome! feel free to update this for your distribution
 
         if os.path.exists("/etc/lsb-release"):
+            # Debian/Ubuntu.
             data = open("/etc/lsb-release").read().splitlines()
             distribution = None
             release = None
@@ -62,7 +64,8 @@ class PlatformFacts(Facts):
                 elif line.startswith("DISTRIB_CODENAME"):
                     codename = line.split("=")[-1].strip()
             return dict(distribution=distribution, version=release, variant=codename)
-        if os.path.exists("/etc/redhat-release"):
+        elif os.path.exists("/etc/redhat-release"):
+            # RHEL/CentOS/Scientific Linux
             data = open("/etc/redhat-release").read()
             tokens = data.split()
             for (i,t) in enumerate(tokens):
@@ -71,6 +74,20 @@ class PlatformFacts(Facts):
             distribution = " ".join(tokens[0:i-1])
             variant = " ".join(tokens[i:-1])
             return dict(distribution=distribution, version=tokens[i], variant=variant)
+        elif os.path.exists("/etc/system-release"):
+            # Amazon Linux. Needs testing. May not be optimal for other distros.
+            data = open("/etc/system-release").read().splitlines()
+            distribution = None
+            release = None
+            rdate = None
+            for line in data:
+                if line.startswith("NAME"):
+                    distribution = line.split("=")[-1].strip()
+                elif line.startswith("VERSION"):
+                    tokens = line.split(None, 2)
+                    release = tokens[0]
+                    rdate = tokens[1].replace("(","").replace(")","").strip()
+            return dict(distribution=distribution, version=release, variant=rdate)
         return None
 
     @memoize
@@ -105,9 +122,14 @@ class PlatformFacts(Facts):
         if distro == "Darwin":
             from opsmop.providers.package.brew import Brew
             return Brew
-        elif distro in [ 'CentOS Linux', 'Red Hat Linux' ]:
+        elif distro in [ 'CentOS Linux', 'Red Hat Linux', 'Amazon Linux', 'Scientific Linux' ]:
+            # Amazon Linux, Scientific Linux, add yourselves here after testing
+            # this will need some logic to decide when to use dnf
             from opsmop.providers.package.yum import Yum
             return Yum
+        elif shutil.which("apt"):
+            from opsmop.providers.package.apt import Apt
+            return Apt
         return None
 
     def default_service_manager(self):

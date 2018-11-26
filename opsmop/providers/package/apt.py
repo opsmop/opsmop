@@ -15,17 +15,21 @@
 from opsmop.providers.package.package import Package
 
 TIMEOUT = 60
-VERSION_CHECK = "brew ls --versions {name} | cut -f2 -d ' '"
-INSTALL = "brew install {name}"
-UPGRADE = "brew update {name}"
-UNINSTALL = "brew uninstall {name}"
+VERSION_CHECK = "dpkg -s %s | grep '^Version'"
+INSTALL = "apt install -y {name}"
+UPGRADE = "apt update -y {name}"
+UNINSTALL = "apt remove -y {name}"
 
-class Brew(Package):
+class Apt(Package):
 
+    
     def _get_version(self):
-        version_check = VERSION_CHECK.format(name=self.name)
-        return self.test(version_check)
-
+        version_check = VERSION_CHECK % self.name
+        output = self.test(version_check)
+        if output is None:
+            return None
+        return output      
+ 
     def get_default_timeout(self):
         return TIMEOUT
 
@@ -47,3 +51,5 @@ class Brew(Package):
         if which:
             return self.run(which)
         return self.ok()
+
+

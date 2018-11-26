@@ -23,9 +23,6 @@ UNINSTALL = "rpm -e {name}"
 
 class Yum(Package):
 
-    """
-    Manages homebrew packages
-    """
     
     def _get_version(self):
         version_check = "%s %s" % (VERSION_CHECK % self.name, QUERY_FORMAT)
