@@ -34,7 +34,7 @@ class Systemd(Service):
         else:
             return "stopped"
 
-    def is_enabled(self, status):
+    def _is_enabled(self, status):
         enabled = self.test(IS_ENABLED.format(name=self.name))
         if enabled is None:
             return False
