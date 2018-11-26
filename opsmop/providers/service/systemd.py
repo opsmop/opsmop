@@ -37,7 +37,7 @@ class Systemd(Service):
     def is_enabled(self, status):
         enabled = self.test(IS_ENABLED.format(name=self.name))
         if enabled is None:
-           return False
+            return False
         return enabled == "enabled"
 
     def plan(self):
