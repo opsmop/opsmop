@@ -66,7 +66,12 @@ See :ref:`development` if you are interested in adding something.
      - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
    * - version()
      - from `python's platform module <https://docs.python.org/3/library/platform.html>`_
-
+   * - os_distribution()
+     - the distribution as reported by the OS, ex: 'CentOS Linux'
+   * - os_version_number()
+     - ex:  7.2
+   * - os_version_string()
+     - ex: "7.2.1234"
 
 Example:
 
