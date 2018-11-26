@@ -48,6 +48,20 @@ class PlatformFacts(Facts):
         Loads OS names and versions. 
         """
         # patches welcome! feel free to update this for your distribution
+
+        if os.path.exists("/etc/lsb-release"):
+            data = open("/etc/lsb-release").read().splitlines()
+            distribution = None
+            release = None
+            codename = None
+            for line in data:
+                if line.startswith("DISTRIB_ID"):
+                    distribution = line.split("=")[-1].strip()
+                elif line.startswith("DISTRIB_RELEASE"):
+                    release = line.split("=")[-1].strip()
+                elif line.startswith("DISTRIB_CODENAME"):
+                    codename = line.split("=")[-1].strip()
+            return dict(distribution=distribution, version=release, variant=codename)
         if os.path.exists("/etc/redhat-release"):
             data = open("/etc/redhat-release").read()
             tokens = data.split()
