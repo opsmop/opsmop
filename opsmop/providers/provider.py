@@ -16,6 +16,7 @@ from opsmop.core.action import Action
 from opsmop.core.command import Command
 from opsmop.core.result import Result
 from opsmop.core.template import Template
+from opsmop.core.errors import ProviderError
 
 DEFAULT_TIMEOUT = 60
 
@@ -59,6 +60,9 @@ class Provider(object):
     def plan(self):
         """ call self.should('foo') for any actions that should be undertaken by .apply() """
         raise NotImplementedError
+
+    def error(self, msg):
+        raise ProviderError(msg=msg, provider=self)
 
     def needs(self, action_name):
         """ declares than an action 'should' take place during an apply step """

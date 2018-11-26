@@ -13,19 +13,35 @@
 # limitations under the License.
 
 from opsmop.providers.service.service import Service
+from opsmop.core.errors import ProviderError
 
-STATUS = "brew services list | grep {name} -m1"
-START = "brew services start {name}"
-STOP  = "brew services stop {name}"
-RESTART = "brew services restart {name}"
+STATUS = "systemctl status {name}"
+IS_ENABLED = "systemctl is-enabled {name}"
+START = "systemctl start {name}"
+STOP  = "systemctl stop {name}"
+RESTART = "systemctl restart {name}"
+ENABLE = "systemctl enable {name}"
+DISABLE = "systemctl disable {name}"
 
 class Systemd(Service):
 
     def _get_status(self):
-        return self.test(STATUS.format(name=self.name))
+        status = self.test(STATUS.format(name=self.name), loose=True)
+        if "could not be found" in status:
+            self.error("service %s could not be found" % self.name)
+        if "Active: active" in status:
+            return "running"
+        else:
+            return "stopped"
+
+    def is_enabled(self, status):
+        enabled = self.test(IS_ENABLED.format(name=self.name))
+        if enabled is None:
+           return False
+        return enabled == "enabled"
 
     def plan(self):
-        super().plan(on_boot=False)
+        super().plan()
 
     def apply(self):
 
@@ -41,12 +57,11 @@ class Systemd(Service):
             self.run(STOP.format(name=self.name))
 
         # enable/disable
-        if self.should('enable') and not self.should('start'):
+        if self.should('enable'):
             self.do('enable')
-            self.error("brew does not support enablement")
-
-        elif self.should('disable') and not self.should('stop'):
+            self.run(ENABLE.format(name=self.name))
+        elif self.should('disable'):
             self.do('disable')
-            self.error("brew does not support disablement")
+            self.run(DISABLE.format(name=self.name))
         
         return self.ok()
