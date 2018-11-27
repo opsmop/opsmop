@@ -231,7 +231,9 @@ See also :ref:`module_file` and :ref:`module_service`.
 Variables
 =========
 
-The method 'set_variables' on a *Resource* or a *Role* can define *variables*.
+The method 'set_variables' on a *Resource* or a *Role* can define *variables*:
+
+.. code-block:: python
 
     def set_variables(self):
         return dict(a=1, b=2, c=3)
