@@ -35,6 +35,14 @@ class ValidationError(OpsMopError):
         self.resource = resource
         self.msg = msg
 
+class NoSuchProviderError(OpsMopError):
+    
+    __slots__ = [ 'resource', 'msg' ]
+
+    def __init__(self, resource, provider_name):
+        self.resource = resource
+        self.msg = "No such provider: %s" % provider_name
+
 class ProviderError(OpsMopError):
 
     """

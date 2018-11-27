@@ -142,6 +142,25 @@ class PlatformFacts(Facts):
             from opsmop.providers.service.systemd import Systemd
             return Systemd
 
+    def default_user_manager(self):
+        # patches welcome! feel free to update this for your distribution        
+        distro = self.os_distribution()
+        if distro != "Darwin":
+            from opsmop.providers.user.useradd import UserAdd
+            return UserAdd
+        else:
+            # someone may want to add this later, but skipping for now
+            return None
+
+    def default_group_manager(self):
+        # patches welcome! feel free to update this for your distribution        
+        distro = self.os_distribution()
+        if distro != "Darwin":
+            from opsmop.providers.group.groupadd import GroupAdd
+            return GroupAdd
+        else:
+            return None
+
     def constants(self):
         """
         This returns all facts that do not take parameters .

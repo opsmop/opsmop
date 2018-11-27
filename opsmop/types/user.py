@@ -18,7 +18,7 @@ from opsmop.facts.platform import Platform
 from opsmop.types.type import Type
 from opsmop.core.errors import ValidationError, NoSuchProviderError
 
-class Package(Type):
+class User(Type):
 
     def __init__(self, name=None, **kwargs):
         self.setup(name=name, **kwargs)
@@ -26,27 +26,26 @@ class Package(Type):
     def fields(self):
         return Fields(
             self,
-            name = Field(kind=str, help="the name of the package to install"),
-            version = Field(kind=str, default=None, help="what version to install"),
-            latest = Field(kind=bool, default=False, help="if true, upgrade the package regardless of version"),
-            absent = Field(kind=bool, default=False, help="if true, remove the package")
+            name = Field(kind=str, help="the name of the user account"),
+            group = Field(kind=str, default=None, help="if set, assign the user's primary group (on creation)"), 
+            home = Field(kind=str, default=None, help="if set, override the user's home directory location (on creation)"),
+            uid = Field(kind=int, default=None, help="if set, use a specific UID for the account (on creation)"),
+            system = Field(kind=bool, default=False, help="if true, specifies a system account (on creation)"),
+            groups = Field(kind=list, default=None, of=str, help="if set, assign these groups in addition to the primary groups (on creation)"),
+            shell = Field(kind=str, default=None, help="if set, assign the user's shell (on creation)"),
+            absent = Field(kind=bool, default=False, help="if True, remove this user account")
         )
 
     def validate(self):
-        # FIXME: latest and absent are incompatible, as are version and absent
         pass
 
     def get_provider(self, method):
-        if method == 'brew':
-            from opsmop.providers.package.brew import Brew
-            return Brew
-        elif method == 'yum':
-            from opsmop.providers.package.yum import Yum
-            return Yum
-        elif method == 'apt':
-            from opsmop.providers.package.apt import Apt
-            return Apt
+        if method == 'useradd':
+            from opsmop.providers.user.useradd import UserAdd
+            return UserAdd
         raise NoSuchProviderError(self, method)
 
     def default_provider(self):
-        return Platform.default_package_manager()
+        return Platform.default_user_manager()
+
+

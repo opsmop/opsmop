@@ -14,6 +14,7 @@ core platform:
 * implement changed_when, failed_when
 * when actions taken != actions planned, show both lists
 * reinstate the resource counters - how many resources added/changed/etc
+* fatal commands should result in ending the program (callback change)
 
 modules:
 * Still allow some way for Set('') to also do global scope.  Maybe Global()

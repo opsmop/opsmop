@@ -16,7 +16,7 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
 from opsmop.facts.platform import Platform
-from opsmop.core.errors import ValidationError
+from opsmop.core.errors import ValidationError, NoSuchProviderError
 
 class Service(Type):
 
@@ -43,7 +43,12 @@ class Service(Type):
         if method == 'brew':
             from opsmop.providers.service.brew import Brew
             return Brew
-        raise ValidationError("unsupported provider: %s" % method)
+        elif method == 'systemd':
+            from opsmop.providers.package.systemd import Systemd
+            return Systemd
+        raise NoSuchProviderError(self, method)
 
     def default_provider(self):
         return Platform.default_service_manager()
+
+
