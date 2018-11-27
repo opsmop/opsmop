@@ -14,6 +14,7 @@ sphinx:
 	(cd docs; make html)
 
 gendocs:
+	mkdir -p docs/source/modules/
 	PYTHONPATH=. python3 -m opsmop.meta.docs.cli ../opsmop-demo/module_docs docs/source/modules
 
 docs_publish:
