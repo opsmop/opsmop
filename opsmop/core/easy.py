@@ -40,6 +40,7 @@ from opsmop.types.set import Set
 from opsmop.types.shell import Shell
 from opsmop.types.stop import Stop
 from opsmop.types.user import User
+from opsmop.types.group import Group
 
 __all__ = [
     # common resources
@@ -52,5 +53,7 @@ __all__ = [
     'Platform', 'UserFacts', 'FileTests', 'Chaos',
 
     # common types
-    'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 'Set', 'Stop', 'Asserts', 'Debug', 'DebugFacts', 'User'
+    'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 
+    'Set', 'Stop', 'Asserts', 'Debug', 'DebugFacts', 'User',
+    'Group'
 ]
