@@ -56,8 +56,10 @@ Supported:
 Status
 ======
 
-* We will be open to pull requests and bug reports starting December 1.
-* Documentated language features locked in by January 2019
+* Now open for pull requests!
+* Extensive help for new contributors available in December 2019, stop by the forum!
+* Pull and Push features under active development
+* Documentated language features mostly locked in by January 2019
 * Tagged release in Feburary 2019
 
 If you like where this is going, now is the time to join up with thoughts
@@ -77,14 +79,7 @@ Community and Contributions
 ===========================
 
 The purpose of the Opsmop community is to come together to build the ultimate configuration tool we all want to use.
-
-Contributions are greatly appreciated and will be open starting December 1st. Until then, we're moving things around and establishing a solid
-baseline, as well as gathering your feedback and ideas.
-
-Take a look at the development guide on the website for starters and feel free to browse around the code - there are some areas
-that are still undergoing heavy refactoring.
-
-If this project seems interesting to you, we highly recommend joining the OpsMop forum linked below.
+If this project seems interesting to you, we highly recommend joining the [forum](https://talk.msphere.io).
 
 Twitter
 =======
