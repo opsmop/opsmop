@@ -95,6 +95,6 @@ Twitter
 Forum
 =====
 
-Feature ideas, questions, want to share something, or need some help? [Post on the Discourse Forum!](https://talk.vespene.io/c/opsmop-general).
+Feature ideas, questions, want to share something, or need some help? [Post on the Discourse Forum!](https://talk.msphere.io/).
 
 

@@ -16,7 +16,7 @@ Code contributions are always welcome, but never required.
 Forum
 =====
 
-The official Opsmop discussion form is hosted `here <https://talk.vespene.io/c/opsmop-general>`.  The purpose of the forum
+The official Opsmop discussion form is hosted `here <https://talk.msphere.io/>`.  The purpose of the forum
 is to get help, ask questions, post ideas, coordinate development, and brainstorm features.  While this is a subforum
 of the `Vespene <http://vespene.io>` forum, OpsMop and Vespene do not require one another, but are simply
 two projects started by the same person.

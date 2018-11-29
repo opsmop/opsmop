@@ -100,7 +100,7 @@ GitHub
 Forum
 =====
 
-* `Join here <https://talk.vespene.io/c/opsmop-general>`_
+* `Join here <https://talk.msphere.io/>`_
 
 Twitter
 =======
