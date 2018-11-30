@@ -63,13 +63,14 @@ Supported:
 Status
 ======
 
-Alpha. OpsMop is in a tech-preview/feedback phase.
+Alpha.  Entirely usable for local configuration, with a limited module set.
 
-We are still refactoring some minor parts and working on plugins. Existing modules/plugins are limited
-and features are not fully implemented in all cases. Still, the language itself is very well evolved
-and close to complete. We love new ideas, so stop by the forum and share your ideas and to talk
-about the things you want to configure with OpsMop. If you would like to get involved with development,
-now is the time to read up on OpsMop, and the floodgates will be open in December!
+Initial plugin versions are now available, and we're providing extensive help to new contributors
+and users this December.
+
+Push and pull modes are also in active development at this time.
+
+Share language feedback, thoughts, and experiences on the `forum <https://talk.msphere.io>`_.
 
 See also: :ref:`development` and :ref:`community`
 

@@ -23,14 +23,14 @@ Check mode runs a policy and reports on actions that should be changed, but does
 make any changes (use :ref:`apply` to make changes).  This is often called a 'dry-run' mode, 
 and dry-run support is a first-class citizen of OpsMop::
 
-   opsmop check opsmop-demo/content/hello.py
+   opsmop --check opsmop-demo/content/hello.py
 
 .. _validate:
 
 To just look for missing files and bad parameters, without running the full check mode,
 you can also run::
 
-   opsmop validate opsmop-demo/content/hello.py
+   opsmop --validate opsmop-demo/content/hello.py
 
 .. _apply:
 
@@ -39,7 +39,7 @@ Apply Mode
 
 Apply mode runs a policy, plans what changes are needed, and also runs the policy::
 
-    opsmop apply opsmop-demo/content/hello.py
+    opsmop --apply opsmop-demo/content/hello.py
 
 .. note:
     As a nice feature, OpsMop enforces that planned actions reported in check mode

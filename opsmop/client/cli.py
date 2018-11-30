@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import sys
+import argparse
 
 from opsmop.client.callbacks import CliCallbacks
 from opsmop.core.api import Api
@@ -25,9 +26,9 @@ USAGE = """
 |
 | opsmop - (C) 2018, Michael DeHaan LLC
 |
-| opsmop show  demo/policy.py 
-| opsmop check demo/policy.py
-| opsmop apply demo/policy.py  
+| opsmop --validate demo/policy.py 
+| opsmop --check demo/policy.py
+| opsmop --apply demo/policy.py  
 |
 """
 
@@ -51,15 +52,31 @@ class Cli(object):
         path = sys.argv[2]
         callbacks = [ CliCallbacks() ]
 
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--validate', help='policy file to validate')
+        parser.add_argument('--apply', help="policy file to apply")
+        parser.add_argument('--check', help="policy file to check")
+
+        args = parser.parse_args(self.args[1:])
+
+        all_modes = [ args.validate, args.apply, args.check ]
+        selected_modes = [ x for x in all_modes if x is not None ]
+        if len(selected_modes) != 1:
+            print(USAGE)
+            sys.exit(1)
+
+        path = args.validate or args.apply or args.check
+
         api = Api.from_file(path=path, callbacks=callbacks)
         
-        if mode == 'validate':
+        if args.validate:
             # just check for missing files and invalid types
             api.validate()
-        elif mode == 'check':
+        elif args.check:
             # operate in dry-run mode
             api.check()
-        elif mode == 'apply':
+        elif args.apply:
             # configure everything
             api.apply()
         else:
