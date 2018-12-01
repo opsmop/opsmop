@@ -39,11 +39,17 @@ class Apt(Package):
         which = None
         if self.should('install'):
             self.do('install')
-            which = INSTALL.format(name=self.name)
+            if self.version:
+                which = INSTALL.format(name="{}={}".format(self.name, self.version))
+            else:
+                which = INSTALL.format(name=self.name)
         elif self.should('upgrade'):
             self.do('upgrade')
             # In apt-get, install also performs the task of upgrading a single package, so it is re-used
-            which = INSTALL.format(name=self.name)
+            if self.version:
+                which = INSTALL.format(name="{}={}".format(self.name, self.version))
+            else:
+                which = INSTALL.format(name=self.name)
         elif self.should('remove'):
             self.do('remove')
             which = UNINSTALL.format(name=self.name)
