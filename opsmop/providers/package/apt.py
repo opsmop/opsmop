@@ -24,10 +24,10 @@ class Apt(Package):
     
     def _get_version(self):
         version_check = VERSION_CHECK % self.name
-        output = self.test(version_check).split(':')[1].strip()
+        output = self.test(version_check)
         if output is None:
             return None
-        return output      
+        return output.split(':')[1].strip()
  
     def get_default_timeout(self):
         return TIMEOUT
