@@ -24,7 +24,7 @@ class Apt(Package):
     
     def _get_version(self):
         version_check = VERSION_CHECK % self.name
-        output = self.test(version_check)
+        output = self.test(version_check).split(':')[1].strip()
         if output is None:
             return None
         return output      
