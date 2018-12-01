@@ -16,9 +16,8 @@ from opsmop.providers.package.package import Package
 
 TIMEOUT = 60
 VERSION_CHECK = "dpkg -s %s | grep '^Version'"
-INSTALL = "apt install -y {name}"
-UPGRADE = "apt update -y {name}"
-UNINSTALL = "apt remove -y {name}"
+INSTALL = "apt-get -q=2 install -y {name}"
+UNINSTALL = "apt-get -q=2 remove -y {name}"
 
 class Apt(Package):
 
@@ -43,7 +42,8 @@ class Apt(Package):
             which = INSTALL.format(name=self.name)
         elif self.should('upgrade'):
             self.do('upgrade')
-            which = UPGRADE.format(name=self.name)
+            # In apt-get, install also performs the task of upgrading a single package, so it is re-used
+            which = INSTALL.format(name=self.name)
         elif self.should('remove'):
             self.do('remove')
             which = UNINSTALL.format(name=self.name)
