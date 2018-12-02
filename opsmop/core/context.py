@@ -99,8 +99,8 @@ class Context(object):
     def on_skipped(self, value, is_handler=False):
         self._run_callbacks('on_skipped', value, is_handler)
 
-    def on_flagged(self, value):
-        self._run_callbacks('on_flagged', value)
+    def on_signalled(self, value):
+        self._run_callbacks('on_signalled', value)
 
     def on_complete(self, value):
         self._run_callbacks('on_complete', value)

@@ -272,7 +272,7 @@ class Executor(object):
             # record the list of all events signalled while processing this role
             context.add_signal(resource.signals)
             # tell the callbacks that a signal occurred
-            context.on_flagged(resource.signals)
+            context.on_signalled(resource.signals)
 
     # ---------------------------------------------------------------
 

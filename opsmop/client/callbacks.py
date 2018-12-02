@@ -149,8 +149,8 @@ class CliCallbacks(BaseCallback):
         if is_handler:
             self.i3("(handler)")
 
-    def on_flagged(self, flagged):
-        self.i3("flagged: %s" % flagged)
+    def on_signalled(self, what):
+        self.i3("signalled: %s" % what)
 
     def on_complete(self, policy):
         self.i1("")
