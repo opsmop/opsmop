@@ -83,7 +83,7 @@ class Executor(object):
         for policy in self._policies:
             # the context holds some types of state, such as signalled events
             # and is cleared between each policy execution
-            context = Context(callbacks=self._callbacks)
+            context = Context(mode=mode, callbacks=self._callbacks)
             # actual running of the policy here:
             self.run_policy(policy=policy, context=context, mode=mode)
             contexts.append(context)

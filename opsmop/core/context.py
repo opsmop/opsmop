@@ -16,12 +16,17 @@
 
 class Context(object):
 
-    def __init__(self, callbacks=None):
+    def __init__(self, mode=None, callbacks=None):
 
         self._callbacks = callbacks
         self._signals = []
+        assert mode in [ 'validate', 'apply', 'check' ]
+        self._mode = mode
         for cb in self._callbacks:
             cb.set_context(self)
+
+    def mode(self):
+        return self._mode
 
     def add_signal(self, signal):
         self._signals.append(signal)
