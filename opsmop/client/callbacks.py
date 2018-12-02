@@ -59,8 +59,11 @@ class CliCallbacks(BaseCallback):
             return
         self.i5("| %s" % echo.rstrip())
 
-    def on_echo(self, echo):
-        self.i5("| %s" % echo)
+    def on_echo(self, provider, echo):
+        if not provider or not provider.very_quiet():
+            self.i5("| %s" % echo)
+        else:
+            self.i3(echo)
 
     def on_execute_command(self, command):
         if command.echo:
@@ -73,7 +76,9 @@ class CliCallbacks(BaseCallback):
         self.i3("planning...")
 
     def on_apply(self, provider):
-        self.i3(provider.verb())
+        verb = provider.verb()
+        if verb:
+            self.i3(verb)
     
     def on_planned_actions(self, provider, actions_planned):
         if self.provider.skip_plan_stage():
@@ -95,11 +100,15 @@ class CliCallbacks(BaseCallback):
         if (taken != planned):
             self.i5("ERROR: actions planned do not equal actions taken: %s" % taken)
             self.on_fatal()
+        if provider.quiet():
+            return
         self.i3("actions:")
         for x in actions_taken:
             self.i5("| %s" % str(x))
 
     def on_result(self, result):
+        if result.provider.quiet():
+            return
         self.i3(str(result))
 
     def on_command_result(self, result):
@@ -127,14 +136,14 @@ class CliCallbacks(BaseCallback):
         self.banner("{count} :: {role} :: {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
         self.i1("")
         if is_handler:
-            self.i3("handler")
+            self.i3("(handler for '%s')\n" % resource.handles)
 
     def on_flagged(self, flagged):
         self.i3("flagged: %s" % flagged)
 
     def on_complete(self, policy):
         self.i1("")
-        self.i1("complete!")
+        self.banner("complete!")
         self.summarize()
 
     def on_role(self, role):
@@ -157,7 +166,7 @@ class CliCallbacks(BaseCallback):
     def on_update_variables(self, variables):
         self.i3("registered:")
         for (k,v) in variables.items():
-            self.on_echo("%s => %s" % (k,v))
+            self.on_echo(None, "%s => %s" % (k,v))
 
     def i1(self, msg):
         # indent methods

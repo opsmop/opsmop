@@ -47,8 +47,8 @@ class Context(object):
     def on_finished(self, value):
         self._run_callbacks('on_finished')
 
-    def on_echo(self, value):
-        self._run_callbacks('on_echo', value)
+    def on_echo(self, provider, value):
+        self._run_callbacks('on_echo', provider, value)
 
     def on_plan(self, provider):
         self._run_callbacks('on_plan', provider)

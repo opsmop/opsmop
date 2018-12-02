@@ -49,6 +49,10 @@ class Provider(object):
         """ if True, a resource claiming it is quiet will silence most properly programmed callbacks. """
         return False
 
+    def very_quiet(self):
+        """ if True, this will silence even more callbacks """
+        return False
+
     def has_changed(self):
         """ Returns whether the provider has undertaken any actions """
         return len(self.actions_taken) > 0
@@ -149,7 +153,7 @@ class Provider(object):
         self.actions_taken = self.actions_planned
 
     def echo(self, msg):
-        self._context.on_echo(msg)
+        self._context.on_echo(self, msg)
 
     def context(self):
         """
