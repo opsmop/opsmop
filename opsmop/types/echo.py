@@ -21,6 +21,9 @@ class Echo(Type):
     def __init__(self, msg, *args, **kwargs):
         self.setup(msg=msg, **kwargs)
 
+    def quiet(self):
+        return True
+
     def fields(self):
         return Fields(
             self,

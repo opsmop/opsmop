@@ -16,6 +16,9 @@ from opsmop.core.resource import Resource
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
 
+import json
+import inspect
+
 class Type(Resource):
 
     def validate(self):
@@ -93,12 +96,14 @@ class Type(Resource):
     def __str__(self):
         # we use kwargs here because the member variables might not be set up yet
         str_name = ""
+        
         if 'name' in self.kwargs:
             str_name = self.__class__.__name__ + ": %s" % self.kwargs['name']
         else:
             str_name = self.__class__.__name__
-        if 'signals' in self.kwargs:
-            str_name = str_name + " (signals: %s)" % self.kwargs['signals']
-        if 'handles' in self.kwargs:
-            str_name = str_name + " (handles: %s)" % self.kwargs['handles']
+
+        #if 'signals' in self.kwargs:
+        #    str_name = str_name + " (signals: %s)" % self.kwargs['signals']
+        #if 'handles' in self.kwargs
+        #    str_name = str_name + " (handles: %s)" % self.kwargs['handles']
         return str_name

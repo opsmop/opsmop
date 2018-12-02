@@ -20,6 +20,9 @@ class DebugFacts(Type):
     def __init__(self, *args, **kwargs):
         self.setup(**kwargs)
 
+    def quiet(self):
+        return True
+
     def fields(self):
         return Fields(
             self

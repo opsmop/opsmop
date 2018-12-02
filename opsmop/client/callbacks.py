@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import sys
+import inspect
+import json
 
 from opsmop.core.callback import BaseCallback
 from opsmop.core.role import Role
@@ -118,13 +120,33 @@ class CliCallbacks(BaseCallback):
     def on_resource(self, resource, is_handler):
         if self.phase == 'validate':
             return
+
+        # print the resource name / banner
         self.i1("")
         role = resource.role()
         self.count = self.count + 1
-        self.banner("{count} :: {role} :: {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
+        self.banner("{count}. {role} => {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
         self.i1("")
+
+        # show the keys for each resource, name first
+        # FIXME: refactor coercion of output into provider code
+        if not resource.quiet():
+            if len(resource.kwargs.keys()):
+                self.i3("parameters:")
+                if 'name' in resource.kwargs:
+                    self.i5("| %s: %s" % ('name', resource.kwargs['name']))
+                keys = [ k for k in sorted(resource.kwargs.keys()) if (k != 'name') ]
+                for k in keys:
+                    v = resource.kwargs[k]
+                    if k == 'mode' and type(v) == int:
+                        # remove this hack to print modes as octal, move this into
+                        # type code and make it generic
+                        v = "0o{0:o}".format(v)
+                    self.i5("| %s: %s" % (k,v))
+
+        # show if this resource is a handler
         if is_handler:
-            self.i3("(handler for '%s')\n" % resource.handles)
+            self.i3("(handler)")
 
     def on_flagged(self, flagged):
         self.i3("flagged: %s" % flagged)

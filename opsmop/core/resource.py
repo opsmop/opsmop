@@ -30,6 +30,10 @@ class Resource(object):
         self._field_spec.find_unexpected_keys(self)
         self._field_spec.load_parameters(self)
 
+    def quiet(self):
+        """ If true, surpresses some callbacks """
+        return False
+
     def split_common_kwargs(self, kwargs):
         """
         Return a set of (original, common) dicts, where original contains

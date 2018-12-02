@@ -22,6 +22,9 @@ class Debug(Type):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(variable_names=args, evals=original, **common)
 
+    def quiet(self):
+        return True
+
     def fields(self):
         return Fields(
             self,

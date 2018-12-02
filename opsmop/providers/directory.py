@@ -47,7 +47,7 @@ class Directory(Provider):
 
             # metadata?
             if self.owner and (self.recursive or not exists or (FileTests.owner(self.name) != self.owner)):
-                self.needs('chmod')
+                self.needs('chown')
             elif self.group and (self.recursive or not exists or (FileTests.group(self.name) != self.group)):
                 self.needs('chgrp')
             elif self.mode and (self.recursive or not exists or (FileTests.mode(self.name) != self.mode)):
