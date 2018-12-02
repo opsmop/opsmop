@@ -131,11 +131,10 @@ class CliCallbacks(BaseCallback):
         # show the keys for each resource, name first
         # FIXME: refactor coercion of output into provider code
         if not resource.quiet():
-            if len(resource.kwargs.keys()):
+            keys = resource.kwargs.keys()
+            keys = [ k for k in sorted(keys) if (k != 'name') ]
+            if keys:
                 self.i3("parameters:")
-                if 'name' in resource.kwargs:
-                    self.i5("| %s: %s" % ('name', resource.kwargs['name']))
-                keys = [ k for k in sorted(resource.kwargs.keys()) if (k != 'name') ]
                 for k in keys:
                     v = resource.kwargs[k]
                     if k == 'mode' and type(v) == int:
