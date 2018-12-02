@@ -25,6 +25,8 @@ class Package(Provider):
 
         # FIXME: this can probably should advantage of the StrictVersion class to be smarter.
         # Setting the absent parameter on Package should override any other parameters
+        if self.update_cache:
+            self.needs('update_cache')
         if self.absent:
             if current_version:
                 self.needs('remove')

@@ -16,6 +16,7 @@ from opsmop.providers.package.package import Package
 
 TIMEOUT = 60
 VERSION_CHECK = "dpkg -s %s | grep '^Version'"
+UPDATE_CACHE = "apt-get update -q=2"
 INSTALL = "apt-get -q=2 install -y {name}"
 INSTALL_VERSION = "apt-get -q=2 install -y {name}={version}"
 UNINSTALL = "apt-get -q=2 remove -y {name}"
@@ -46,6 +47,9 @@ class Apt(Package):
 
     def apply(self):
         which = None
+        if self.should('update_cache'):
+            self.do('update_cache')
+            self.run(UPDATE_CACHE)
         if self.should('install'):
             self.do('install')
             which = self._get_install_command()
