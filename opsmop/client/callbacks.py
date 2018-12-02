@@ -78,13 +78,15 @@ class CliCallbacks(BaseCallback):
         return
     
     def on_needs(self, provider, action):
+        self.provider = provider
         if self.provider.skip_plan_stage():
             return
-        self.provider = provider
-        self.i3("needs: %s" % action.do)
+        if self.context().is_check():
+            self.i3("needs: %s" % action.do)
 
     def on_do(self, provider, action):
-        self.i3("do: %s" % action.do)
+        if self.context().is_apply():
+            self.i3("do: %s" % action.do)
 
     def on_taken_actions(self, provider, actions_taken):
         if provider.skip_plan_stage():

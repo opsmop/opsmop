@@ -28,6 +28,15 @@ class Context(object):
     def mode(self):
         return self._mode
 
+    def is_validate(self):
+        return self._mode == 'validate'
+
+    def is_check(self):
+        return self._mode == 'check'
+
+    def is_apply(self):
+        return self._mode == 'apply'
+
     def add_signal(self, signal):
         self._signals.append(signal)
 
