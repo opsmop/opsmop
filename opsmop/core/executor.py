@@ -208,7 +208,6 @@ class Executor(object):
         context.on_plan(provider)
         # compute the plan
         provider.plan()
-        context.on_planned_actions(provider, provider.actions_planned)
         # copy the list of planned actions into the 'to do' list for the apply method
         # on the provider
         provider.commit_to_plan()

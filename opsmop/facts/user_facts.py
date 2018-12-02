@@ -73,6 +73,8 @@ class UserFactsGenerator(Facts):
         return FACTS_CACHE
 
     def __getattr__(self, attr):
+        if FACTS_CACHE is None:
+            self.reload()
         if FACTS_CACHE and (attr in FACTS_CACHE):
             return FACTS_CACHE.get(attr)
         else:

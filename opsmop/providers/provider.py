@@ -37,10 +37,6 @@ class Provider(object):
         # isn't this already copied over - safe to remove?
         # self.name = getattr(self.resource, 'name', None)
 
-    def verb(self):
-        """ the verb for the applying operation in CLI output """
-        return "applying..."
-
     def skip_plan_stage(self):
         """ for trivial providers like debug, tell the callbacks to not do plan computations """
         return False
@@ -70,15 +66,20 @@ class Provider(object):
 
     def needs(self, action_name):
         """ declares than an action 'should' take place during an apply step """
-        self.actions_planned.append(Action(action_name))
+        action = Action(action_name)
+        self.actions_planned.append(action)
+        self._context.on_needs(self, action)
 
     def should(self, what):
         """ returns True if an action should take place during an apply step """
         return any(True for action in self.actions_planned if action.do == what)
 
-    def do(self, what):
+    def do(self, action_name):
         """ marks off that an action has been completed. not marking off all planned actions (or any unplanned ones) will result in an error """
-        self.actions_taken.append(Action(what))
+        action = Action(action_name)
+        self.actions_taken.append(action)
+        self._context.on_do(self, action)
+
 
     def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True):
         """

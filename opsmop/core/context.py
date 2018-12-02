@@ -68,11 +68,14 @@ class Context(object):
     def on_command_result(self, value):
         self._run_callbacks('on_command_result', value)
 
-    def on_planned_actions(self, provider, actions_planned):
-        self._run_callbacks('on_planned_actions', provider, actions_planned)
+    def on_needs(self, provider, action):
+        self._run_callbacks('on_needs', provider, action)
 
-    def on_taken_actions(self, provider, actions_taken):
-        self._run_callbacks('on_taken_actions', provider, actions_taken)
+    def on_do(self, provider, action):
+        self._run_callbacks('on_do', provider, action)
+    
+    def on_taken_actions(self, provider, actions_list):
+        self._run_callbacks('on_taken_actions', provider, actions_list)
 
     def on_result(self, result):
         self._run_callbacks('on_result', result)

@@ -71,25 +71,18 @@ class CliCallbacks(BaseCallback):
 
     def on_plan(self, provider):
         self.provider = provider
-        if self.provider.skip_plan_stage():
-            return
-        self.i3("planning...")
-
+ 
     def on_apply(self, provider):
-        verb = provider.verb()
-        if verb:
-            self.i3(verb)
+        return
     
-    def on_planned_actions(self, provider, actions_planned):
+    def on_needs(self, provider, action):
         if self.provider.skip_plan_stage():
             return
         self.provider = provider
-        if len(actions_planned):
-            self.i3("planned:")
-            for x in actions_planned:
-                self.i5("| %s" % x)
-        else:
-            self.i3("no changes needed")
+        self.i3("needs: %s" % action.do)
+
+    def on_do(self, provider, action):
+        self.i3("do: %s" % action.do)
 
     def on_taken_actions(self, provider, actions_taken):
         if provider.skip_plan_stage():
@@ -100,11 +93,6 @@ class CliCallbacks(BaseCallback):
         if (taken != planned):
             self.i5("ERROR: actions planned do not equal actions taken: %s" % taken)
             self.on_fatal()
-        if provider.quiet():
-            return
-        self.i3("actions:")
-        for x in actions_taken:
-            self.i5("| %s" % str(x))
 
     def on_result(self, result):
         if result.provider.quiet():
