@@ -56,7 +56,7 @@ class LocalCallbacks(BaseCallback):
         if big:
             self.i1(sep)
 
-    def on_command_echo(self, echo):
+    def on_command_echo(self, provider, echo):
         if echo == "":
             return
         self.i5("| %s" % echo.rstrip())
@@ -67,7 +67,7 @@ class LocalCallbacks(BaseCallback):
         else:
             self.i3(echo)
 
-    def on_execute_command(self, command):
+    def on_execute_command(self, provider, command):
         if command.echo:
             self.i5("# %s" % command.cmd)
 
@@ -94,12 +94,12 @@ class LocalCallbacks(BaseCallback):
             return
         self.provider = provider
 
-    def on_result(self, result):
+    def on_result(self, provider, result):
         if result.provider.quiet():
             return
         self.i3(str(result))
 
-    def on_command_result(self, result):
+    def on_command_result(self, provider, result):
         self.i5("= %s" % result)
         if result.fatal:
             raise CommandError(self.provider, "command failed", result)
@@ -162,7 +162,7 @@ class LocalCallbacks(BaseCallback):
         # TODO: reimplement the counter and percentages summary
         pass
 
-    def on_fatal(self, msg=None):
+    def on_fatal(self, provider, msg=None):
         if msg:
             self.i1("FAILED: %s" % msg)
         else:

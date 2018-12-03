@@ -80,7 +80,7 @@ class Command(object):
         """
 
         context = self.provider.context()
-        context.on_execute_command(self)
+        context.on_execute_command(self.provider, self)
         
         command = self.cmd
         timeout_cmd = self.get_timeout()
@@ -120,10 +120,10 @@ class Command(object):
         output = ""
         for line in stdout:
             if (self.echo or self.loud) and (not self.ignore_lines or not self.should_ignore(line)):
-                context.on_command_echo(line)
+                context.on_command_echo(self.provider, line)
             output = output + line
         if output.strip() == "":
-            context.on_command_echo("(no output)")
+            context.on_command_echo(self.provider, "(no output)")
 
 
         process.wait()
@@ -135,7 +135,7 @@ class Command(object):
         else:
             res = Result(self.provider, rc=rc, data=output, fatal=False)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
-        context.on_command_result(res)
+        context.on_command_result(self.provider, res)
         return res
 
     def should_ignore(self, line):

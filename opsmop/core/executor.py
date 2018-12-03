@@ -246,9 +246,9 @@ class Executor(object):
             provider.handle_registration(context=context, result=result)
 
         # tell the callbacks about the result
-        context.on_result(result)
+        context.on_result(provider, result)
         if result.fatal:
-            context.on_fatal(result)
+            context.on_fatal(provider, result)
 
         return True
 

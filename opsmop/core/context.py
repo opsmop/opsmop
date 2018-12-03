@@ -70,17 +70,17 @@ class Context(object):
     def on_role(self, role):
         self._run_callbacks('on_role', role)
 
-    def on_command_echo(self, value):
-        self._run_callbacks('on_command_echo', value)
+    def on_command_echo(self, provider, value):
+        self._run_callbacks('on_command_echo', provider, value)
 
-    def on_execute_command(self, value):
-        self._run_callbacks('on_execute_command', value)
+    def on_execute_command(self, provider, value):
+        self._run_callbacks('on_execute_command', provider, value)
 
     def on_resource(self, resource, is_handler):
         self._run_callbacks('on_resource', resource, is_handler)
 
-    def on_command_result(self, value):
-        self._run_callbacks('on_command_result', value)
+    def on_command_result(self, provider, value):
+        self._run_callbacks('on_command_result', provider, value)
 
     def on_needs(self, provider, action):
         self._run_callbacks('on_needs', provider, action)
@@ -91,10 +91,10 @@ class Context(object):
     def on_taken_actions(self, provider, actions_list):
         self._run_callbacks('on_taken_actions', provider, actions_list)
 
-    def on_result(self, result):
-        self._run_callbacks('on_result', result)
+    def on_result(self, provider, result):
+        self._run_callbacks('on_result', provider, result)
         if result.fatal:
-            self._run_callbacks('on_fatal', result)
+            self._run_callbacks('on_fatal', provider, result)
 
     def on_skipped(self, value, is_handler=False):
         self._run_callbacks('on_skipped', value, is_handler)

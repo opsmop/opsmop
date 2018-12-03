@@ -45,13 +45,13 @@ class CommonCallbacks(BaseCallback):
     def set_phase(self, phase):
         self.phase = phase
 
-    def on_command_echo(self, echo):
+    def on_command_echo(self, provider, echo):
         pass
 
     def on_echo(self, provider, echo):
         pass
 
-    def on_execute_command(self, command):
+    def on_execute_command(self, provider, command):
         pass
 
     def on_plan(self, provider):
@@ -78,10 +78,10 @@ class CommonCallbacks(BaseCallback):
         if (taken != planned):
             raise ProviderError(provider, "actions taken (%s) do not equal planned (%s)" % (taken, planned))
 
-    def on_result(self, result):
+    def on_result(self, provider, result):
         pass
 
-    def on_command_result(self, result):
+    def on_command_result(self, provider, result):
         pass
 
     def on_skipped(self, skipped, is_handler=False):
@@ -111,7 +111,7 @@ class CommonCallbacks(BaseCallback):
     def summarize(self):
         pass
 
-    def on_fatal(self, msg=None):
+    def on_fatal(self, provider, msg=None):
         sys.exit(1)
 
     def on_update_variables(self, variables):
