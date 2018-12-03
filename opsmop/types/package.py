@@ -41,6 +41,9 @@ class Package(Type):
         if method == 'brew':
             from opsmop.providers.package.brew import Brew
             return Brew
+        elif method == 'dnf':
+            from opsmop.providers.package.dnf import Dnf
+            return Dnf
         elif method == 'yum':
             from opsmop.providers.package.yum import Yum
             return Yum
