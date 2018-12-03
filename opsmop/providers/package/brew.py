@@ -14,7 +14,7 @@
 
 from opsmop.providers.package.package import Package
 
-TIMEOUT = 60
+TIMEOUT = 1800
 VERSION_CHECK = "brew ls --versions {name} | cut -f2 -d ' '"
 INSTALL = "brew install {name}"
 UPGRADE = "brew update {name}"

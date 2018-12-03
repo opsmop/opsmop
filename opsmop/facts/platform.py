@@ -88,6 +88,9 @@ class PlatformFacts(Facts):
                     release = tokens[0]
                     rdate = tokens[1].replace("(","").replace(")","").strip()
             return dict(distribution=distribution, version=release, variant=rdate)
+        else:
+            if self.system() == "Darwin":
+                return dict(distribution="Darwin", version=self.release(), variant=None)
         return None
 
     @memoize
