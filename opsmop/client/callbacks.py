@@ -19,6 +19,7 @@ import json
 from opsmop.core.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
+from opsmop.core.errors import CommandError
 
 # NOTE: this interface is subject to change
 
@@ -105,6 +106,8 @@ class CliCallbacks(BaseCallback):
 
     def on_command_result(self, result):
         self.i5("= %s" % result)
+        if result.fatal:
+            raise CommandError(self.provider, "command failed", result)
 
     def on_skipped(self, skipped, is_handler=False):
         if self.phase != 'validate' and not is_handler and issubclass(type(skipped), Type):

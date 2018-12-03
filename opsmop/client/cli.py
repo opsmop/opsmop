@@ -18,6 +18,7 @@ import argparse
 
 from opsmop.client.callbacks import CliCallbacks
 from opsmop.core.api import Api
+from opsmop.core.errors import OpsMopError
 
 # import argparse
 
@@ -70,18 +71,25 @@ class Cli(object):
 
         api = Api.from_file(path=path, callbacks=callbacks)
         
-        if args.validate:
-            # just check for missing files and invalid types
-            api.validate()
-        elif args.check:
-            # operate in dry-run mode
-            api.check()
-        elif args.apply:
-            # configure everything
-            api.apply()
-        else:
-            print(USAGE)
+        try:
+            if args.validate:
+                # just check for missing files and invalid types
+                api.validate()
+            elif args.check:
+                # operate in dry-run mode
+                api.check()
+            elif args.apply:
+                # configure everything
+                api.apply()
+            else:
+                print(USAGE)
+                sys.exit(1)
+        except OpsMopError as ome:
+            print("")
+            print(str(ome))
+            print("")
             sys.exit(1)
-   
+
+
         print("")
         sys.exit(0)

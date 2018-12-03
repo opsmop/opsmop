@@ -35,6 +35,9 @@ class ValidationError(OpsMopError):
         self.resource = resource
         self.msg = msg
 
+    def __str__(self):
+        return "<ValidationError: %s>" % self.msg
+
 class NoSuchProviderError(OpsMopError):
     
     __slots__ = [ 'resource', 'msg' ]
@@ -42,6 +45,9 @@ class NoSuchProviderError(OpsMopError):
     def __init__(self, resource, provider_name):
         self.resource = resource
         self.msg = "No such provider: %s" % provider_name
+
+    def __str__(self):
+        return "<%s>" % self.msg
 
 class ProviderError(OpsMopError):
 
@@ -54,7 +60,25 @@ class ProviderError(OpsMopError):
 
     __slots__ = [ 'provider', 'resource', 'msg' ]
 
-    def __init__(self, provider, msg):
+    def __init__(self, provider=None, msg=None):
+        assert provider is not None
         self.provider = provider
         self.resource = provider.resource
         self.msg = msg
+
+    def __str__(self):
+        return "<ProviderError (%s)>" % (self.msg)
+
+class CommandError(ProviderError):
+
+    __slots__ = [ 'provider', 'resource', 'msg', 'result' ]
+
+    def __init__(self, provider=None, msg=None, result=None):
+        assert provider is not None
+        self.provider = provider
+        self.resource = provider.resource
+        self.msg = msg
+        self.result = result
+
+    def __str__(self):
+        return "<CommandError (%s) (%s)>" % (self.msg, self.result)
