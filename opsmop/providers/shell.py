@@ -26,5 +26,4 @@ class Shell(Provider):
 
         self.do('execute')
 
-        result = self.run(self.cmd, timeout=self.timeout, echo=True)
-        return self.ok(data=result)
+        return self.run(self.cmd, timeout=self.timeout, echo=True)
