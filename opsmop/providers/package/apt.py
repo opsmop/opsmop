@@ -14,17 +14,19 @@
 
 from opsmop.providers.package.package import Package
 
-TIMEOUT = 60
+TIMEOUT = 3600
 VERSION_CHECK = "dpkg -s %s | grep '^Version'"
 UPDATE_CACHE = "apt-get update -q=2"
 INSTALL = "apt-get -q=2 install -y {name}"
 INSTALL_VERSION = "apt-get -q=2 install -y {name}={version}"
 UNINSTALL = "apt-get -q=2 remove -y {name}"
+IGNORE_LINES = [ "(Reading database" ]
 
 class Apt(Package):
 
     
     def _get_version(self):
+
         version_check = VERSION_CHECK % self.name
         output = self.test(version_check)
         if output is None:
@@ -32,20 +34,22 @@ class Apt(Package):
         return output.split(':')[1].strip()
  
     def get_default_timeout(self):
+
         return TIMEOUT
 
     def plan(self):
+
         super().plan()
 
     def _get_install_command(self):
-        """This decides whether we are going to install a specific version, or latest based on the presence of
-         self.version"""
+
         if self.version:
             return INSTALL_VERSION.format(name=self.name, version=self.version)
         else:
             return INSTALL.format(name=self.name)
 
     def apply(self):
+
         which = None
         if self.should('update_cache'):
             self.do('update_cache')
@@ -62,7 +66,8 @@ class Apt(Package):
             which = UNINSTALL.format(name=self.name)
 
         if which:
-            return self.run(which)
+            self.run(which, ignore_lines=IGNORE_LINES)
+
         return self.ok()
 
 
