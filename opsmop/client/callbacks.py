@@ -74,6 +74,7 @@ class CliCallbacks(BaseCallback):
 
     def on_plan(self, provider):
         self.provider = provider
+        self.i3("planning...")
  
     def on_apply(self, provider):
         return
