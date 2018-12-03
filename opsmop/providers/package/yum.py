@@ -14,7 +14,7 @@
 
 from opsmop.providers.package.package import Package
 
-TIMEOUT = 60
+TIMEOUT = 3600
 VERSION_CHECK = "rpm -q %s"
 QUERY_FORMAT = "--queryformat '%{VERSION}\\n'"
 INSTALL = "yum install -y {name}"
@@ -23,24 +23,17 @@ UNINSTALL = "rpm -e {name}"
 
 class Yum(Package):
 
-    
     def _get_version(self):
         version_check = "%s %s" % (VERSION_CHECK % self.name, QUERY_FORMAT)
         output = self.test(version_check)
         if output is None:
             return None
         return output      
- 
+
     def get_default_timeout(self):
-        # TODO: can just leave this in superclass
         return TIMEOUT
 
-    def plan(self):
-        # TODO: can just leave this in superclass
-        super().plan()
-
     def apply(self):
-        # TODO: can just leave this in superclass
         which = None
         if self.should('install'):
             self.do('install')

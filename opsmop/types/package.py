@@ -29,7 +29,8 @@ class Package(Type):
             name = Field(kind=str, help="the name of the package to install"),
             version = Field(kind=str, default=None, help="what version to install"),
             latest = Field(kind=bool, default=False, help="if true, upgrade the package regardless of version"),
-            absent = Field(kind=bool, default=False, help="if true, remove the package")
+            absent = Field(kind=bool, default=False, help="if true, remove the package"),
+            update_cache = Field(kind=bool, default=False, help="if true, update the package cache")
         )
 
     def validate(self):

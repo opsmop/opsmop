@@ -24,12 +24,16 @@ class Package(Provider):
         current_version = self._get_version()
 
         # FIXME: this can probably should advantage of the StrictVersion class to be smarter.
-        if current_version and self.absent:
-            self.needs('remove')
-        elif not current_version:
-            self.needs('install')
-        elif self.latest:
-            self.needs('upgrade')
-        elif self.version and self.version != current_version:
-            self.needs('upgrade')
-       
+        # Setting the absent parameter on Package should override any other parameters
+        if self.update_cache:
+            self.needs('update_cache')
+        if self.absent:
+            if current_version:
+                self.needs('remove')
+        else:
+            if not current_version:
+                self.needs('install')
+            elif self.latest:
+                self.needs('upgrade')
+            elif self.version and self.version != current_version:
+                self.needs('upgrade')
