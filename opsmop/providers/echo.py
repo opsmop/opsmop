@@ -28,9 +28,6 @@ class Echo(Provider):
     def very_quiet(self):
         return True
 
-    def verb(self):
-        return None
-
     def skip_plan_stage(self):
         return True
 
