@@ -25,20 +25,19 @@ from opsmop.core.errors import CommandError
 
 INDENT="  "
 
-class CliCallbacks(BaseCallback):
+class LocalCallbacks(BaseCallback):
 
     """
     Callback class for the default CLI implementation.
     Improvements are welcome.
     """
 
-    __slots__ = [ 'dry_run', 'role', 'last_role', 'phase', 'count' ]
+    __slots__ = [ 'dry_run', 'role', 'phase', 'count' ]
 
     def __init__(self):
         super()
         self.dry_run = False
         self.role = None
-        self.last_role = None
         self.phase = None
         self.count = 0
 
@@ -94,11 +93,6 @@ class CliCallbacks(BaseCallback):
         if provider.skip_plan_stage():
             return
         self.provider = provider
-        taken = sorted([ str(x) for x in provider.actions_taken ])
-        planned = sorted([ str(x) for x in provider.actions_planned ])
-        if (taken != planned):
-            self.i5("ERROR: actions planned do not equal actions taken: %s" % taken)
-            self.on_fatal()
 
     def on_result(self, result):
         if result.provider.quiet():
@@ -174,9 +168,6 @@ class CliCallbacks(BaseCallback):
         else:
             self.i1("FAILED")
         self.summarize()
-        # TODO: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
-        # TODO: further, run_callbacks in Context() should catch any exceptions from *ALL* callbacks and re-raise
-        sys.exit(1)
 
     def on_update_variables(self, variables):
         self.i3("registered:")

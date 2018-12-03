@@ -16,7 +16,8 @@
 import sys
 import argparse
 
-from opsmop.client.callbacks import CliCallbacks
+from opsmop.callbacks.local import LocalCallbacks
+from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.api import Api
 from opsmop.core.errors import OpsMopError
 
@@ -51,7 +52,7 @@ class Cli(object):
 
         mode = self.args[1]
         path = sys.argv[2]
-        callbacks = [ CliCallbacks() ]
+        callbacks = [ LocalCallbacks(), CommonCallbacks() ]
 
 
         parser = argparse.ArgumentParser()
