@@ -32,12 +32,10 @@ class LocalCallbacks(BaseCallback):
     Improvements are welcome.
     """
 
-    __slots__ = [ 'dry_run', 'role', 'phase', 'count' ]
+    __slots__ = [ 'phase', 'count' ]
 
     def __init__(self):
         super()
-        self.dry_run = False
-        self.role = None
         self.phase = None
         self.count = 0
 
@@ -72,15 +70,13 @@ class LocalCallbacks(BaseCallback):
             self.i5("# %s" % command.cmd)
 
     def on_plan(self, provider):
-        self.provider = provider
         self.i3("planning...")
  
     def on_apply(self, provider):
         return
     
     def on_needs(self, provider, action):
-        self.provider = provider
-        if self.provider.skip_plan_stage():
+        if provider.skip_plan_stage():
             return
         if self.context().is_check():
             self.i3("needs: %s" % action.do)
@@ -92,7 +88,6 @@ class LocalCallbacks(BaseCallback):
     def on_taken_actions(self, provider, actions_taken):
         if provider.skip_plan_stage():
             return
-        self.provider = provider
 
     def on_result(self, provider, result):
         if result.provider.quiet():
@@ -102,7 +97,7 @@ class LocalCallbacks(BaseCallback):
     def on_command_result(self, provider, result):
         self.i5("= %s" % result)
         if result.fatal:
-            raise CommandError(self.provider, "command failed", result)
+            raise CommandError(provider, "command failed", result)
 
     def on_skipped(self, skipped, is_handler=False):
         if self.phase != 'validate' and not is_handler and issubclass(type(skipped), Type):

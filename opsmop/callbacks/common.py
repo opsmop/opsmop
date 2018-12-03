@@ -33,14 +33,8 @@ class CommonCallbacks(BaseCallback):
     in the main Executor code.
     """
 
-    __slots__ = [ 'dry_run', 'role', 'phase', 'count' ]
-
     def __init__(self):
         super()
-        self.dry_run = False
-        self.role = None
-        self.phase = None
-        self.count = 0
 
     def set_phase(self, phase):
         self.phase = phase
@@ -55,14 +49,14 @@ class CommonCallbacks(BaseCallback):
         pass
 
     def on_plan(self, provider):
-        self.provider = provider
+        pass
  
     def on_apply(self, provider):
         pass
 
     def on_needs(self, provider, action):
-        self.provider = provider
-        if self.provider.skip_plan_stage():
+        provider = provider
+        if provider.skip_plan_stage():
             return
         pass
 
@@ -70,7 +64,7 @@ class CommonCallbacks(BaseCallback):
         pass
 
     def on_taken_actions(self, provider, actions_taken):
-        self.provider = provider
+        provider = provider
         if provider.skip_plan_stage():
             return
         taken = sorted([ str(x) for x in provider.actions_taken ])
@@ -88,13 +82,13 @@ class CommonCallbacks(BaseCallback):
         pass
 
     def on_begin_role(self, role):
-        self.phase = 'resource'
+        pass
 
     def on_validate(self):
-        self.phase = 'validate'
+        pass
 
     def on_begin_handlers(self):
-        self.phase = 'handlers'
+        pass
 
     def on_resource(self, resource, is_handler):
         pass
