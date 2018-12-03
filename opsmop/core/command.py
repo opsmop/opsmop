@@ -29,9 +29,9 @@ class Command(object):
     returns an "opsmop.core.result.Result" object.
     """
 
-    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env', 'ignore_lines' ]
+    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env' ]
 
-    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False, ignore_lines=None):
+    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False):
 
         """
         Constructs but does not execute a command.
@@ -44,7 +44,6 @@ class Command(object):
         echo: whether to show the command names + return codes + output on the screen using whatever callback class is set in the system
         fatal: whether any errors should fail the resource execution
         loud: whether to ignore 'quiet' preferences for just the output (but not command name or return codes)
-        ignore_lines: don't echo any lines starting with these items (takes a list of strings)
         """
         self.cmd = cmd
         self.provider = provider
@@ -54,7 +53,6 @@ class Command(object):
         self.fatal = fatal
         self.input_text = input_text
         self.env = env
-        self.ignore_lines = ignore_lines
 
     @memoize
     def get_timeout(self):
@@ -119,7 +117,7 @@ class Command(object):
 
         output = ""
         for line in stdout:
-            if (self.echo or self.loud) and (not self.ignore_lines or not self.should_ignore(line)):
+            if self.echo or self.loud:
                 context.on_command_echo(line)
             output = output + line
         if output.strip() == "":
@@ -137,12 +135,3 @@ class Command(object):
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
         context.on_command_result(res)
         return res
-
-    def should_ignore(self, line):
-        # used for ignoring output on the console like "(Reading database 20% ...)" which is common for 'apt'
-        # this may be modified to also do regular expressions in the future.
-        for x in self.ignore_lines:
-            if line.startswith(x):
-                return True
-        return False
-

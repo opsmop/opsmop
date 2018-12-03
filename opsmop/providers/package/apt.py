@@ -14,60 +14,42 @@
 
 from opsmop.providers.package.package import Package
 
-TIMEOUT = 3600
+TIMEOUT = 60
 VERSION_CHECK = "dpkg -s %s | grep '^Version'"
-UPDATE_CACHE = "apt-get update -q=2"
-INSTALL = "apt-get -q=2 install -y {name}"
-INSTALL_VERSION = "apt-get -q=2 install -y {name}={version}"
-UNINSTALL = "apt-get -q=2 remove -y {name}"
-IGNORE_LINES = [ "(Reading database" ]
+INSTALL = "apt install -y {name}"
+UPGRADE = "apt update -y {name}"
+UNINSTALL = "apt remove -y {name}"
 
 class Apt(Package):
 
     
     def _get_version(self):
-
         version_check = VERSION_CHECK % self.name
         output = self.test(version_check)
         if output is None:
             return None
-        return output.split(':')[1].strip()
+        return output      
  
     def get_default_timeout(self):
-
         return TIMEOUT
 
     def plan(self):
-
         super().plan()
 
-    def _get_install_command(self):
-
-        if self.version:
-            return INSTALL_VERSION.format(name=self.name, version=self.version)
-        else:
-            return INSTALL.format(name=self.name)
-
     def apply(self):
-
         which = None
-        if self.should('update_cache'):
-            self.do('update_cache')
-            self.run(UPDATE_CACHE)
         if self.should('install'):
             self.do('install')
-            which = self._get_install_command()
+            which = INSTALL.format(name=self.name)
         elif self.should('upgrade'):
             self.do('upgrade')
-            # In apt-get, install also performs the task of upgrading a single package, so it is re-used
-            which = self._get_install_command()
+            which = UPGRADE.format(name=self.name)
         elif self.should('remove'):
             self.do('remove')
             which = UNINSTALL.format(name=self.name)
 
         if which:
-            self.run(which, ignore_lines=IGNORE_LINES)
-
+            return self.run(which)
         return self.ok()
 
 
