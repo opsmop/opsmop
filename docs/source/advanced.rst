@@ -241,7 +241,7 @@ This value is entered into local scope:
             Shell('date', register='date'),
             Debug('date'),
             Echo("{{ date.rc }}"),
-            Echo("{{ date.data }})
+            Echo("{{ date.data }}")
         ])
         return resources
 
