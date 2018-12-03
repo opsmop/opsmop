@@ -55,16 +55,12 @@ class CommonCallbacks(BaseCallback):
         pass
 
     def on_needs(self, provider, action):
-        provider = provider
-        if provider.skip_plan_stage():
-            return
         pass
 
     def on_do(self, provider, action):
         pass
 
     def on_taken_actions(self, provider, actions_taken):
-        provider = provider
         if provider.skip_plan_stage():
             return
         taken = sorted([ str(x) for x in provider.actions_taken ])
