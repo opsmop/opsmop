@@ -40,6 +40,9 @@ class Resource(object):
         any arguments specified in Fields for a resource (Type) and common
         includes the ones available to all types
         """
+
+        from opsmop.core.fields import Fields
+
         common = dict()
         original = dict()
         for (k,v) in kwargs.items():
@@ -147,12 +150,14 @@ class Resource(object):
         """
         return self.scope().variables()
 
-    def deeper_scope(self):
-        """
-        Return a Scope() object that is one level deeper than the current scope.
-        This is mostly used by collection.claim()
-        """
-        return self.scope().deeper()
+    def has_tag(self, tags):
+        my_tags = self.all_tags()
+        if 'any' in my_tags:
+            return True
+        for t in tags:
+            if t in my_tags:
+                return True
+        return False
 
     def conditions_true(self, context, validate=False):
         """
@@ -203,6 +208,15 @@ class Resource(object):
         while ptr is not None:
             if ptr.handles:
                 result.append(ptr.handles)
+            ptr = ptr.parent()
+        return result
+
+    def all_tags(self):
+        result = []
+        ptr = self
+        while ptr is not None:
+            if ptr.tags:
+                result.extend(ptr.tags)
             ptr = ptr.parent()
         return result
 

@@ -59,6 +59,7 @@ class Cli(object):
         parser.add_argument('--validate', help='policy file to validate')
         parser.add_argument('--apply', help="policy file to apply")
         parser.add_argument('--check', help="policy file to check")
+        parser.add_argument('--tags', help='optional comma seperated list of tags')
 
         args = parser.parse_args(self.args[1:])
 
@@ -70,7 +71,11 @@ class Cli(object):
 
         path = args.validate or args.apply or args.check
 
-        api = Api.from_file(path=path, callbacks=callbacks)
+        tags = None
+        if args.tags is not None:
+            tags = args.tags.strip().split(",")
+
+        api = Api.from_file(path=path, callbacks=callbacks, tags=tags)
         
         try:
             if args.validate:

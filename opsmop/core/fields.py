@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors' ]
+COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors', 'tags' ]
 
 # TODO: refactor
 
@@ -59,6 +59,8 @@ class Fields(object):
         from opsmop.core.field import Field
         from opsmop.core.resource import Resource
 
+        # if adding a new field here be sure to add it to COMMON_FIELDS above
+
         return dict(
             when            = Field(default=None, help="attaches a condition to this resource"),
             signals         = Field(kind=list, of=Resource, default=None, help="signals a handler event by name"),
@@ -68,6 +70,7 @@ class Fields(object):
             ignore_errors   = Field(kind=bool, default=False, help="proceeds in the event of most error conditions"),
             variables       = Field(kind=dict, loader=resource.set_variables, help=None),
             extra_variables = Field(kind=dict, empty=True, help=None),
+            tags            = Field(kind=list, of=str, default=None, help="allows applying part of the policy")
         )
 
     def find_unexpected_keys(self, obj):

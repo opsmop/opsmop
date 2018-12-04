@@ -28,11 +28,11 @@ VALIDATE='validate'
 
 class Executor(object):
 
-    __slots__ = [ '_policies', '_callbacks' ]
+    __slots__ = [ '_policies', '_callbacks', '_tags' ]
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies=None, callbacks=None):
+    def __init__(self, policies=None, callbacks=None, tags=None):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -42,6 +42,7 @@ class Executor(object):
         assert type(callbacks) == list
         self._policies = policies
         self._callbacks = callbacks
+        self._tags = tags
 
     # ---------------------------------------------------------------
 
@@ -118,7 +119,7 @@ class Executor(object):
         
         # resources and handlers must be processed seperately
         # the validate method will raise exceptions when problems are found
-        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=validate, mode=VALIDATE)
+        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=validate, mode=VALIDATE, tags=self._tags)
         role.walk_children(items=role.get_children('handlers'), context=context, which='handlers', fn=validate, mode=VALIDATE)
 
     # ---------------------------------------------------------------
@@ -162,7 +163,7 @@ class Executor(object):
             result = self.execute_resource(resource=resource, context=context, mode=mode)
             resource.post()
             return result
-        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=execute_resource, mode=mode)
+        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=execute_resource, mode=mode, tags=self._tags)
 
     # ---------------------------------------------------------------
 
@@ -177,7 +178,7 @@ class Executor(object):
             result = self.execute_resource(resource=handler, context=context, mode=mode, handlers=True)
             handler.post()
             return result
-        role.walk_children(items=role.get_children('handlers'), context=context, which='handlers', fn=execute_handler, mode=mode)
+        role.walk_children(items=role.get_children('handlers'), context=context, which='handlers', fn=execute_handler, mode=mode, tags=self._tags)
 
     # ---------------------------------------------------------------
 

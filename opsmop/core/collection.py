@@ -74,7 +74,7 @@ class Collection(Resource):
         """
         return self.items
 
-    def walk_children(self, items=None, context=None, which=None, mode=None, fn=None, handlers=False):
+    def walk_children(self, items=None, context=None, which=None, mode=None, fn=None, handlers=False, tags=None):
 
         """
         A relatively complex iterator used by Executor() code.
@@ -94,19 +94,24 @@ class Collection(Resource):
             return
 
         validate = (mode == 'validate')
+
+        def maybe(v):
+            # we'll visit every resource but only call the function on items if tags are *not* engaged
+            if not tags or v.has_tag(tags):
+                fn(v)
        
         if issubclass(items_type, Collection):            
             self.attach_child_scope_for(items)
             proceed = items.conditions_true(context, validate=validate)
             if proceed:
-                return items.walk_children(items=items.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                return items.walk_children(items=items.get_children(mode), mode=mode, which=which, context=context, fn=fn, tags=tags)
             else:
                 context.on_skipped(items, is_handler=handlers)
 
         elif issubclass(items_type, Resource):
             self.attach_child_scope_for(items)
             if items.conditions_true(context, validate=validate):
-                return fn(items)
+                return maybe(items)
             else:
                 context.on_skipped(items, is_handler=handlers)
 
@@ -115,9 +120,9 @@ class Collection(Resource):
                 self.attach_child_scope_for(x)
                 if x.conditions_true(context, validate=validate):
                     if issubclass(type(x), Collection):
-                        x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                        x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn, tags=tags)
                     else:
-                        fn(x)
+                        maybe(x)
                 else:
                     context.on_skipped(items, is_handler=handlers)
 
@@ -126,9 +131,9 @@ class Collection(Resource):
                 self.attach_child_scope_for(v)
                 if v.conditions_true(context, validate=validate):
                     if issubclass(type(v), Collection):
-                        items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                        items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn, tags=tags)
                     else:
                         v.handles = k
-                        fn(v)
+                        maybe(v)
                 else:
                     context.on_skipped(items, is_handler=handlers)
