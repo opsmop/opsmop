@@ -1,7 +1,7 @@
 BACKGROUND
 ==========
 
-Thank you very much for your interest in contributing to Vespene. The purpose of the OpsMop community is work together to create great software we can all share and use.
+Thank you very much for your interest in contributing to OpsMop. The purpose of the OpsMop community is work together to create great software we can all share and use.
 
 OpsMop is licensed under the Apache 2.0 Software License.
 
