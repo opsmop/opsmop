@@ -267,6 +267,33 @@ Some of these examples are shown in the 'opsmop-demo' repo.
     registration only works for tasks at the same level of depth. A solution should be provided in the
     near future.
 
+.. _tags:
+
+Tags
+====
+
+OpsMop Tags are a feature where any certain resources in OpsMop can be selectively triggered without running all
+of the other resources in the policy file.  
+
+.. code-block:: python
+
+    class DemoPolicy(Policy):
+    
+        def set_roles(self):
+
+            return Roles(
+                Security(tags=['security']),
+                WebServer(tags=['webserver'])
+            )
+
+In the above example, if the opsmop binary was invoked with "-\\-tags=security", only the security role
+would be processed.
+
+The special tag name 'any' triggers regardless of what is specified with '-\\-tags'.  
+
+Tags can be assigned to any resource or collection and automatically apply to all contained resources.
+This is best demonstrated by the `tags.py <https://github.com/opsmop/opsmop-demo/blob/master/content/basics.py>`_ demo in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo.
+
 .. _ignore_errors:
 
 Ignore Errors
