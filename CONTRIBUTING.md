@@ -5,6 +5,8 @@ Thank you very much for your interest in contributing to OpsMop. The purpose of 
 
 OpsMop is licensed under the Apache 2.0 Software License.
 
+By contributing changes to this repository you certify that you agree to the following terms:
+
 CONTRIBUTORS LICENSE AGREEMENT
 ==============================
 
