@@ -28,7 +28,7 @@ class Field(object):
     
     # prevent accidental typos of field arguments that don't exist when working on resource type code
     __slots__ = [ 'kwargs', 'kind', 'of', 'default', 'empty', 
-        'loader', 'validator', 'allow_none', 'internal', 'help' ]
+        'loader', 'validator', 'allow_none', 'internal', 'help', 'lazy']
 
     def __init__(self, **kwargs):
 
@@ -59,6 +59,8 @@ class Field(object):
         self.allow_none = kwargs.get('allow_none', True)
         # describe what the field does
         self.help = kwargs.get('help', '')
+        # if set, do not resolve the field immediately, it will be evaluated further down at runtime
+        self.lazy = kwargs.get('lazy', False)
 
     def has_field(self, k):
         """

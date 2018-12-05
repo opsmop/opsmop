@@ -339,48 +339,33 @@ happened, and that's a good practice.
 Failure Status Overrides
 ========================
 
-.. note::
-   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
+By default, if a resource returns a fatal error, the program will halt at that point. What causes an error like this? 
+Errors could be a non-zero exit code from the :ref:`shell` module, or any other time a provider might return a failed result that is not
+a runtime exception. 
 
-By default if a command returns a fatal error, the program will halt at this step.  This is not
-always good, as sometimes, failure should depend on something other than that error status.
+The problem is, sometimes return codes are not reliable.  Other times, return codes are not enough.
 
-At the most basic level, 'failed_when' is equivalent to 'ignore_errors':
+Here are a few examples of controlling when a resource should be considered failed:
+
+.. code-block:: python
+
+    Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 5")
 
 .. code-block:: python
     
-    Shell("/bin/foo --args", register="x", failed_when=False)
-
-In a more practical example, suppose we have a shell command that is programmed incorrectly and 
-returns 5 on success. To deal with that, we might do this:
-
-.. code-block:: python
-
-    Shell("/bin/foo --args", register="x", failed_when="x.rc != 5")
-
-What if we have a shell command that we should consider failed if it doesn't contain the word "SUCCESS" in the output?
-We might do this:
-
-.. code-block:: python
-    
-    Shell("/bin/foo --args", register="x", failed_when="not 'SUCCESS' in data")
+    Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 0 or not 'SUCCESS' in x.data"))
 
 It may also be clearer to save that conditional string to a class or
 package variable and use it this way:
 
 .. code-block:: python
 
-    SUCCESS_IN_OUTPUT = "not 'SUCCESS' in data"
+    SUCCESS_IN_OUTPUT = Eval("x.rc != 0 or not 'SUCCESS' in x.data")
     # ...
     def set_resources(self):
         # ...
         Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
         # ...
-
-.. note::
-
-    Because OpsMop is pure Python it is very easy to assign variables, so when possible do so
-    to increase readability.
 
 .. _hooks:
 

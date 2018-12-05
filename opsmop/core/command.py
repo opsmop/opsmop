@@ -29,9 +29,9 @@ class Command(object):
     returns an "opsmop.core.result.Result" object.
     """
 
-    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env', 'ignore_lines' ]
+    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env', 'ignore_lines', 'primary' ]
 
-    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False, ignore_lines=None):
+    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False, ignore_lines=None, primary=False):
 
         """
         Constructs but does not execute a command.
@@ -45,6 +45,7 @@ class Command(object):
         fatal: whether any errors should fail the resource execution
         loud: whether to ignore 'quiet' preferences for just the output (but not command name or return codes)
         ignore_lines: don't echo any lines starting with these items (takes a list of strings)
+        primary: if True, this command invocation is the sole purpose of the provider (example: the shell module) and failure status be controlled by ignore_errors/failed_when/etc.
         """
         self.cmd = cmd
         self.provider = provider
@@ -55,6 +56,7 @@ class Command(object):
         self.input_text = input_text
         self.env = env
         self.ignore_lines = ignore_lines
+        self.primary = primary
 
     @memoize
     def get_timeout(self):
@@ -131,9 +133,9 @@ class Command(object):
         res = None
         rc = process.returncode
         if rc != 0:
-            res = Result(self.provider, rc=rc, data=output, fatal=self.fatal)
+            res = Result(self.provider, rc=rc, data=output, fatal=self.fatal, primary=self.primary)
         else:
-            res = Result(self.provider, rc=rc, data=output, fatal=False)
+            res = Result(self.provider, rc=rc, data=output, fatal=False, primary=self.primary)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
         context.on_command_result(self.provider, res)
         return res

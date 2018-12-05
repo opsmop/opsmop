@@ -81,7 +81,7 @@ class Provider(object):
         self._context.on_do(self, action)
 
 
-    def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True, ignore_lines=None):
+    def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True, ignore_lines=None, primary=False):
         """
         A convenience method that returns an un-executed command object from any provider, this should be used for executing ALL shell commands in OpsMop.
         """
@@ -89,11 +89,11 @@ class Provider(object):
             fatal = False
         if timeout is None:
             timeout = self.get_default_timeout()
-        return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal, ignore_lines=ignore_lines)
+        return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal, ignore_lines=ignore_lines, primary=primary)
 
-    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False, want_output=False, ignore_lines=None):
+    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False, want_output=False, ignore_lines=None, primary=False):
         """ Common helper code for test and run """
-        cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud, ignore_lines=ignore_lines)
+        cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud, ignore_lines=ignore_lines, primary=primary)
         res = cmd.execute()
         if want_output:
             if res.rc == 0 or loose:
@@ -111,12 +111,12 @@ class Provider(object):
         """
         return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud, want_output=True, ignore_lines=ignore_lines)
 
-    def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False, ignore_lines=None):
+    def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False, ignore_lines=None, primary=False):
         """
         Similar to test, this will call failed command callbacks when the commands fail, which MAY be intercepted
         by properly-programmed callbacks to fail the entire execution process.
         """
-        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud, ignore_lines=ignore_lines)
+        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud, ignore_lines=ignore_lines, primary=primary)
 
     def get_default_timeout(self): 
         """

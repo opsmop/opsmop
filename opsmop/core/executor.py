@@ -15,6 +15,7 @@
 from opsmop.core.collection import Collection
 from opsmop.core.context import Context
 from opsmop.core.result import Result
+from opsmop.lookups.lookup import Lookup
 
 # ---------------------------------------------------------------
 
@@ -243,12 +244,29 @@ class Executor(object):
         assert issubclass(type(result), Result)
 
         # the 'register' feature saves results into variable scope
-        if provider.resource.register is not None:
+        resource = provider.resource
+        if resource.register is not None:
             provider.handle_registration(context=context, result=result)
+
+        # determine if there was a failure
+        fatal = False
+        cond = resource.failed_when
+        if cond is not None:
+            if issubclass(type(cond), Lookup):
+                fatal = cond.evaluate(resource)
+                result.reason = cond
+            else:
+                fatal = cond
+        elif result.fatal:
+            fatal = True
+        result.fatal = fatal
 
         # tell the callbacks about the result
         context.on_result(provider, result)
-        if result.fatal:
+
+        # if there was a failure, handle it
+        # (common callbacks should abort execution)
+        if fatal:
             context.on_fatal(provider, result)
 
         return True

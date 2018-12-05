@@ -96,7 +96,10 @@ class LocalCallbacks(BaseCallback):
 
     def on_command_result(self, provider, result):
         self.i5("= %s" % result)
-        if result.fatal:
+        if not result.primary and result.fatal:
+            # only process intermediate command results here, if the command result is to be the final
+            # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
+            # effect
             raise CommandError(provider, "command failed", result)
 
     def on_skipped(self, skipped, is_handler=False):
@@ -158,10 +161,12 @@ class LocalCallbacks(BaseCallback):
         pass
 
     def on_fatal(self, provider, msg=None):
+        self.i1("")
         if msg:
             self.i1("FAILED: %s" % msg)
         else:
             self.i1("FAILED")
+        self.i1("")
         self.summarize()
 
     def on_update_variables(self, variables):
