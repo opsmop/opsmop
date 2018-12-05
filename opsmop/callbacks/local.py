@@ -145,8 +145,8 @@ class LocalCallbacks(BaseCallback):
         if is_handler:
             self.i3("(handler)")
 
-    def on_signalled(self, what):
-        self.i3("signalled: %s" % what)
+    def on_signalled(self, resource, event_name):
+        self.i3("signalled: %s" % event_name)
 
     def on_complete(self, policy):
         self.i1("")

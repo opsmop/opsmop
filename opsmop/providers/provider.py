@@ -17,6 +17,7 @@ from opsmop.core.command import Command
 from opsmop.core.result import Result
 from opsmop.core.template import Template
 from opsmop.core.errors import ProviderError
+from opsmop.lookups.lookup import Lookup
 
 DEFAULT_TIMEOUT = 60
 
@@ -50,7 +51,13 @@ class Provider(object):
         return False
 
     def has_changed(self):
-        """ Returns whether the provider has undertaken any actions """
+        """ similar to has_changed but takes changed_when into account """
+        cond = self.resource.changed_when
+        if cond is not None:
+            if issubclass(type(cond), Lookup):
+                return cond.evaluate(self.resource)
+            return cond
+        # otherwise the default is to see if any actions were taken        
         return len(self.actions_taken) > 0
 
     def apply(self):
@@ -143,6 +150,7 @@ class Provider(object):
         va = dict()
         va[self.register] = result
         context.on_update_variables(va)
+        self.resource.update_variables(va)
         self.resource.update_parent_variables(va)
 
     def commit_to_plan(self):

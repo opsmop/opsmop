@@ -89,7 +89,7 @@ class CommonCallbacks(BaseCallback):
     def on_resource(self, resource, is_handler):
         pass
 
-    def on_signalled(self, what):
+    def on_signalled(self, resource, event_name):
         pass
 
     def on_complete(self, policy):

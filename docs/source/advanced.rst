@@ -317,22 +317,20 @@ command.  This is demoed in the :ref:`module_shell` documentation.
 Change Reporting Control
 ========================
 
-.. note::
-   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
-
-A resource will mark itself as containing changes if it performs any actions to the system.
-These changes are used to decide whether to notify :ref:`handlers`.
+Normally, a resource will mark itself as containing changes if it performs any actions to the system.
+Presence of these changes are used to decide whether to notify :ref:`handlers`.
 
 Sometimes, particularly for shell commands, this is not appropriate, and the changed status
 should possibly depend on specific return codes or output. The state can be overriden as follows:
 
 .. code-block:: python
 
-    Shell("/bin/foo --args", register="x", ignore_errors=True, changed_when="'changed' in x.data", notify="some_step")
+    Shell("/bin/foo --args", register="x", changed_when=Eval("'changed' in x.data"), notify="some_step")
 
-If not using handlers, the change reporting isn't too significant, but it will affect CLI output counts at
-the end of the policy execution.  Some users like their policies to report no changes when nothing really
-happened, and that's a good practice.
+If not using handlers, the change reporting isn't too significant, but is still useful to record whether or not
+the policy evaluation made any changes. 
+
+If no 'changed_when' clause is added to the Shell resource, it will always record that it made a change.
 
 .. _failed_when:
 

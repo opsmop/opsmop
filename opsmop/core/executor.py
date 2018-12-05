@@ -281,17 +281,17 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def signal_changes(self, provider, resource=None, context=None):
+    def signal_changes(self, provider=None, resource=None, context=None):
         """
         If any events were signalled, add them to the context here.
-        """
+        """    
         if not provider.has_changed():
             return
         if resource.signals:
             # record the list of all events signalled while processing this role
             context.add_signal(resource.signals)
             # tell the callbacks that a signal occurred
-            context.on_signalled(resource.signals)
+            context.on_signalled(resource, resource.signals)
 
     # ---------------------------------------------------------------
 

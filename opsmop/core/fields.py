@@ -71,7 +71,9 @@ class Fields(object):
             variables       = Field(kind=dict, loader=resource.set_variables, help=None),
             extra_variables = Field(kind=dict, empty=True, help=None),
             tags            = Field(kind=list, of=str, default=None, help="allows applying part of the policy"),
-            failed_when     = Field(default=None, lazy=True, help="if set, specify terms of resource application failure")
+            failed_when     = Field(default=None, lazy=True, help="if set, specify terms of resource application failure"),
+            changed_when    = Field(default=None, lazy=True, help="if set, only signal handlers if this is true")
+
         )
 
     def find_unexpected_keys(self, obj):
