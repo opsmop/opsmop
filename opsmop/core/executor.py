@@ -83,7 +83,7 @@ class Executor(object):
         context = None
 
         for policy in self._policies:
-            # the context holds some types of state, such as signalled events
+            # the context holds some types of state, such as signaled events
             # and is cleared between each policy execution
             context = Context(mode=mode, callbacks=self._callbacks)
             # actual running of the policy here:
@@ -283,15 +283,15 @@ class Executor(object):
 
     def signal_changes(self, provider=None, resource=None, context=None):
         """
-        If any events were signalled, add them to the context here.
+        If any events were signaled, add them to the context here.
         """    
         if not provider.has_changed():
             return
         if resource.signals:
-            # record the list of all events signalled while processing this role
+            # record the list of all events signaled while processing this role
             context.add_signal(resource.signals)
             # tell the callbacks that a signal occurred
-            context.on_signalled(resource, resource.signals)
+            context.on_signaled(resource, resource.signals)
 
     # ---------------------------------------------------------------
 
@@ -304,7 +304,7 @@ class Executor(object):
         if self.is_collection(resource):
             return
 
-        # if in handler mode we do not process the handler unless it was signalled
+        # if in handler mode we do not process the handler unless it was signaled
         if handlers and not context.has_seen_any_signal(resource.all_handles()):
             context.on_skipped(resource, is_handler=handlers)
             return

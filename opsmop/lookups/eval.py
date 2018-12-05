@@ -30,3 +30,6 @@ class Eval(Lookup):
 
     def __str__(self):
         return "Eval: <'%s'>" % self.expr
+
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__, expr=self.expr)

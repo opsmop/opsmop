@@ -19,95 +19,101 @@ import json
 from opsmop.core.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.errors import CommandError, ProviderError
+from opsmop.core.errors import CommandError
 
+# NOTE: this interface is subject to change
 
 INDENT="  "
 
-class CommonCallbacks(BaseCallback):
+class EventStreamCallbacks(BaseCallback):
 
     """
-    Regardless of output modes, some behavior needs to happen after
-    all callbacks are run. To keep this behavior user extensible,
-    this behavior is implemented in a Callback class versus
-    in the main Executor code.
+    Callback class for the default CLI implementation.
+    Improvements are welcome.
     """
+
+    __slots__ = [ 'phase', 'count' ]
 
     def __init__(self):
         super()
 
-    def set_phase(self, phase):
-        self.phase = phase
-
     def on_command_echo(self, provider, echo):
-        pass
+        self.event('command_echo', data=echo)
 
     def on_echo(self, provider, echo):
-        pass
+        self.event('echo', data=echo)
 
     def on_execute_command(self, provider, command):
-        pass
+        self.event('execute_command', provider=provider, data=command)
 
     def on_plan(self, provider):
-        pass
+        self.event('plan', provider=provider)
  
     def on_apply(self, provider):
-        pass
-
+        self.event('apply', provider=provider)
+    
     def on_needs(self, provider, action):
-        pass
+        self.event('needs', provider=provider, data=action)
 
     def on_do(self, provider, action):
-        pass
+        self.event('do', provider=provider, data=action)
 
     def on_taken_actions(self, provider, actions_taken):
-        if provider.skip_plan_stage():
-            return
-        taken = sorted([ str(x) for x in provider.actions_taken ])
-        planned = sorted([ str(x) for x in provider.actions_planned ])
-        if (taken != planned):
-            raise ProviderError(provider, "actions taken (%s) do not equal planned (%s)" % (taken, planned))
+        self.event('taken', provider=provider, data=actions_taken)
 
     def on_result(self, provider, result):
-        pass
+        self.event('result', provider=provider, data=result)
 
     def on_command_result(self, provider, result):
-        if not result.primary and result.fatal:
-            # only process intermediate command results here, if the command result is to be the final
-            # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
-            # effect
-            raise CommandError(provider, "command failed", result)
+        self.event('command_result', provider=provider, data=result)
 
     def on_skipped(self, skipped, is_handler=False):
         pass
 
     def on_begin_role(self, role):
-        pass
+        self.event('begin_role', role=role)
 
     def on_validate(self):
-        pass
+        self.event('validate')
 
     def on_begin_handlers(self):
         pass
 
     def on_resource(self, resource, is_handler):
-        pass
+        self.event('resource', resource=resource, is_handler=is_handler)
 
     def on_signaled(self, resource, event_name):
-        pass
+        self.event('signaled', resource=resource, data=event_name)
 
     def on_complete(self, policy):
-        pass
+        self.event('complete', policy=policy)
 
     def on_role(self, role):
-        pass
+        self.event('role', role=role)
 
     def summarize(self):
         pass
 
     def on_fatal(self, provider, msg=None):
-        sys.exit(1)
+        self.event('fatal', provider=provider, data=msg)
 
     def on_update_variables(self, variables):
         pass
 
+    def event(self, name, **kwargs):
+        data = dict()
+        data['evt'] = name
+        for (k,v) in kwargs.items():
+            if type(v) == list:
+                interim = []
+                for i in v:
+                    if hasattr(i, 'to_dict'):
+                        interim.append(i.to_dict())
+                    else:
+                        interim.append(i)
+                v = interim
+            else:
+                if hasattr(v, 'to_dict'):
+                    v = v.to_dict()
+            data[k] = v
+        print(json.dumps(data))

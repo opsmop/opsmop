@@ -231,3 +231,12 @@ class Resource(object):
         user hook. called after executing a resource in Executor code
         """
         pass
+
+    def to_dict(self):
+        result = dict()
+        result['cls']= self.__class__.__name__
+        for (k,v) in self.kwargs.items():
+            if hasattr(v, 'to_dict'):
+                v = v.to_dict()
+            result[k] = v
+        return result

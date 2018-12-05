@@ -99,8 +99,8 @@ class Context(object):
     def on_skipped(self, value, is_handler=False):
         self._run_callbacks('on_skipped', value, is_handler)
 
-    def on_signalled(self, resource, event_name):
-        self._run_callbacks('on_signalled', resource, event_name)
+    def on_signaled(self, resource, event_name):
+        self._run_callbacks('on_signaled', resource, event_name)
 
     def on_complete(self, policy):
         self._run_callbacks('on_complete', policy)

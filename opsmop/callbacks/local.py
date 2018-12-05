@@ -25,7 +25,7 @@ from opsmop.core.errors import CommandError
 
 INDENT="  "
 
-class LocalCallbacks(BaseCallback):
+class LocalCliCallbacks(BaseCallback):
 
     """
     Callback class for the default CLI implementation.
@@ -96,11 +96,6 @@ class LocalCallbacks(BaseCallback):
 
     def on_command_result(self, provider, result):
         self.i5("= %s" % result)
-        if not result.primary and result.fatal:
-            # only process intermediate command results here, if the command result is to be the final
-            # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
-            # effect
-            raise CommandError(provider, "command failed", result)
 
     def on_skipped(self, skipped, is_handler=False):
         if self.phase != 'validate' and not is_handler and issubclass(type(skipped), Type):
@@ -145,8 +140,8 @@ class LocalCallbacks(BaseCallback):
         if is_handler:
             self.i3("(handler)")
 
-    def on_signalled(self, resource, event_name):
-        self.i3("signalled: %s" % event_name)
+    def on_signaled(self, resource, event_name):
+        self.i3("signaled: %s" % event_name)
 
     def on_complete(self, policy):
         self.i1("")

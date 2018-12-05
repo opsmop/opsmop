@@ -58,6 +58,9 @@ class Command(object):
         self.ignore_lines = ignore_lines
         self.primary = primary
 
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__, cmd=self.cmd, timeout=self.timeout, env=self.env)
+
     @memoize
     def get_timeout(self):
         """

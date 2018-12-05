@@ -16,7 +16,8 @@
 import sys
 import argparse
 
-from opsmop.callbacks.local import LocalCallbacks
+from opsmop.callbacks.local import LocalCliCallbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.api import Api
 from opsmop.core.errors import OpsMopError
@@ -52,14 +53,14 @@ class Cli(object):
 
         mode = self.args[1]
         path = sys.argv[2]
-        callbacks = [ LocalCallbacks(), CommonCallbacks() ]
-
+        callbacks = None
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--validate', help='policy file to validate')
         parser.add_argument('--apply', help="policy file to apply")
         parser.add_argument('--check', help="policy file to check")
         parser.add_argument('--tags', help='optional comma seperated list of tags')
+        parser.add_argument('--event-stream', action='store_true', help=argparse.SUPPRESS)
 
         args = parser.parse_args(self.args[1:])
 
@@ -70,6 +71,11 @@ class Cli(object):
             sys.exit(1)
 
         path = args.validate or args.apply or args.check
+
+        if not args.event_stream:
+            callbacks = [ LocalCliCallbacks(), CommonCallbacks() ]
+        else:
+            callbacks = [ EventStreamCallbacks(), CommonCallbacks() ]
 
         tags = None
         if args.tags is not None:

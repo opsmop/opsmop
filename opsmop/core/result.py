@@ -59,3 +59,9 @@ class Result(object):
             return "ok%s%s" % (rc_msg, msg)
         else:
             return "fatal%s%s" % (rc_msg, msg)
+
+    def to_dict(self):
+        reason = self.reason
+        if self.reason is not None:
+            reason = self.reason.to_dict()
+        return dict(cls=self.__class__.__name__, rc=self.rc, data=self.data, fatal=self.fatal, message=self.message, reason=reason)

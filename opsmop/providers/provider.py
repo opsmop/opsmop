@@ -182,3 +182,6 @@ class Provider(object):
 
     def template_file(self, path):
         return Template.from_file(path, self)
+
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__)
