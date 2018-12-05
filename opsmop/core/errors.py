@@ -31,12 +31,15 @@ class ValidationError(OpsMopError):
 
     __slots__ = [ 'resource', 'msg' ]
     
-    def __init__(self, resource, msg):
+    def __init__(self, resource=None, msg=None):
         self.resource = resource
         self.msg = msg
 
     def __str__(self):
         return "<ValidationError: %s>" % self.msg
+
+class InventoryError(ValidationError):
+    pass
 
 class NoSuchProviderError(OpsMopError):
     
