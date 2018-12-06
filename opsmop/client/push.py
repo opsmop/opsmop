@@ -15,33 +15,26 @@
 
 import sys
 import argparse
+from opsmop.push.api import PushApi
 
-from opsmop.callbacks.local import LocalCliCallbacks
-from opsmop.callbacks.event_stream import EventStreamCallbacks
-from opsmop.callbacks.common import CommonCallbacks
-from opsmop.core.api import Api
-from opsmop.core.errors import OpsMopError
-
-# import argparse
-
+# from opsmop.core.errors import OpsMopError
 
 USAGE = """
 |
 | opsmop - (C) 2018, Michael DeHaan LLC
 |
-| opsmop --validate demo/policy.py 
-| opsmop --check demo/policy.py
-| opsmop --apply demo/policy.py  
+| opsmop-push --check demo/policy.py 
+| opsmop-push --apply demo/policy.py 
 |
 """
 
-class Cli(object):
+class PushCli(object):
 
     __slots__ = [ 'args' ]
 
     def __init__(self, args):
         """
-        The CLI is constructed with the sys.argv command line, see bin/opsmop
+        The CLI is constructed with the sys.argv command line, see bin/opsmop-push
         """
         self.args = args
  
@@ -56,38 +49,23 @@ class Cli(object):
         callbacks = None
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('--validate', help='policy file to validate')
         parser.add_argument('--apply', help="policy file to apply")
         parser.add_argument('--check', help="policy file to check")
-        parser.add_argument('--tags', help='optional comma seperated list of tags')
-        parser.add_argument('--event-stream', action='store_true', help=argparse.SUPPRESS)
 
         args = parser.parse_args(self.args[1:])
 
-        all_modes = [ args.validate, args.apply, args.check ]
+        all_modes = [ args.apply, args.check ]
         selected_modes = [ x for x in all_modes if x is not None ]
         if len(selected_modes) != 1:
             print(USAGE)
             sys.exit(1)
 
-        path = args.validate or args.apply or args.check
-
-        if not args.event_stream:
-            callbacks = [ LocalCliCallbacks(), CommonCallbacks() ]
-        else:
-            callbacks = [ EventStreamCallbacks(), CommonCallbacks() ]
-
-        tags = None
-        if args.tags is not None:
-            tags = args.tags.strip().split(",")
-
-        api = Api.from_file(path=path, callbacks=callbacks, tags=tags)
+        path = args.check or args.apply
+        
+        api = PushApi.from_file(path=path) #, transport=<SshTransport>
         
         try:
-            if args.validate:
-                # just check for missing files and invalid types
-                api.validate()
-            elif args.check:
+            if args.check:
                 # operate in dry-run mode
                 api.check()
             elif args.apply:
@@ -101,7 +79,6 @@ class Cli(object):
             print(str(ome))
             print("")
             sys.exit(1)
-
 
         print("")
         sys.exit(0)

@@ -19,18 +19,18 @@ from opsmop.inventory.inventory import Inventory
 
 class TomlInventory(Inventory):
 
-    def __init__(self):
+    def __init__(self, filename):
         super().__init__()
+        self._path = os.path.expanduser(os.path.expandvars(filename))
+        if not os.path.exists(self._path):
+            raise InventoryError(msg="TOML inventory does not exist at: %s" % self._path)
 
-    def load(self, filename):
-
-        path = os.path.expanduser(os.path.expandvars(filename))
-        if not os.path.exists(path):
-            raise InventoryError(msg="TOML inventory does not exist at: %s" % path)
-        data = open(path).read()
+    def load(self):
+        data = open(self._path).read()
         data = toml.loads(data)
         self.accumulate(data)
         return self
+
 
         
 

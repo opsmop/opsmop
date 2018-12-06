@@ -41,22 +41,25 @@ import shlex
 # * the special group name 'all' assigns variables to all groups
 # * a host does not have to appear in hosts, that's just an alternate way to assign variables to each host
 
-_HOSTS = dict()
-_GROUPS = dict()
+
 
 class Inventory(object):
 
-    def __init__(self):
+    def __init__(self, hosts=None, groups=None, loaded=False):
 
         """
         Create the inventory class with a list of hosts and groups common to all inventories
         """
 
-        global _HOSTS
-        global _GROUPS
+        if hosts is None:
+            hosts = dict()
+        if groups is None:
+            groups = dict
 
-        self._hosts = _HOSTS  
-        self._groups = _GROUPS
+        self._hosts = hosts
+        self._groups = groups
+
+        self.loaded = loaded
 
     def _shlex_parse(self, in_data):
         """
@@ -141,14 +144,54 @@ class Inventory(object):
     def accumulate(self, data):
         self._process_hosts(data)
         self._process_groups(data)
-        print(self._hosts.values())
-        print(self._groups.values())
 
     def groups(self):
         return self._groups
 
     def hosts(self):
         return self._hosts
+
+    def filter(self, groups=None, hosts=None):
+        """
+        Given a list of fnmatch-style group patterns and fnmatch-style host patterns,
+        return a subset of the inventory where all groups match the patterns in each.
+        If either pattern is omitted, return everything.  Demo, see 'push_to'
+        in the opsmop-demo repo: content/push_demo.py
+        """
+
+        if not self._loaded:
+            self.load()
+            self.loaded = True
+
+        new_groups = dict()
+        new_hosts = dict()
+
+        group_names = self._groups.keys()
+        host_names  = self._hots.keys()
+
+        matched_groups = set()
+        matched_host = set()
+
+        if groups:
+            for group_filter in groups:
+                results = fnmatch.filter(group_names, group_filter)
+                for r in results:
+                    new_groups[r] = self._groups[r]
+        else:
+            new_groups = self._groups
+
+        if hosts:
+            for host_filter in hosts:
+                results = fnmatch.filter(host_names, host_filter)
+                for r in results:
+                    new_hosts[r] = self._hosts[r]
+        else:
+            new_hosts = self._hosts
+
+
+        return Inventory(hosts=new_hosts, groups=new_groups, loaded=True)
+
+           
 
 
 

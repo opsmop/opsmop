@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from opsmop.client.cli import Cli
+from opsmop.client.local import LocalCli
 import sys
 
 if __name__ == "__main__":
-    Cli(sys.argv).go()
+    LocalCli(sys.argv).go()
