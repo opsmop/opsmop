@@ -55,7 +55,7 @@ class Api(object):
         This just checks for invalid types in the python file as well as missing files
         and non-sensical option combinations.
         """
-        executor = Executor(policies=self._policies, tags=self._tags)
+        executor = Executor(self._policies, tags=self._tags)
         contexts = executor.validate()
         return contexts
 
@@ -63,7 +63,7 @@ class Api(object):
         """
         This is dry-run mode
         """
-        executor = Executor(policies=self._policies, tags=self._tags)
+        executor = Executor(self._policies, tags=self._tags)
         contexts = executor.check()
         return contexts
 
@@ -71,6 +71,6 @@ class Api(object):
         """
         This is live-configuration mode.
         """
-        executor = Executor(policies=self._policies, tags=self._tags)
+        executor = Executor(self._policies, tags=self._tags)
         contexts = executor.apply()
         return contexts

@@ -27,7 +27,7 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies=None, tags=None, local=True):
+    def __init__(self, policies, tags=None, local=True):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -122,15 +122,15 @@ class Executor(object):
             hosts = role.inventory().hosts()
 
         for host in hosts:
-            self.process_role_for_host(host=host, policy=policy, role=role)
+            self.process_role_for_host(host, policy, role)
 
-    def process_role_for_host(self, host=None, policy=None, role=None):
+    def process_role_for_host(self, host, policy, role):
 
         Context.set_host(host)
 
         if host.name == "127.0.0.1":
 
-            self.process_role_internal(host=host, policy=policy, role=role, local=True)
+            self.process_role_internal(host, policy, role, local=True)
 
         else:
 
@@ -143,7 +143,7 @@ class Executor(object):
 
             raise exceptions.NotImplementedError()
 
-    def process_role_internal(self, host=None, policy=None, role=None, local=True):
+    def process_role_internal(self, host, policy, role, local=True):
         
         if not local:
             # FIXME: not implemented
@@ -313,7 +313,7 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def execute_resource(self, host=None, resource=None, handlers=False):
+    def execute_resource(self, host, resource, handlers=False):
         """
         This handles the plan/apply intercharge for a given resource in the resource tree.
         It is called recursively via walk_children to run against all resources.
