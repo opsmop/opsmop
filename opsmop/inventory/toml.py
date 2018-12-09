@@ -28,6 +28,9 @@ class TomlInventory(Inventory):
     def load(self):
         data = open(self._path).read()
         data = toml.loads(data)
+        print("RAW")
+        import json
+        print(json.dumps(data, indent=4))
         self.accumulate(data)
         return self
 

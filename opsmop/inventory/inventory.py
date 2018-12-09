@@ -18,6 +18,7 @@ from opsmop.inventory.group import Group
 
 import json
 import shlex
+import fnmatch
 
 # inventory structure for ALL inventory subclasses implementations
 
@@ -54,12 +55,12 @@ class Inventory(object):
         if hosts is None:
             hosts = dict()
         if groups is None:
-            groups = dict
+            groups = dict()
 
         self._hosts = hosts
         self._groups = groups
 
-        self.loaded = loaded
+        self._loaded = loaded
 
     def _shlex_parse(self, in_data):
         """
@@ -140,6 +141,7 @@ class Inventory(object):
                 host_data = self._shlex_parse(host_data)
                 host = self._get_or_create_host(host_name, host_data)
                 group.add_host(host)
+                host.add_group(group)
 
     def accumulate(self, data):
         self._process_hosts(data)
@@ -167,10 +169,15 @@ class Inventory(object):
         new_hosts = dict()
 
         group_names = self._groups.keys()
-        host_names  = self._hots.keys()
+        host_names  = self._hosts.keys()
 
         matched_groups = set()
         matched_host = set()
+
+        if groups is not None and type(groups) != list:
+            groups = [ groups ]
+        if hosts is not None and type(hosts) != list:
+            hosts = [ hosts ]
 
         if groups:
             for group_filter in groups:
@@ -180,13 +187,19 @@ class Inventory(object):
         else:
             new_groups = self._groups
 
+        grouped_hosts = []
+        for g in new_groups:
+            grouped_hosts.extend(self._groups[g].hosts())
+        grouped_hosts = list(set(grouped_hosts))
+        grouped_hostnames = [ h.name for h in grouped_hosts ]
+
         if hosts:
             for host_filter in hosts:
-                results = fnmatch.filter(host_names, host_filter)
+                results = fnmatch.filter(grouped_hostnames, host_filter)
                 for r in results:
                     new_hosts[r] = self._hosts[r]
         else:
-            new_hosts = self._hosts
+            new_hosts = grouped_hosts
 
 
         return Inventory(hosts=new_hosts, groups=new_groups, loaded=True)

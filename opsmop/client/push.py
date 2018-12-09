@@ -16,8 +16,7 @@
 import sys
 import argparse
 from opsmop.push.api import PushApi
-
-# from opsmop.core.errors import OpsMopError
+from opsmop.core.errors import OpsMopError
 
 USAGE = """
 |

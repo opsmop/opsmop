@@ -23,39 +23,39 @@ APPLY = 'apply'
 class Context(object):
 
     @classmethod
-    def set_mode(self, mode):
+    def set_mode(cls, mode):
         global MODE
         assert mode in [ VALIDATE, CHECK, APPLY ]
         MODE = mode
 
     @classmethod
-    def set_host(self, host):
+    def set_host(cls, host):
         global HOST
         HOST = host
 
     @classmethod
-    def host(self):
+    def host(cls):
         return host
 
     @classmethod
-    def mode(self):
+    def mode(cls):
         global MODE
         return MODE
 
     @classmethod
-    def is_validate(self):
+    def is_validate(cls):
         return MODE == VALIDATE
 
     @classmethod
-    def is_check(self):
+    def is_check(cls):
         return MODE == CHECK
 
     @classmethod
-    def is_apply(self):
+    def is_apply(cls):
         return MODE == APPLY
 
     @classmethod
-    def add_signal(self, host, signal):
+    def add_signal(cls, host, signal):
 
         global HOST_SIGNALS
         if not host.name in HOST_SIGNALS:
@@ -63,7 +63,7 @@ class Context(object):
         HOST_SIGNALS[host.name].append(signal)
 
     @classmethod
-    def has_seen_any_signal(self, host, signals):
+    def has_seen_any_signal(cls, host, signals):
 
         global HOST_SIGNALS
         host_signals = HOST_SIGNALS.get(host.name, [])

@@ -28,7 +28,7 @@ class Group(object):
         self._hosts[host.name] = host
     
     def hosts(self):
-        return self._hosts.values()
+        return [ h for h in self._hosts.values() ]
 
         
 

@@ -34,8 +34,9 @@ class EventStreamCallbacks(BaseCallback):
 
     __slots__ = [ 'phase', 'count' ]
 
-    def __init__(self):
+    def __init__(self, sender=None):
         super()
+        self.sender = sender
 
     def on_command_echo(self, provider, echo):
         self.event('command_echo', data=echo)
@@ -116,4 +117,7 @@ class EventStreamCallbacks(BaseCallback):
                 if hasattr(v, 'to_dict'):
                     v = v.to_dict()
             data[k] = v
-        print(json.dumps(data))
+        if not sender:
+            print(json.dumps(data))
+        else:
+            sender.send(data)

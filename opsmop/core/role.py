@@ -19,6 +19,7 @@ from opsmop.core.handlers import Handlers
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
 from opsmop.callbacks.callbacks import Callbacks
+from opsmop.client.user_defaults import UserDefaults
 
 class Role(Collection):
 
@@ -50,6 +51,18 @@ class Role(Collection):
 
     def set_handlers(self):
         return Handlers()
+
+    def sudo(self):
+        return False
+
+    def ssh_as(self):
+        return (UserDefaults.ssh_username(), UserDefaults.ssh_password())
+
+    def sudo_as(self):
+        return (UserDefaults.sudo_username(), UserDefaults.sudo_password())
+
+    def check_host_keys(self):
+        return UserDefaults.ssh_check_host_keys()
 
     def _on_walk(self):
         Callbacks.on_role(self)

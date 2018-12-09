@@ -19,6 +19,14 @@ from opsmop.lookups.lookup import Lookup
 from opsmop.inventory.host import Host
 from opsmop.callbacks.callbacks import Callbacks
 
+import mitogen.core
+import mitogen.master
+import mitogen.select
+import mitogen.utils
+
+MITOGEN_SELECT=None
+
+
 # ---------------------------------------------------------------
 
 class Executor(object):
@@ -86,7 +94,10 @@ class Executor(object):
         policy.init_scope()
         roles = policy.get_roles()
         for role in roles.items:
-            self.process_role(policy, role)
+            if self._local:
+                self.process_role(policy, role)
+            else:
+                self.process_role_push(policy, role)
         Callbacks.on_complete(policy)
 
     # ---------------------------------------------------------------
@@ -110,21 +121,66 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def process_role(self, policy, role):
+    def process_role_push(self, policy, role):
         """
         Processes one role in any mode
         """
 
+        broker = mitogen.master.Broker()
+        router = mitogen.master.Router(broker)
 
-        if self._local:
-            hosts = [ Host("127.0.0.1") ]
-        else:
+        with router:
             hosts = role.inventory().hosts()
+            global MITOGEN_SELECT
+            MITOGEN_SELECT = mitogen.select.Select(oneshot=False)
+            for host in hosts:
+                print("HOST=%s" % host.hostname())
+                self.process_role_for_host(host, policy, role, router=router)
+            while True:
+                msg = MITOGEN_SELECT.get()
+            
+    # ---------------------------------------------------------------
 
-        for host in hosts:
-            self.process_role_for_host(host, policy, role)
+    def process_role(self, policy, role):
+        host = Host("127.0.0.1") 
+        self.process_role_for_host(host, policy, role)
 
-    def process_role_for_host(self, host, policy, role):
+    # ---------------------------------------------------------------
+
+    def get_remote_context(self, host, role):
+        
+        hostname = host.hostname()
+        sudo = role.sudo()
+        
+        (role_sudo_username, role_sudo_password) = role.sudo_as()
+        if role_sudo_username is None:
+            role_sudo_username = host.sudo_username()
+        if role_sudo_password is None:
+            role_sudo_password = host.sudo_password()
+
+        (role_ssh_username, role_ssh_password) = role.ssh_as()
+        if role_ssh_username is None:
+            role_ssh_username = host.ssh_username()
+        if role_ssh_password is None:
+            role_ssh_password = host.ssh_password()
+        
+        role_check_host_keys = role.check_host_keys()
+        if role_check_host_keys is None:
+            role_check_host_keys = host.check_host_keys()
+
+        return dict(
+            hostname = hostname,
+            sudo = sudo,
+            username = role_ssh_username,
+            password = role_ssh_password,
+            sudo_username = role_sudo_username,
+            sudo_password = role_sudo_password,
+            check_host_keys = role_check_host_keys
+        )
+
+    # ---------------------------------------------------------------
+
+    def process_role_for_host(self, host, policy, role, router=None):
 
         Context.set_host(host)
 
@@ -134,20 +190,41 @@ class Executor(object):
 
         else:
 
-            # FIXME: IMPLEMENT / BOOKMARK
-            # here's where we would call the remote version.
-            # which is just a wrapper around the same function
+            context = self.get_remote_context(host, role)
+            print("DEBUG: SSH CONTEXT =%s" % context )
 
-            # be sure to set Context and Callback objects up correctly
-            # and then copy over signals from Contexts returns when done.
+            final = None
+            remote = router.ssh(hostname=context['hostname'], check_host_keys=context['check_host_keys'], username=context['username'], password=context['password'])
 
-            raise exceptions.NotImplementedError()
+            if context['sudo']:
+                sudo = router.sudo(username=context['sudo_username'], password=context['sudo_password'], via=remote)
+                final = sudo
+            else:
+                final = remote
 
-    def process_role_internal(self, host, policy, role, local=True):
+            receiver =  mitogen.core.Receiver(router)
+            global MITOGEN_SELECT
+            MITOGEN_SELECT.add(receiver)
+            sender = receiver.to_sender()
+
+            def remote_fn(sender):
+                return self.process_role_remote(host, policy, role, local=False, sender=sender)
+
+            call_recv = final.call_async(remote_fn, sender)
+            MITOGEN_SELECT.add(call_recv)
+
+
+    def process_role_remote(host, policy, role):
+        return self.process_role_internal(host, policy, role, local=False)
+
+
+    def process_role_internal(self, host, policy, role, local=True, sender=None):
         
         if not local:
-            # FIXME: not implemented
-            self.use_remote_callbacks()
+            from opsmop.callbacks.event_stream import EventStreamStreamCallbacks
+            from opsmop.callbacks.common import CommonCallbacks
+            Context.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
+
         
         role.pre()
         # set up the variable scope - this is done later by walk_handlers for lower-level objects in the tree
