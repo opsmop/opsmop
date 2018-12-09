@@ -16,6 +16,7 @@
 import sys
 import argparse
 
+from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
@@ -73,15 +74,15 @@ class LocalCli(object):
         path = args.validate or args.apply or args.check
 
         if not args.event_stream:
-            callbacks = [ LocalCliCallbacks(), CommonCallbacks() ]
+            Callbacks.set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         else:
-            callbacks = [ EventStreamCallbacks(), CommonCallbacks() ]
+            Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
 
         tags = None
         if args.tags is not None:
             tags = args.tags.strip().split(",")
 
-        api = Api.from_file(path=path, callbacks=callbacks, tags=tags)
+        api = Api.from_file(path=path, tags=tags)
         
         try:
             if args.validate:

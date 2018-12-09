@@ -159,7 +159,7 @@ class Resource(object):
                 return True
         return False
 
-    def conditions_true(self, context, validate=False):
+    def conditions_true(self, validate=False):
         """
         Called by Executor code to decide if a resource is processable.
         """

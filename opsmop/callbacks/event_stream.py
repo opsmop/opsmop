@@ -16,7 +16,7 @@ import sys
 import inspect
 import json
 
-from opsmop.core.callback import BaseCallback
+from opsmop.callbacks.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 from opsmop.core.errors import CommandError

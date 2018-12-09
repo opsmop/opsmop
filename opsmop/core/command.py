@@ -19,6 +19,7 @@ import subprocess
 
 from opsmop.core.common import memoize
 from opsmop.core.result import Result
+from opsmop.callbacks.callbacks import Callbacks
 
 
 class Command(object):
@@ -84,8 +85,7 @@ class Command(object):
         because there are no database objects.
         """
 
-        context = self.provider.context()
-        context.on_execute_command(self.provider, self)
+        Callbacks.on_execute_command(self.provider, self)
         
         command = self.cmd
         timeout_cmd = self.get_timeout()
@@ -125,10 +125,10 @@ class Command(object):
         output = ""
         for line in stdout:
             if (self.echo or self.loud) and (not self.ignore_lines or not self.should_ignore(line)):
-                context.on_command_echo(self.provider, line)
+                Callbacks.on_command_echo(self.provider, line)
             output = output + line
         if output.strip() == "":
-            context.on_command_echo(self.provider, "(no output)")
+            Callbacks.on_command_echo(self.provider, "(no output)")
 
 
         process.wait()
@@ -140,7 +140,7 @@ class Command(object):
         else:
             res = Result(self.provider, rc=rc, data=output, fatal=False, primary=self.primary)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
-        context.on_command_result(self.provider, res)
+        Callbacks.on_command_result(self.provider, res)
         return res
 
     def should_ignore(self, line):

@@ -20,20 +20,17 @@ from opsmop.core.executor import Executor
 class Api(object):
 
 
-    __slots__ = [ '_policies', '_callbacks', '_tags' ]
+    __slots__ = [ '_policies', '_tags' ]
 
-    def __init__(self, policies=None, callbacks=None, tags=None):
+    def __init__(self, policies=None, tags=None):
 
-        assert type(callbacks) == list
         assert type(policies) == list
         self._policies = policies
-        self._callbacks = callbacks
         self._tags = tags
 
     @classmethod
-    def from_file(cls, callbacks=None, path=None, tags=None):
+    def from_file(cls, path=None, tags=None):
 
-        assert type(callbacks) == list
         assert path is not None
 
         path = os.path.abspath(os.path.expandvars(os.path.expanduser(path)))
@@ -51,14 +48,14 @@ class Api(object):
         if type(policies) != list:
             policies = [ policies ]
 
-        return cls(policies=policies, callbacks=callbacks, tags=tags)
+        return cls(policies=policies, tags=tags)
         
     def validate(self):
         """
         This just checks for invalid types in the python file as well as missing files
         and non-sensical option combinations.
         """
-        executor = Executor(policies=self._policies, callbacks=self._callbacks, tags=self._tags)
+        executor = Executor(policies=self._policies, tags=self._tags)
         contexts = executor.validate()
         return contexts
 
@@ -66,7 +63,7 @@ class Api(object):
         """
         This is dry-run mode
         """
-        executor = Executor(policies=self._policies, callbacks=self._callbacks, tags=self._tags)
+        executor = Executor(policies=self._policies, tags=self._tags)
         contexts = executor.check()
         return contexts
 
@@ -74,6 +71,6 @@ class Api(object):
         """
         This is live-configuration mode.
         """
-        executor = Executor(policies=self._policies, callbacks=self._callbacks, tags=self._tags)
+        executor = Executor(policies=self._policies, tags=self._tags)
         contexts = executor.apply()
         return contexts

@@ -18,6 +18,7 @@ from opsmop.core.result import Result
 from opsmop.core.template import Template
 from opsmop.core.errors import ProviderError
 from opsmop.lookups.lookup import Lookup
+from opsmop.callbacks.callbacks import Callbacks
 
 DEFAULT_TIMEOUT = 60
 
@@ -75,7 +76,7 @@ class Provider(object):
         """ declares than an action 'should' take place during an apply step """
         action = Action(action_name)
         self.actions_planned.append(action)
-        self._context.on_needs(self, action)
+        Callbacks.on_needs(self, action)
 
     def should(self, what):
         """ returns True if an action should take place during an apply step """
@@ -85,7 +86,7 @@ class Provider(object):
         """ marks off that an action has been completed. not marking off all planned actions (or any unplanned ones) will result in an error """
         action = Action(action_name)
         self.actions_taken.append(action)
-        self._context.on_do(self, action)
+        Callbacks.on_do(self, action)
 
 
     def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True, ignore_lines=None, primary=False):
@@ -146,10 +147,11 @@ class Provider(object):
         """
         return len(self.actions_planned)
 
-    def handle_registration(self, context=None, result=None):
+    def handle_registration(self, result):
+        assert result is not None
         va = dict()
         va[self.register] = result
-        context.on_update_variables(va)
+        Callbacks.on_update_variables(va)
         self.resource.update_variables(va)
         self.resource.update_parent_variables(va)
 
@@ -162,7 +164,7 @@ class Provider(object):
         self.actions_taken = self.actions_planned
 
     def echo(self, msg):
-        self._context.on_echo(self, msg)
+        Callbacks.on_echo(self, msg)
 
     def context(self):
         """

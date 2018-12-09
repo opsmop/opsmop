@@ -46,7 +46,6 @@ class PushCli(object):
 
         mode = self.args[1]
         path = sys.argv[2]
-        callbacks = None
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--apply', help="policy file to apply")

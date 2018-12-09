@@ -18,6 +18,7 @@ from opsmop.core.fields import Fields
 from opsmop.core.handlers import Handlers
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
+from opsmop.callbacks.callbacks import Callbacks
 
 class Role(Collection):
 
@@ -50,8 +51,8 @@ class Role(Collection):
     def set_handlers(self):
         return Handlers()
 
-    def _on_walk(self, context):
-        context.on_role(self)
+    def _on_walk(self):
+        Callbacks.on_role(self)
 
     def get_children(self, mode):
         if mode == 'resources':

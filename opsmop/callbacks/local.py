@@ -16,14 +16,17 @@ import sys
 import inspect
 import json
 
-from opsmop.core.callback import BaseCallback
+from opsmop.callbacks.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 from opsmop.core.errors import CommandError
+from opsmop.core.context import Context
 
 # NOTE: this interface is subject to change
 
 INDENT="  "
+
+Context = Context()
 
 class LocalCliCallbacks(BaseCallback):
 
@@ -78,11 +81,11 @@ class LocalCliCallbacks(BaseCallback):
     def on_needs(self, provider, action):
         if provider.skip_plan_stage():
             return
-        if self.context().is_check():
+        if Context.is_check():
             self.i3("needs: %s" % action.do)
 
     def on_do(self, provider, action):
-        if self.context().is_apply():
+        if Context.is_apply():
             self.i3("do: %s" % action.do)
 
     def on_taken_actions(self, provider, actions_taken):

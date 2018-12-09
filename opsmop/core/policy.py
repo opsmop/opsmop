@@ -29,9 +29,8 @@ class Policy(Collection):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
 
-    def init_scope(self, context):
+    def init_scope(self):
         self.set_scope(Scope.for_top_level(self))
-        self.context = context
         self.update_variables(self.variables)
 
     def fields(self):
@@ -51,7 +50,7 @@ class Policy(Collection):
     def get_roles(self):
         return self.roles
 
-    def get_children(self, mode):
+    def get_children(self):
         return self.roles
 
     @memoize
