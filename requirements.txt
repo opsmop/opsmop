@@ -1,4 +1,4 @@
 PyYAML>=3.13
 toml>=0.10
-mitogen>0.23
+mitogen>0.2.3
 jinja2>=2.10
