@@ -15,7 +15,7 @@
 import os
 from runpy import run_path
 
-from opsmop.push.pusher import Pusher
+from opsmop.core.executor import Executor
 
 class PushApi(object):
 
@@ -52,10 +52,10 @@ class PushApi(object):
         """
         This is dry-run mode
         """
-        return Pusher(policies=self._policies).check()
+        return Executor(policies=self._policies, local=False).check()
 
     def apply(self):
         """
         This is live-configuration mode.
         """
-        return Pusher(policies=self._policies).apply()
+        return Executor(policies=self._policies, local=False).apply()
