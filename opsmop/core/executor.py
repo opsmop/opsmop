@@ -223,7 +223,7 @@ class Executor(object):
             # ConnectionManager.get_connection_for_host(host)
             # and likely wrapped with some multi-process pool around establishing connections
             final = None
-            remote = router.ssh(hostname=context['hostname'], check_host_keys=context['check_host_keys'], username=context['username'], password=context['password'])
+            remote = router.ssh(python_path="/usr/bin/python3", hostname=context['hostname'], check_host_keys=context['check_host_keys'], username=context['username'], password=context['password'])
 
             if context['sudo']:
                 sudo = router.sudo(username=context['sudo_username'], password=context['sudo_password'], via=remote)

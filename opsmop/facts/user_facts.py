@@ -14,6 +14,7 @@
 
 import glob
 import subprocess
+import yaml
 
 from opsmop.facts.facts import Facts
 from opsmop.facts.filetests import FileTests
@@ -47,7 +48,6 @@ class UserFactsGenerator(Facts):
             FACTS_CACHE.update(parsed)
 
     def _parse(self, content):
-        import yaml
         return yaml.safe_load(content)
 
     def invalidate(self):
