@@ -338,7 +338,7 @@ Failure Status Overrides
 ========================
 
 By default, if a resource returns a fatal error, the program will halt at that point. What causes an error like this? 
-Errors could be a non-zero exit code from the :ref:`shell` module, or any other time a provider might return a failed result that is not
+Errors could be a non-zero exit code from the :ref:`module_shell`, or any other time a provider might return a failed result that is not
 a runtime exception. 
 
 The problem is, sometimes return codes are not reliable.  Other times, return codes are not enough.

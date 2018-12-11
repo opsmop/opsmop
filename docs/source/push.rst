@@ -16,7 +16,7 @@ This is best understood while reviewing the `push_demo.py <https://github.com/op
 Command Line Usage
 ==================
 
-Similar to :ref:`local, the opsmop command line for push mode is very simple::
+Similar to :ref:`local`, the opsmop command line for push mode is very simple::
 
     cd opsmop-demo/content
     python3 filename.py --check --push
