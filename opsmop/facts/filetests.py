@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from pathlib import Path
 import stat
 import hashlib
 
@@ -33,27 +32,37 @@ class FileTestFacts(Facts):
         return os.path.isfile(fname) and os.access(fname, os.X_OK)
     
     def is_file(self, fname):
+        from pathlib import Path
+
         if not self.exists(fname):
             return None
         return Path(fname).is_file()
     
     def is_directory(self, fname):
+        from pathlib import Path
+
         if not self.exists(fname):
             return None
         return Path(fname).is_dir()
 
     def mode(self, fname):
+        from pathlib import Path
+
         if not self.exists(fname):
             return None
         lstat = Path(fname).lstat()
         return stat.S_IMODE(lstat.st_mode)
     
     def owner(self, fname):
+        from pathlib import Path
+
         if not self.exists(fname):
             return None
         return Path(fname).owner()
     
     def group(self, fname):
+        from pathlib import Path
+
         if not self.exists(fname):
             return None
         return Path(fname).group()

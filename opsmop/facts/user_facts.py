@@ -14,7 +14,6 @@
 
 import glob
 import subprocess
-import yaml
 
 from opsmop.facts.facts import Facts
 from opsmop.facts.filetests import FileTests
@@ -29,7 +28,7 @@ def invalidate():
 class UserFactsGenerator(Facts):
 
     def __init__(self):
-        super().__init__() 
+        super(UserFactsGenerator, self).__init__() 
         self.reload()
 
     def reload(self):
@@ -48,6 +47,7 @@ class UserFactsGenerator(Facts):
             FACTS_CACHE.update(parsed)
 
     def _parse(self, content):
+        import yaml
         return yaml.safe_load(content)
 
     def invalidate(self):

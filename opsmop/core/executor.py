@@ -32,6 +32,9 @@ import time
 
 MITOGEN_SELECT=None
 
+def remote_hi(sender):
+    return 2
+
 def remote_fn(host, policy, role, mode, sender):
     """
     This is the remote function used for mitogen calls
@@ -233,7 +236,10 @@ class Executor(object):
             MITOGEN_SELECT.add(receiver)
             sender = receiver.to_sender()
 
-            call_recv = final.call_async(remote_fn, dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
+            # call_recv = final.call_async(remote_fn, dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
+            call_recv = final.call_async(remote_hi, sender)
+            # , dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
+
             MITOGEN_SELECT.add(call_recv)
 
 
