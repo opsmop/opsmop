@@ -133,7 +133,7 @@ class Inventory(object):
         # traverse the dictionary of group names, where each value contains
         # a dictionary of hosts and a dictionary of group variables
         for (group_name, group_data) in data['groups'].items():
-            group_vars = group_data.get('vars', None)
+            group_vars = group_data.get('vars', dict())
             group = self._get_or_create_group(group_name, group_vars)
             hosts = group_data.get('hosts', dict())
             # now walk each host in the group specification

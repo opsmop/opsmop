@@ -117,7 +117,7 @@ class EventStreamCallbacks(BaseCallback):
                 if hasattr(v, 'to_dict'):
                     v = v.to_dict()
             data[k] = v
-        if not sender:
+        if not self.sender:
             print(json.dumps(data))
         else:
-            sender.send(data)
+            self.sender.send(data)

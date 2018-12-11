@@ -20,12 +20,9 @@ class UserDefaults(object):
         f2 = GLOBAL_CONFIG
         data = dict()
         if os.path.exists(f1):
-            print("F1")
             return toml.load(f1)
         elif os.path.exists(f2):
-            print("F2")
             return toml.load(f2)
-        print("F3")
         return data
 
     @classmethod
@@ -61,6 +58,13 @@ class UserDefaults(object):
             return None
         return pw
 
+    @classmethod
+    def python_path(cls):
+        # this is the default remote python path and is mostly intended to be
+        # set on inventory variables, not in the config, but technically can still
+        # have a default here.
+        return cls._extract('python', 'python_path', '/usr/bin/python3')
+        
     
             
 

@@ -16,47 +16,49 @@ from opsmop.core.collection import Collection
 from opsmop.core.context import Context, VALIDATE, APPLY, CHECK
 from opsmop.core.result import Result
 from opsmop.core.role import Role
+from opsmop.core.roles import Roles
+from opsmop.push.connections import ConnectionManager
+from opsmop.push.batch import Batch
 from opsmop.lookups.lookup import Lookup
 from opsmop.inventory.host import Host
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 
-import mitogen.core
-import mitogen.master
-import mitogen.select
-import mitogen.utils
-import dill
+#import mitogen.core
+#import mitogen.master
+#import mitogen.select
+#import mitogen.utils
 
 import time
 
-MITOGEN_SELECT=None
-
-def remote_hi(sender):
-    return 2
 
 def remote_fn(host, policy, role, mode, sender):
     """
     This is the remote function used for mitogen calls
     """
+    import dill
     host = dill.loads(host)
     policy = dill.loads(policy)
     role = dill.loads(role)
     Context.set_mode(mode)
-    Context.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
-    executor = Executor([ RemotePolicy ], local=True, single_role=role)
-    executor.run_policy(policy=RemotePolicy())
+    policy.items = Roles(role)
+    Callbacks.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
+    executor = Executor([ policy ], push=False) # remove single_role
+    # FIXME: care about mode
+    executor.apply()
+
       
 
 # ---------------------------------------------------------------
 
 class Executor(object):
 
-    __slots__ = [ '_policies', '_tags', '_push', '_single_role' ]
+    __slots__ = [ '_policies', '_tags', '_push', '_local_host', 'connection_manager' ]
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies, tags=None, push=False, single_role=None):
+    def __init__(self, policies, local_host=None, tags=None, push=False):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -66,7 +68,10 @@ class Executor(object):
         self._policies = policies
         self._tags = tags
         self._push = push
-        self._single_role = single_role
+        if local_host is None:
+            local_host = Host("127.0.0.1")
+        self._local_host = local_host
+        self.connection_manager = None
 
     # ---------------------------------------------------------------
 
@@ -102,6 +107,8 @@ class Executor(object):
         Runs all policies in the specified mode
         """
         Context.set_mode(mode)
+        if self._push:
+            self.connection_manager = ConnectionManager()
         for policy in self._policies:     
             self.run_policy(policy=policy)
 
@@ -116,12 +123,10 @@ class Executor(object):
         policy.init_scope()
         roles = policy.get_roles()
         for role in roles.items:
-            if self._single_role and role != self._single_role:
-                continue
             if not self._push:
-                self.process_role(policy, role)
+                self.process_local_role(policy, role)
             else:
-                self.process_role_push(policy, role)
+                self.process_remote_role(policy, role)
         Callbacks.on_complete(policy)
 
     # ---------------------------------------------------------------
@@ -145,109 +150,35 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def process_role_push(self, policy, role):
+    def process_remote_role(self, policy, role):
         """
         Processes one role in any mode
         """
 
-        broker = mitogen.master.Broker()
-        router = mitogen.master.Router(broker)
+        import dill
 
-        with router:
+        with self.connection_manager.router:
+
             hosts = role.inventory().hosts()
-            global MITOGEN_SELECT
-            MITOGEN_SELECT = mitogen.select.Select(oneshot=False)
-            for host in hosts:
-                print("HOST=%s" % host.hostname())
-                self.process_role_for_host(host, policy, role, router=router)
-            while True:
-                msg = MITOGEN_SELECT.get()
-                print(msg)
-                print(msg.unpickle())
-                time.sleep(0.05)
+            self.connection_manager.add_hosts(hosts)
+            batch = Batch(hosts)
+
+            def processor(host):
+                Context.set_host(host)
+                self.connection_manager.process_remote_role(host, policy, role, Context.mode())
+
+            batch.apply(processor)
             
+            print("LOOP!!")
+            self.connection_manager.loop()
+          
     # ---------------------------------------------------------------
 
-    def process_role(self, policy, role):
-        host = Host("127.0.0.1") 
-        self.process_role_for_host(host, policy, role)
+    def process_local_role(self, policy=None, role=None):
 
-    # ---------------------------------------------------------------
-
-    def get_remote_context(self, host, role):
-        
-        hostname = host.hostname()
-        sudo = role.sudo()
-        
-        (role_sudo_username, role_sudo_password) = role.sudo_as()
-        if role_sudo_username is None:
-            role_sudo_username = host.sudo_username()
-        if role_sudo_password is None:
-            role_sudo_password = host.sudo_password()
-
-        (role_ssh_username, role_ssh_password) = role.ssh_as()
-        if role_ssh_username is None:
-            role_ssh_username = host.ssh_username()
-        if role_ssh_password is None:
-            role_ssh_password = host.ssh_password()
-        
-        role_check_host_keys = role.check_host_keys()
-        if role_check_host_keys is None:
-            role_check_host_keys = host.check_host_keys()
-        
-        return dict(
-            hostname = hostname,
-            sudo = sudo,
-            username = role_ssh_username,
-            password = role_ssh_password,
-            sudo_username = role_sudo_username,
-            sudo_password = role_sudo_password,
-            check_host_keys = role_check_host_keys
-        )
-
-    # ---------------------------------------------------------------
-
-    def process_role_for_host(self, host, policy, role, router=None):
+        host = self._local_host
 
         Context.set_host(host)
-
-        if host.name == "127.0.0.1":
-
-            self.process_role_internal(host, policy, role)
-
-        else:
-
-            context = self.get_remote_context(host, role)
-
-            # TODO: this will be replaced by a ConnectionManager class
-            # ConnectionManager.get_connection_for_host(host)
-            # and likely wrapped with some multi-process pool around establishing connections
-            final = None
-            remote = router.ssh(python_path="/usr/bin/python3", hostname=context['hostname'], check_host_keys=context['check_host_keys'], username=context['username'], password=context['password'])
-
-            if context['sudo']:
-                sudo = router.sudo(username=context['sudo_username'], password=context['sudo_password'], via=remote)
-                final = sudo
-            else:
-                final = remote
-
-            receiver =  mitogen.core.Receiver(router)
-            global MITOGEN_SELECT
-            MITOGEN_SELECT.add(receiver)
-            sender = receiver.to_sender()
-
-            # call_recv = final.call_async(remote_fn, dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
-            call_recv = final.call_async(remote_hi, sender)
-            # , dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
-
-            MITOGEN_SELECT.add(call_recv)
-
-
-    def process_role_remote(host, policy, role):
-        return self.process_role_internal(host, policy, role, local=False)
-
-
-    def process_role_internal(self, host, policy, role):
 
         role.pre()
         # set up the variable scope - this is done later by walk_handlers for lower-level objects in the tree
@@ -300,14 +231,6 @@ class Executor(object):
             handler.post()
             return result
         role.walk_children(items=role.get_children('handlers'), which='handlers', fn=execute_handler, tags=self._tags)
-
-    # ---------------------------------------------------------------
-
-    def is_collection(self, resource):
-        """
-        Is the resource a collection?
-        """
-        return issubclass(type(resource), Collection)
 
     # ---------------------------------------------------------------
 
@@ -419,8 +342,9 @@ class Executor(object):
         It is called recursively via walk_children to run against all resources.
         """
         assert host is not None
+
         # we only care about processing leaf node objects
-        if self.is_collection(resource):
+        if issubclass(type(resource), Collection):
             return
 
         # if in handler mode we do not process the handler unless it was signaled

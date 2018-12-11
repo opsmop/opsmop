@@ -57,14 +57,36 @@ class Host(object):
     def check_host_keys(self):
         return self.variables.get('opsmop_ssh_check_host_keys', UserDefaults.ssh_check_host_keys())
     
-    def to_dict(self):
-        # serialization for remote functionality only, sends a limited set of info
-        return dict(
-            name = self.name,
-            variables = self.variables,
-        )
-
-    @classmethod
-    def from_dict(cls, data):
-        return Host.__new__(cls, name=data['name'], variables=data['variables'])
+    def python_path(self):
+        return self.variables.get('opsmop_python_path', UserDefaults.python_path())
       
+    def connection_context(self, role):
+        
+        hostname = self.hostname()
+        sudo = role.sudo()
+        
+        (role_sudo_username, role_sudo_password) = role.sudo_as()
+        if role_sudo_username is None:
+            role_sudo_username = host.sudo_username()
+        if role_sudo_password is None:
+            role_sudo_password = host.sudo_password()
+
+        (role_ssh_username, role_ssh_password) = role.ssh_as()
+        if role_ssh_username is None:
+            role_ssh_username = self.ssh_username()
+        if role_ssh_password is None:
+            role_ssh_password = self.ssh_password()
+        
+        role_check_host_keys = role.check_host_keys()
+        if role_check_host_keys is None:
+            role_check_host_keys = self.check_host_keys()
+        
+        return dict(
+            hostname = hostname,
+            sudo = sudo,
+            username = role_ssh_username,
+            password = role_ssh_password,
+            sudo_username = role_sudo_username,
+            sudo_password = role_sudo_password,
+            check_host_keys = role_check_host_keys
+        )

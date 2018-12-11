@@ -17,20 +17,24 @@ import toml
 from opsmop.core.errors import InventoryError
 from opsmop.inventory.inventory import Inventory
 
+import logging
+logger = logging.getLogger('toml')
+
+
 class TomlInventory(Inventory):
 
     def __init__(self, filename):
         super().__init__()
         self._path = os.path.expanduser(os.path.expandvars(filename))
-        if not os.path.exists(self._path):
+        if not self._loaded and not os.path.exists(self._path):
             raise InventoryError(msg="TOML inventory does not exist at: %s" % self._path)
+        self.load()
 
     def load(self):
+        if self._loaded:
+            return self
         data = open(self._path).read()
         data = toml.loads(data)
-        print("RAW")
-        import json
-        print(json.dumps(data, indent=4))
         self.accumulate(data)
         return self
 
