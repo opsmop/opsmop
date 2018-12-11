@@ -35,12 +35,8 @@ most commonly used classes:
 
 If you had written your own *Types*, or wanted to pull in any python library at all, you could also import them here.
 
-All *Policy* files must contain a 'main()' function which returns either a *Policy* object or a list of *Policy* objects.
-This main function does not need to be surrounded in the usual 'if __name__' pattern commonly found in Python files,
-because you should not be calling this function - the opsmop CLI (see :ref:`local`) and corresponding API 
-will be calling it for you.
-
-Here is a very basic Policy definition:
+OpsMop policies are made excutable by adding a "__main__" clause that invokes the opsmop CLI code, turning a policy
+file into an executable program. Here is a very basic Policy definition:
 
 .. code-block:: python
 
@@ -52,14 +48,13 @@ Here is a very basic Policy definition:
         def set_roles(self):
             return Roles(HelloRole())
    
-    def main():
-        return Hello()
+    if __name__ == '__main__':
+        Cli(Hello())
 
+See :ref:`local` for how this file would be executed.  
 
-Take note of 'set_variables' and 'set_roles'.  
-
-*Roles* are the real units of work in OpsMop. *Polices* say what *Roles* are applied, and optionally set some
-*variables*, but *Roles* will do all the work.
+Take special note of 'set_variables' and 'set_roles'. *Roles* are the real units of work in OpsMop. 
+*Polices* say what *Roles* are applied, and optionally set some *variables*, but *Roles* will do all the work.
 
 Assigning *variables* in a *Policy* declaration is optional, but *Roles* are not.
 Why? A *Policy* without *Roles* has nothing to do!  We'll get to :ref:`roles` very shortly.

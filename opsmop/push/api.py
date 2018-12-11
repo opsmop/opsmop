@@ -25,29 +25,7 @@ class PushApi(object):
 
         assert type(policies) == list
         self._policies = policies
-      
-    @classmethod
-    def from_file(cls, path=None):
-
-        assert path is not None
-
-        path = os.path.abspath(os.path.expandvars(os.path.expanduser(path)))
-        
-        if not os.path.exists(path):
-            raise Exception("file does not exist: %s" % path)
-
-        dirname = os.path.dirname(path)
-        os.chdir(dirname)
-        ran = run_path(path)
-
-        if 'main' not in ran:
-            raise Exception("unable to find main() function in %s" % path)
-        policies = ran['main']()
-        if type(policies) != list:
-            policies = [ policies ]
-
-        return cls(policies=policies)
-        
+              
     def check(self):
         """
         This is dry-run mode
