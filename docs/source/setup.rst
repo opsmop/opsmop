@@ -78,8 +78,9 @@ Trying Things Out
 The other chapters will explain opsmop in greater depth, but let's see
 if this works::
 
-    bin/opsmop apply ../opsmop-demo/content/hello.py
-
+    cd opsmop-demo/content
+    python3 hello.py --local --apply
+    
 .. _pypi:	
 
 What About PyPi?
