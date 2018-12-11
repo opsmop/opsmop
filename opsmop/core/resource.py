@@ -239,4 +239,6 @@ class Resource(object):
             if hasattr(v, 'to_dict'):
                 v = v.to_dict()
             result[k] = v
+        print("TO DICT=%s" % result)
         return result
+

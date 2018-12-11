@@ -21,7 +21,6 @@ from opsmop.core.role import Role
 from opsmop.types.type import Type
 from opsmop.core.errors import CommandError, ProviderError
 
-
 INDENT="  "
 
 class CommonCallbacks(BaseCallback):

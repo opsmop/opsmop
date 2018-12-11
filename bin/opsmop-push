@@ -1,7 +1,0 @@
-#!/usr/bin/env python3
-
-from opsmop.client.push import PushCli
-import sys
-
-if __name__ == "__main__":
-    PushCli(sys.argv).go()

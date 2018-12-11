@@ -46,6 +46,8 @@ from opsmop.types.user import User
 from opsmop.types.group import Group
 
 from opsmop.inventory.toml import TomlInventory
+from opsmop.client.cli import Cli
+
 
 __all__ = [
     # common resources
@@ -63,5 +65,8 @@ __all__ = [
     'Group',
 
     # inventory
-    'TomlInventory'
+    'TomlInventory',
+
+    # cli
+    'Cli'
 ]

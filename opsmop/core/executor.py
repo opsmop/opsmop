@@ -15,27 +15,45 @@
 from opsmop.core.collection import Collection
 from opsmop.core.context import Context, VALIDATE, APPLY, CHECK
 from opsmop.core.result import Result
+from opsmop.core.role import Role
 from opsmop.lookups.lookup import Lookup
 from opsmop.inventory.host import Host
 from opsmop.callbacks.callbacks import Callbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.common import CommonCallbacks
 
 import mitogen.core
 import mitogen.master
 import mitogen.select
 import mitogen.utils
+import dill
+
+import time
 
 MITOGEN_SELECT=None
 
+def remote_fn(host, policy, role, mode, sender):
+    """
+    This is the remote function used for mitogen calls
+    """
+    host = dill.loads(host)
+    policy = dill.loads(policy)
+    role = dill.loads(role)
+    Context.set_mode(mode)
+    Context.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
+    executor = Executor([ RemotePolicy ], local=True, single_role=role)
+    executor.run_policy(policy=RemotePolicy())
+      
 
 # ---------------------------------------------------------------
 
 class Executor(object):
 
-    __slots__ = [ '_policies', '_tags', '_local' ]
+    __slots__ = [ '_policies', '_tags', '_push', '_single_role' ]
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies, tags=None, local=True):
+    def __init__(self, policies, tags=None, push=False, single_role=None):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -44,7 +62,8 @@ class Executor(object):
         assert type(policies) == list
         self._policies = policies
         self._tags = tags
-        self._local = local
+        self._push = push
+        self._single_role = single_role
 
     # ---------------------------------------------------------------
 
@@ -94,7 +113,9 @@ class Executor(object):
         policy.init_scope()
         roles = policy.get_roles()
         for role in roles.items:
-            if self._local:
+            if self._single_role and role != self._single_role:
+                continue
+            if not self._push:
                 self.process_role(policy, role)
             else:
                 self.process_role_push(policy, role)
@@ -138,6 +159,9 @@ class Executor(object):
                 self.process_role_for_host(host, policy, role, router=router)
             while True:
                 msg = MITOGEN_SELECT.get()
+                print(msg)
+                print(msg.unpickle())
+                time.sleep(0.05)
             
     # ---------------------------------------------------------------
 
@@ -167,7 +191,7 @@ class Executor(object):
         role_check_host_keys = role.check_host_keys()
         if role_check_host_keys is None:
             role_check_host_keys = host.check_host_keys()
-
+        
         return dict(
             hostname = hostname,
             sudo = sudo,
@@ -186,13 +210,15 @@ class Executor(object):
 
         if host.name == "127.0.0.1":
 
-            self.process_role_internal(host, policy, role, local=True)
+            self.process_role_internal(host, policy, role)
 
         else:
 
             context = self.get_remote_context(host, role)
-            print("DEBUG: SSH CONTEXT =%s" % context )
 
+            # TODO: this will be replaced by a ConnectionManager class
+            # ConnectionManager.get_connection_for_host(host)
+            # and likely wrapped with some multi-process pool around establishing connections
             final = None
             remote = router.ssh(hostname=context['hostname'], check_host_keys=context['check_host_keys'], username=context['username'], password=context['password'])
 
@@ -207,10 +233,7 @@ class Executor(object):
             MITOGEN_SELECT.add(receiver)
             sender = receiver.to_sender()
 
-            def remote_fn(sender):
-                return self.process_role_remote(host, policy, role, local=False, sender=sender)
-
-            call_recv = final.call_async(remote_fn, sender)
+            call_recv = final.call_async(remote_fn, dill.dumps(host), dill.dumps(policy), dill.dumps(role), Context.mode(), sender)
             MITOGEN_SELECT.add(call_recv)
 
 
@@ -218,14 +241,8 @@ class Executor(object):
         return self.process_role_internal(host, policy, role, local=False)
 
 
-    def process_role_internal(self, host, policy, role, local=True, sender=None):
-        
-        if not local:
-            from opsmop.callbacks.event_stream import EventStreamStreamCallbacks
-            from opsmop.callbacks.common import CommonCallbacks
-            Context.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
+    def process_role_internal(self, host, policy, role):
 
-        
         role.pre()
         # set up the variable scope - this is done later by walk_handlers for lower-level objects in the tree
         policy.attach_child_scope_for(role)

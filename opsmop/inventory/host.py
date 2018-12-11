@@ -57,3 +57,14 @@ class Host(object):
     def check_host_keys(self):
         return self.variables.get('opsmop_ssh_check_host_keys', UserDefaults.ssh_check_host_keys())
     
+    def to_dict(self):
+        # serialization for remote functionality only, sends a limited set of info
+        return dict(
+            name = self.name,
+            variables = self.variables,
+        )
+
+    @classmethod
+    def from_dict(cls, data):
+        return Host.__new__(cls, name=data['name'], variables=data['variables'])
+      

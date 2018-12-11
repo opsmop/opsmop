@@ -6,6 +6,9 @@
 Push Mode
 ---------
 
+WARNING: Push mode is under active development - this just documents current plans.  
+It should be available by January 2019.
+
 OpsMop push mode is very similar to :ref:`local`, but operates on multiple hosts via SSH.
 
 This is best understood while reviewing the `push_demo.py <https://github.com/opsmop/opsmop-demo/blob/master/content/push_demo.py>`_ example.
@@ -15,8 +18,9 @@ Command Line Usage
 
 Similar to :ref:`local, the opsmop command line for push mode is very simple::
 
-    opsmop-push --check filename.py
-    opsmop-push --apply filename.py
+    cd opsmop-demo/content
+    python3 filename.py --check --push
+    python3 filename.py --apply --push
 
 Configuration is largely defined in the policy file.  Additional CLI flags may be added over time.
 
@@ -102,6 +106,9 @@ The file has the following format::
     username = "root"
     # password = "letmein1234"
 
+    [tuning]
+    # options pending
+
 These values are IGNORED if returned as "None" in the "sudo_as" or "connect_as" methods on the *Role* object.
          
 Inventory
@@ -141,18 +148,71 @@ These variables are usable regardless of inventory source::
     * opsmop_ssh_password - the SSH password
     * opsmop_sudo_username - the sudo username
     * opsmop_sudo_password - the sudo password
+    * opsmop_via - name of the parent host (see :ref:`connection_trees`)
+
+Connection Trees
+================
+
+Connection trees are an optional feature.  
+
+OpsMop (via mitogen) can SSH-connect through multiple-layers of intermediate hosts, in a fan-out architecture.
+
+Here is an Example using the TOML inventory, to make it easier to understand the structure:
+
+.. code-block: toml
+
+    [groups.bastions.hosts]
+    "bastion.example.com" = ""
+
+    [groups.rack1.hosts]
+    "rack1-top.example.com" = "opsmop_via=bastion.example.com"
+    "rack1-101.example.com" = ""
+    "rack1-102.example.com" = ""
+
+    [groups.rack2.hosts]
+    "rack2-top.example.com" = "opsmop_via=bastion.example.com"
+    "rack2-201.example.com" = ""
+    "rack2-202.example.com" = ""
+
+    [groups.rack1.vars]
+    opsmop_via = "rack1-top.example.com"
+
+    [groups.rack2.vars]
+    opsmop_via = "rack2-top.example.com"
+
+    [groups.fooapp.hosts]
+    "rack1-101.example.com" = ""
+    "rack2-202.example.com" = ""
+
+    [groups.barapp.hosts]
+    "rack2-102.example.com" = ""
+
+.. code-block: python
+
+    class FooApp(Role):
+
+        def inventory(self):
+            return inventory.filter(groups='fooapp')
+
+        # ...
+
+Tuning
+======
+
+Your ansible providers likely have many dependencies.  While opsmop does not require
+that you install these dependencies on managed nodes, if you install them, this will
+greatly speed up execution time.
 
 Current State
 =============
 
 * Push mode is an early alpha
 * Work needs to be done to enable file transfer
-* SELinux may not be operational
+* SELinux is not operational yet and is waiting on enhancements in mitogen
 
 Credits
 =======
 
 OpsMop SSH features are powered by `mitogen <https://mitogen.readthedocs.io/en/latest/>`.
 
-Not all of mitogen features are exposed at this point (such as multi-layer routing) and more features can be surfaced 
-in the future.
+Not all of mitogen features are exposed at this point, more features can be surfaced over time.
