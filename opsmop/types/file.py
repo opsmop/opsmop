@@ -27,6 +27,7 @@ class File(Type):
             self,
             name = Field(kind=str, help="path to the destination file"),
             from_file = Field(kind=str, default=None, help="path to a source file"),
+            from_url = Field(kind=str, default=None, help="url to a source file"),
             from_template = Field(kind=str, default=None, help="path to a source Jinja2 template"),
             from_content = Field(kind=str, default=None, help="use this string as source data instead of a file"),
             owner = Field(kind=str, default=None, help="owner name"),
@@ -38,10 +39,7 @@ class File(Type):
 
     def validate(self):
         v = Validators(self)
-        v.mutually_exclusive(['from_file', 'from_template', 'from_content'])
-        v.mutually_exclusive(['directory', 'from_file'])
-        v.mutually_exclusive(['directory', 'from_template'])
-        v.mutually_exclusive(['directory', 'from_content'])
+        v.mutually_exclusive(['from_file', 'from_url', 'from_template', 'from_content'])
         v.path_exists(self.from_file)
         v.path_exists(self.from_template)
 

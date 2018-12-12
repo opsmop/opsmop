@@ -60,6 +60,12 @@ class File(Provider):
 
     # ---------------------------------------------------------------
 
+    def should_replace_using_url(self):
+        """ for from_url, should we write the file? """
+        return self.overwrite
+
+    # ---------------------------------------------------------------
+
     def plan(self):
         """ what actions are needed? """
 
@@ -75,13 +81,16 @@ class File(Provider):
             return
 
         # content?
-        if (self.from_content or self.from_template or self.from_file):
+        if (self.from_content or self.from_template or self.from_file or self.from_url):
             if self.from_template:
                 if self.should_replace_using_template():
                     self.needs('copy_template')
             elif self.from_file:
                 if self.should_replace_using_file():
                     self.needs('copy_file')
+            elif self.from_url:
+                if self.should_replace_using_url():
+                    self.needs('copy_url')
             elif self.from_content:
                 if self.should_replace_using_content():
                     self.needs('copy_content')
@@ -101,8 +110,6 @@ class File(Provider):
         Apply homebrew status changes.
         """
 
-        # TODO: from_url would be a great feature to have
-        
         # removal ...
 
         if self.should('rm'):
@@ -110,8 +117,13 @@ class File(Provider):
             self.path.unlink()
             return self.ok()
         
+        # fetch from url ...
+        
+        elif self.should('copy_url'):
+            self.do('copy_url')
+            self.run(['curl', self.from_url, '-o', self.name])
+        
         # creation ...
-
         elif self.should('copy_file'):
             self.do('copy_file')
             shutil.copy2(self.from_file, self.name)
