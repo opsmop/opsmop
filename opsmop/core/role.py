@@ -43,6 +43,10 @@ class Role(Collection):
             handlers  = Field(kind=dict, of=Resource, loader=self.set_handlers),
         )
 
+    def serial(self):
+        # number of hosts to simultaenously execute
+        return 80
+
     def set_variables(self):
         return dict()
 

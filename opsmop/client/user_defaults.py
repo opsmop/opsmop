@@ -64,6 +64,11 @@ class UserDefaults(object):
         # set on inventory variables, not in the config, but technically can still
         # have a default here.
         return cls._extract('python', 'python_path', '/usr/bin/python3')
+
+    @classmethod
+    def max_workers(cls):
+        # number of simultaneous workers during connection attempts
+        return cls._extract('tuning', 'max_workers', 8)
         
     
             

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.collection import Collection
 from opsmop.core.context import Context, VALIDATE, APPLY, CHECK
 from opsmop.core.result import Result
@@ -161,16 +162,26 @@ class Executor(object):
 
             hosts = role.inventory().hosts()
             self.connection_manager.add_hosts(hosts)
-            batch = Batch(hosts)
 
-            def processor(host):
+            batch_size = role.serial()
+            max_workers = UserDefaults.max_workers()
+
+            print("ASYNC CONNECTING")
+            batch = Batch(hosts, batch_size=200)
+            def host_connector(host):
                 Context.set_host(host)
-                self.connection_manager.process_remote_role(host, policy, role, Context.mode())
+                self.connection_manager.connect(host, role)
+            batch.apply_async(host_connector, max_workers=max_workers)
 
-            batch.apply(processor)
-            
+            print("ROLE RUNNING")
+            def role_runner(host):
+                print("PRR!")
+                self.connection_manager.process_remote_role(host, policy, role, Context.mode())
+            batch = Batch(hosts, batch_size=batch_size)
+            batch.apply(role_runner)
+
             print("LOOP!!")
-            self.connection_manager.loop()
+            self.connection_manager.event_loop()
           
     # ---------------------------------------------------------------
 
