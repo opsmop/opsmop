@@ -68,7 +68,7 @@ class UserDefaults(object):
     @classmethod
     def max_workers(cls):
         # number of simultaneous workers during connection attempts
-        return cls._extract('tuning', 'max_workers', 8)
+        return cls._extract('tuning', 'max_workers', 16)
         
     @classmethod
     def log_path(cls):
