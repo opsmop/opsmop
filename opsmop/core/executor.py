@@ -166,21 +166,17 @@ class Executor(object):
             batch_size = role.serial()
             max_workers = UserDefaults.max_workers()
 
-            print("ASYNC CONNECTING")
             batch = Batch(hosts, batch_size=200)
             def host_connector(host):
                 Context.set_host(host)
                 self.connection_manager.connect(host, role)
             batch.apply_async(host_connector, max_workers=max_workers)
 
-            print("ROLE RUNNING")
             def role_runner(host):
-                print("PRR!")
                 self.connection_manager.process_remote_role(host, policy, role, Context.mode())
             batch = Batch(hosts, batch_size=batch_size)
             batch.apply(role_runner)
 
-            print("LOOP!!")
             self.connection_manager.event_loop()
           
     # ---------------------------------------------------------------

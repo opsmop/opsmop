@@ -18,6 +18,7 @@ from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.roles import Roles
+from opsmop.callbacks.replay import ReplayCallbacks
 
 import mitogen.core
 import mitogen.master
@@ -35,6 +36,7 @@ class ConnectionManager(object):
         self.broker = mitogen.master.Broker()
         self.router = mitogen.master.Router(self.broker)
         self.events_select = mitogen.select.Select(oneshot=False)
+        self.replay_callbacks = ReplayCallbacks()
 
         self.calls_sel = mitogen.select.Select()
         self.status_recv = mitogen.core.Receiver(self.router)
@@ -135,17 +137,23 @@ class ConnectionManager(object):
             if msg.receiver is self.status_recv:   
                 # https://mitogen.readthedocs.io/en/stable/api.html#mitogen.core.Message.receiver
                 # handle a status update
-                print('Got status update from %s: %s' % (host.name, msg.unpickle()))
+                
+                response = msg.unpickle()
+                event = response['evt']
+                cb_func = getattr(self.replay_callbacks, "on_%s" % event, None)
+                if cb_func:
+                    cb_func(host, response)
+                else:
+                    self.replay_callbacks.on_default(host, response)
+
             elif msg.receiver is self.calls_sel:  
-                # subselect
                 # handle a function call result.
                 try:
-                    assert None == msg.unpickle()
-                    print('Task succeeded on %s' % (host.name,))
+                    msg.unpickle()
+                    # all done for host
                 except mitogen.core.CallError as e:
                     print('Task failed on host %s: %s' % (host.name, e))
 
-    print('All tasks completed.')
 
 def remote_fn(host, policy, role, mode, sender):
     """

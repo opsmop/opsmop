@@ -32,7 +32,6 @@ class Batch(object):
 
     def apply_async(self, fn, max_workers=8):
         
-        print("HOSTS1=%s" % self.hosts)
         while True:
 
             batch = self.next()
@@ -46,21 +45,17 @@ class Batch(object):
                 for future in concurrent.futures.as_completed(futures):
                     try:
                         data = future.result()
-                        print("FRESULT=%s" % data)
                     except Exception as exc:
                         raise
 
 
     def apply(self, fn):
 
-        print("HOSTS=%s" % self.hosts)
         while True:
             batch = self.next()
             if len(batch) == 0:
-                print("NB")
                 return
             for host in batch:
-                print("H: %s" % host)
                 fn(host)
 
 
