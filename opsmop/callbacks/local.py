@@ -64,6 +64,9 @@ class LocalCliCallbacks(BaseCallback):
         self.logger.setLevel(logging.DEBUG)
         handler = logging.handlers.RotatingFileHandler(
               path, maxBytes=1024*5000, backupCount=5)
+        formatter = logging.Formatter(UserDefaults.log_format())
+        handler.setFormatter(formatter)
+
         self.logger.addHandler(handler)
 
     def set_phase(self, phase):

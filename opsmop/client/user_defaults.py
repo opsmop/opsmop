@@ -73,3 +73,7 @@ class UserDefaults(object):
     @classmethod
     def log_path(cls):
         return os.path.expanduser(cls._extract('log', 'path', '~/.opsmop/opsmop.log'))
+
+    @classmethod
+    def log_format(cls):
+        return cls._extract('log', 'format', "%(asctime)s %(message)s")
