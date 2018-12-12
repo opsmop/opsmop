@@ -70,6 +70,6 @@ class UserDefaults(object):
         # number of simultaneous workers during connection attempts
         return cls._extract('tuning', 'max_workers', 8)
         
-    
-            
-
+    @classmethod
+    def log_path(cls):
+        return os.path.expanduser(cls._extract('log', 'path', '~/.opsmop/opsmop.log'))

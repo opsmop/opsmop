@@ -15,12 +15,19 @@
 import sys
 import inspect
 import json
+import os
+
+import logging
+import logging.handlers
 
 from opsmop.callbacks.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 from opsmop.core.errors import CommandError
 from opsmop.core.context import Context
+from opsmop.client.user_defaults import UserDefaults
+
+LOG_FILENAME = os.path.expanduser("~/.opsmop.log")
 
 # NOTE: this interface is subject to change
 
@@ -35,12 +42,29 @@ class LocalCliCallbacks(BaseCallback):
     Improvements are welcome.
     """
 
-    __slots__ = [ 'phase', 'count' ]
+    __slots__ = [ 'phase', 'count', 'logger' ]
 
     def __init__(self):
         super()
         self.phase = None
         self.count = 0
+        self.logger = None
+        self.setup_logger()
+
+    def setup_logger(self):
+
+        path = UserDefaults.log_path()
+        dirname = os.path.dirname(path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname, 0o770)
+
+        if self.logger is not None:
+            return
+        self.logger = logging.getLogger('opsmop')
+        self.logger.setLevel(logging.DEBUG)
+        handler = logging.handlers.RotatingFileHandler(
+              path, maxBytes=1024*5000, backupCount=5)
+        self.logger.addHandler(handler)
 
     def set_phase(self, phase):
         self.phase = phase
@@ -191,3 +215,4 @@ class LocalCliCallbacks(BaseCallback):
     def _indent(self, level, msg):
         spc = INDENT * level
         print("%s%s" % (spc, msg))
+        self.logger.info(msg)
