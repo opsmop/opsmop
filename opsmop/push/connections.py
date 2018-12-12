@@ -38,7 +38,7 @@ class ConnectionManager(object):
 
         self.calls_sel = mitogen.select.Select()
         self.status_recv = mitogen.core.Receiver(self.router)
-
+        self.hosts_by_context = dict()
 
         # self.calls_select = mitogen.select.Select(oneshot=False)
         self.connections = dict()
@@ -88,6 +88,7 @@ class ConnectionManager(object):
             password=context['password'],
             via=parent
         )
+        self.hosts_by_context[remote.context_id] = host
         self.connections[host.name] = remote
         self.context[host.name] = context
         return remote
@@ -105,6 +106,7 @@ class ConnectionManager(object):
                 password=context['sudo_password'], 
                 via=conn
             )
+            self.hosts_by_context[result.context_id] = host
         return result
 
     def process_remote_role(self, host, policy, role, mode):
@@ -128,21 +130,20 @@ class ConnectionManager(object):
                 print("No update in 60 seconds, something's broke?")
                 raise Exception("boom")
 
-            # hostname = hostname_by_context_id[msg.src_id]
-            hostname = msg.src_id # TEMPORARY
+            host = self.hosts_by_context[msg.src_id]
 
             if msg.receiver is self.status_recv:   
                 # https://mitogen.readthedocs.io/en/stable/api.html#mitogen.core.Message.receiver
                 # handle a status update
-                print('Got status update from %s: %s' % (hostname, msg.unpickle()))
+                print('Got status update from %s: %s' % (host.name, msg.unpickle()))
             elif msg.receiver is self.calls_sel:  
                 # subselect
                 # handle a function call result.
                 try:
                     assert None == msg.unpickle()
-                    print('Task succeeded on %s' % (hostname,))
+                    print('Task succeeded on %s' % (host.name,))
                 except mitogen.core.CallError as e:
-                    print('Task failed on host %s: %s' % (hostname, e))
+                    print('Task failed on host %s: %s' % (host.name, e))
 
     print('All tasks completed.')
 
