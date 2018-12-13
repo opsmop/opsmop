@@ -14,8 +14,4 @@
 
 class BaseCallback(object):
 
-    def set_context(self, context):
-        self._context = context
-
-    def context(self):
-        return self._context
+    pass

@@ -9,5 +9,5 @@ setup(name='opsmop',
       author_email='michael@michaeldehaan.net',
       url='https://opsmop.io/',
       packages=['opsmop'],
-      scripts=['bin/opsmop']
+      scripts=[],
      )

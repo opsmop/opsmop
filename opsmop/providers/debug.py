@@ -20,9 +20,6 @@ class Debug(Provider):
     def quiet(self):
         return True
 
-    def verb(self):
-        return "debugging..."
-
     def skip_plan_stage(self):
         return True
  

@@ -65,7 +65,7 @@ class PlatformFacts(Facts):
                     codename = line.split("=")[-1].strip()
             return dict(distribution=distribution, version=release, variant=codename)
         elif os.path.exists("/etc/redhat-release"):
-            # RHEL/CentOS/Scientific Linux
+            # RHEL/CentOS/Scientific Linux/Fedora
             data = open("/etc/redhat-release").read()
             tokens = data.split()
             for (i,t) in enumerate(tokens):
@@ -88,6 +88,9 @@ class PlatformFacts(Facts):
                     release = tokens[0]
                     rdate = tokens[1].replace("(","").replace(")","").strip()
             return dict(distribution=distribution, version=release, variant=rdate)
+        else:
+            if self.system() == "Darwin":
+                return dict(distribution="Darwin", version=self.release(), variant=None)
         return None
 
     @memoize
@@ -122,7 +125,10 @@ class PlatformFacts(Facts):
         if distro == "Darwin":
             from opsmop.providers.package.brew import Brew
             return Brew
-        elif distro in [ 'CentOS Linux', 'Red Hat Linux', 'Amazon Linux', 'Scientific Linux' ]:
+        elif distro == "Fedora":
+            from opsmop.providers.package.dnf import Dnf
+            return Dnf
+        elif distro in ['CentOS Linux', 'Red Hat Linux', 'Amazon Linux', 'Scientific Linux']:
             # Amazon Linux, Scientific Linux, add yourselves here after testing
             # this will need some logic to decide when to use dnf
             from opsmop.providers.package.yum import Yum

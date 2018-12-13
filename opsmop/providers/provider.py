@@ -17,6 +17,16 @@ from opsmop.core.command import Command
 from opsmop.core.result import Result
 from opsmop.core.template import Template
 from opsmop.core.errors import ProviderError
+from opsmop.lookups.lookup import Lookup
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.core.context import Context
+
+import mitogen
+import io
+import logging
+import os
+
+logger = logging.getLogger("opsmop")
 
 DEFAULT_TIMEOUT = 60
 
@@ -37,9 +47,43 @@ class Provider(object):
         # isn't this already copied over - safe to remove?
         # self.name = getattr(self.resource, 'name', None)
 
-    def verb(self):
-        """ the verb for the applying operation in CLI output """
-        return "applying..."
+    def copy_file(self, src, dest):
+        """
+        Copy a file in local mode, or download from the fileserver in push mode
+        """
+        caller = Context.caller()
+        if caller:
+            bio = open(dest, "wb", buffering=0)     
+            if not src.startswith('/'):    
+                src = os.path.join(Context.relative_root(), src)
+            logger.debug("SRC:%s" % src)
+            ok, metadata = mitogen.service.FileService.get(caller, src, bio)
+            if not ok:
+               raise Exception("file transfer failed")
+        else:
+            shutil.copy2(src, dest)
+
+    def slurp(self, src):
+        """
+        Read a file into memory,  use the fileserver if in push mode, otherwise just use the filesystem.
+        """
+        caller = Context.caller()
+        if caller:
+            bio = io.BytesIO()
+            logger.debug("slurp: %s" % src)
+            if not src.startswith('/'):    
+                src = os.path.join(Context.relative_root(), src)
+            ok, metadata = mitogen.service.FileService.get(caller, src, bio)
+            logger.debug("slurp ok!")
+            data = bio.getvalue().decode('utf-8')
+            bio.close()
+            return data
+        else:
+            fd = open(src)
+            data = fd.read()
+            fd.close()
+            return data
+
 
     def skip_plan_stage(self):
         """ for trivial providers like debug, tell the callbacks to not do plan computations """
@@ -49,8 +93,18 @@ class Provider(object):
         """ if True, a resource claiming it is quiet will silence most properly programmed callbacks. """
         return False
 
+    def very_quiet(self):
+        """ if True, this will silence even more callbacks """
+        return False
+
     def has_changed(self):
-        """ Returns whether the provider has undertaken any actions """
+        """ similar to has_changed but takes changed_when into account """
+        cond = self.resource.changed_when
+        if cond is not None:
+            if issubclass(type(cond), Lookup):
+                return cond.evaluate(self.resource)
+            return cond
+        # otherwise the default is to see if any actions were taken        
         return len(self.actions_taken) > 0
 
     def apply(self):
@@ -66,17 +120,22 @@ class Provider(object):
 
     def needs(self, action_name):
         """ declares than an action 'should' take place during an apply step """
-        self.actions_planned.append(Action(action_name))
+        action = Action(action_name)
+        self.actions_planned.append(action)
+        Callbacks.on_needs(self, action)
 
     def should(self, what):
         """ returns True if an action should take place during an apply step """
         return any(True for action in self.actions_planned if action.do == what)
 
-    def do(self, what):
+    def do(self, action_name):
         """ marks off that an action has been completed. not marking off all planned actions (or any unplanned ones) will result in an error """
-        self.actions_taken.append(Action(what))
+        action = Action(action_name)
+        self.actions_taken.append(action)
+        Callbacks.on_do(self, action)
 
-    def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True):
+
+    def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True, ignore_lines=None, primary=False):
         """
         A convenience method that returns an un-executed command object from any provider, this should be used for executing ALL shell commands in OpsMop.
         """
@@ -84,11 +143,11 @@ class Provider(object):
             fatal = False
         if timeout is None:
             timeout = self.get_default_timeout()
-        return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal)
+        return Command(cmd, self, input_text=input_text, timeout=timeout, echo=echo, loud=loud, fatal=fatal, ignore_lines=ignore_lines, primary=primary)
 
-    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False, want_output=False):
+    def _handle_cmd(self, cmd, input_text=None, timeout=None, echo=True, fatal=False, loud=False, loose=False, want_output=False, ignore_lines=None, primary=False):
         """ Common helper code for test and run """
-        cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud)
+        cmd = self.get_command(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=fatal, loud=loud, ignore_lines=ignore_lines, primary=primary)
         res = cmd.execute()
         if want_output:
             if res.rc == 0 or loose:
@@ -97,21 +156,21 @@ class Provider(object):
                 return None
         return res
 
-    def test(self, cmd, input_text=None, timeout=None, echo=True, loud=False, loose=False):
+    def test(self, cmd, input_text=None, timeout=None, echo=True, loud=False, loose=False, ignore_lines=None):
         """
         Run a command (cmd) with optional input and timeouts. 
         By default, the command will allow itself to be echoed by callbacks.
         Send "loud" to teach well-programmed methods to allow one command to squeak through even if provider.quiet() returns True.
         Loose will return the output even if the command fails.  If False, failed commands return None
         """
-        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud, want_output=True)
+        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, loose=loose, loud=loud, want_output=True, ignore_lines=ignore_lines)
 
-    def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False):
+    def run(self, cmd, input_text=None, timeout=None, echo=True, loud=False, ignore_lines=None, primary=False):
         """
         Similar to test, this will call failed command callbacks when the commands fail, which MAY be intercepted
         by properly-programmed callbacks to fail the entire execution process.
         """
-        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud)
+        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud, ignore_lines=ignore_lines, primary=primary)
 
     def get_default_timeout(self): 
         """
@@ -134,10 +193,12 @@ class Provider(object):
         """
         return len(self.actions_planned)
 
-    def handle_registration(self, context=None, result=None):
+    def handle_registration(self, result):
+        assert result is not None
         va = dict()
         va[self.register] = result
-        context.on_update_variables(va)
+        Callbacks.on_update_variables(va)
+        self.resource.update_variables(va)
         self.resource.update_parent_variables(va)
 
     def commit_to_plan(self):
@@ -149,7 +210,7 @@ class Provider(object):
         self.actions_taken = self.actions_planned
 
     def echo(self, msg):
-        self._context.on_echo(msg)
+        Callbacks.on_echo(self, msg)
 
     def context(self):
         """
@@ -169,3 +230,6 @@ class Provider(object):
 
     def template_file(self, path):
         return Template.from_file(path, self)
+
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__)

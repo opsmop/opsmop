@@ -76,16 +76,23 @@ Trying Things Out
 -----------------
 
 The other chapters will explain opsmop in greater depth, but let's see
-if this works::
+if this works, just running from source::
 
-    bin/opsmop apply ../opsmop-demo/content/hello.py
-
+    cd opsmop-demo/content
+    PYTHONPATH=/path/for/checkout/of/opsmop python3 hello.py --local --apply
+    
 .. _pypi:	
 
 What About PyPi?
 ----------------
 
 Versions of opsmop will be available in PyPi after the first release in 2019.
+
+The instructions above discuss running from source, which is useful if you are developing
+on the program.  Once installed, everything will work the same way, except PYTHONPATH
+will not need to be set.
+
+You can of course also "chmod +x" any policy file to avoid having to specify the interpreter.
 
 Setup Problems or Questions?
 ----------------------------

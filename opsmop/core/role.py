@@ -18,6 +18,8 @@ from opsmop.core.fields import Fields
 from opsmop.core.handlers import Handlers
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.client.user_defaults import UserDefaults
 
 class Role(Collection):
 
@@ -41,6 +43,10 @@ class Role(Collection):
             handlers  = Field(kind=dict, of=Resource, loader=self.set_handlers),
         )
 
+    def serial(self):
+        # number of hosts to simultaenously execute
+        return 80
+
     def set_variables(self):
         return dict()
 
@@ -50,8 +56,23 @@ class Role(Collection):
     def set_handlers(self):
         return Handlers()
 
-    def _on_walk(self, context):
-        context.on_role(self)
+    def allow_fileserving_paths(self):
+        return []
+
+    def sudo(self):
+        return False
+
+    def ssh_as(self):
+        return (UserDefaults.ssh_username(), UserDefaults.ssh_password())
+
+    def sudo_as(self):
+        return (UserDefaults.sudo_username(), UserDefaults.sudo_password())
+
+    def check_host_keys(self):
+        return UserDefaults.ssh_check_host_keys()
+
+    def _on_walk(self):
+        Callbacks.on_role(self)
 
     def get_children(self, mode):
         if mode == 'resources':

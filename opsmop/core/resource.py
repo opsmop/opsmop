@@ -30,12 +30,19 @@ class Resource(object):
         self._field_spec.find_unexpected_keys(self)
         self._field_spec.load_parameters(self)
 
+    def quiet(self):
+        """ If true, surpresses some callbacks """
+        return False
+
     def split_common_kwargs(self, kwargs):
         """
         Return a set of (original, common) dicts, where original contains
         any arguments specified in Fields for a resource (Type) and common
         includes the ones available to all types
         """
+
+        from opsmop.core.fields import Fields
+
         common = dict()
         original = dict()
         for (k,v) in kwargs.items():
@@ -143,14 +150,16 @@ class Resource(object):
         """
         return self.scope().variables()
 
-    def deeper_scope(self):
-        """
-        Return a Scope() object that is one level deeper than the current scope.
-        This is mostly used by collection.claim()
-        """
-        return self.scope().deeper()
+    def has_tag(self, tags):
+        my_tags = self.all_tags()
+        if 'any' in my_tags:
+            return True
+        for t in tags:
+            if t in my_tags:
+                return True
+        return False
 
-    def conditions_true(self, context, validate=False):
+    def conditions_true(self, validate=False):
         """
         Called by Executor code to decide if a resource is processable.
         """
@@ -202,6 +211,15 @@ class Resource(object):
             ptr = ptr.parent()
         return result
 
+    def all_tags(self):
+        result = []
+        ptr = self
+        while ptr is not None:
+            if ptr.tags:
+                result.extend(ptr.tags)
+            ptr = ptr.parent()
+        return result
+
     def pre(self):
         """
         user hook. called before executing a resource in Executor code
@@ -213,3 +231,14 @@ class Resource(object):
         user hook. called after executing a resource in Executor code
         """
         pass
+
+    def to_dict(self):
+        result = dict()
+        result['cls']= self.__class__.__name__
+        for (k,v) in self.kwargs.items():
+            if hasattr(v, 'to_dict'):
+                v = v.to_dict()
+            result[k] = v
+        print("TO DICT=%s" % result)
+        return result
+

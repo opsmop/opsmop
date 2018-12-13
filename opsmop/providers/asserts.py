@@ -21,9 +21,6 @@ class Asserts(Provider):
     def quiet(self):
         return True
 
-    def verb(self):
-        return "asserting..."
-
     def skip_plan_stage(self):
         return True
  

@@ -19,9 +19,6 @@ class DebugFacts(Provider):
     def quiet(self):
         return True
 
-    def verb(self):
-        return "debugging constant facts..."
-
     def skip_plan_stage(self):
         return True
  

@@ -31,9 +31,6 @@ class Set(Provider):
             self.echo("%s = %s" % (k,temp_items[k]))
         self.resource.update_parent_variables(temp_items)
 
-    def verb(self):
-        return "setting..."
-
     def skip_plan_stage(self):
         return True
 

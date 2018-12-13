@@ -12,90 +12,84 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# NOTE: this interface is subject to change
+HOST = None
+HOST_SIGNALS = dict()
+MODE = None
+CALLER = None
+
+VALIDATE = 'validate'
+CHECK = 'check'
+APPLY = 'apply'
 
 class Context(object):
 
-    def __init__(self, callbacks=None):
+    @classmethod
+    def set_mode(cls, mode):
+        global MODE
+        assert mode in [ VALIDATE, CHECK, APPLY ]
+        MODE = mode
 
-        self._callbacks = callbacks
-        self._signals = []
-        for cb in self._callbacks:
-            cb.set_context(self)
+    @classmethod
+    def set_caller(cls, caller):
+        global CALLER
+        CALLER = caller
 
-    def add_signal(self, signal):
-        self._signals.append(signal)
+    @classmethod
+    def caller(cls):
+        return CALLER
 
-    def has_seen_any_signal(self, signals):
-        for x in self._signals:
+    @classmethod
+    def set_host(cls, host):
+        global HOST
+        HOST = host
+
+    @classmethod
+    def relative_root(cls):
+        global RELATIVE_ROOT
+        return RELATIVE_ROOT
+
+    @classmethod
+    def set_relative_root(cls, root):
+        global RELATIVE_ROOT
+        RELATIVE_ROOT = root
+
+    @classmethod
+    def host(cls):
+        return host
+
+    @classmethod
+    def mode(cls):
+        global MODE
+        return MODE
+
+    @classmethod
+    def is_validate(cls):
+        return MODE == VALIDATE
+
+    @classmethod
+    def is_check(cls):
+        return MODE == CHECK
+
+    @classmethod
+    def is_apply(cls):
+        return MODE == APPLY
+
+    @classmethod
+    def add_signal(cls, host, signal):
+
+        global HOST_SIGNALS
+        if not host.name in HOST_SIGNALS:
+            HOST_SIGNALS[host.name] = []
+        HOST_SIGNALS[host.name].append(signal)
+
+    @classmethod
+    def has_seen_any_signal(cls, host, signals):
+
+        global HOST_SIGNALS
+        host_signals = HOST_SIGNALS.get(host.name, [])
+
+        for x in host_signals:
             if x in signals:
                 return True
         return False
-            
-    def _run_callbacks(self, cb_method, *args):
-        """ 
-        Run a named callback method against all attached callback classes, in order.
-        """
-        for c in self._callbacks:
-            c.set_context(self)
-            attr = getattr(c, cb_method)
-            attr(*args)
-
-    def on_apply(self, provider):
-        self._run_callbacks('on_apply', provider)
-
-    def on_finished(self, value):
-        self._run_callbacks('on_finished')
-
-    def on_echo(self, value):
-        self._run_callbacks('on_echo', value)
-
-    def on_plan(self, provider):
-        self._run_callbacks('on_plan', provider)
-
-    def on_role(self, role):
-        self._run_callbacks('on_role', role)
-
-    def on_command_echo(self, value):
-        self._run_callbacks('on_command_echo', value)
-
-    def on_execute_command(self, value):
-        self._run_callbacks('on_execute_command', value)
-
-    def on_resource(self, resource, is_handler):
-        self._run_callbacks('on_resource', resource, is_handler)
-
-    def on_command_result(self, value):
-        self._run_callbacks('on_command_result', value)
-
-    def on_planned_actions(self, provider, actions_planned):
-        self._run_callbacks('on_planned_actions', provider, actions_planned)
-
-    def on_taken_actions(self, provider, actions_taken):
-        self._run_callbacks('on_taken_actions', provider, actions_taken)
-
-    def on_result(self, result):
-        self._run_callbacks('on_result', result)
-        if result.fatal:
-            self._run_callbacks('on_fatal', result)
-
-    def on_skipped(self, value, is_handler=False):
-        self._run_callbacks('on_skipped', value, is_handler)
-
-    def on_flagged(self, value):
-        self._run_callbacks('on_flagged', value)
-
-    def on_complete(self, value):
-        self._run_callbacks('on_complete', value)
-
-    def on_update_variables(self, variables):
-        self._run_callbacks('on_update_variables', variables)
-
-    def on_begin_role(self, role):
-        self._run_callbacks('on_begin_role', role)
-
-    def on_begin_handlers(self):
-        self._run_callbacks('on_begin_handlers')
-
-    def on_validate(self):
-        self._run_callbacks('on_validate')
+   

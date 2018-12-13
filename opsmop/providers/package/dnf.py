@@ -14,23 +14,25 @@
 
 from opsmop.providers.package.package import Package
 
-TIMEOUT = 1800
-VERSION_CHECK = "brew ls --versions {name} | cut -f2 -d ' '"
-INSTALL = "brew install {name}"
-UPGRADE = "brew update {name}"
-UNINSTALL = "brew uninstall {name}"
+TIMEOUT = 3600
+VERSION_CHECK = "rpm -q %s"
+QUERY_FORMAT = "--queryformat '%{VERSION}\\n'"
+INSTALL = "dnf install -y {name}"
+UPGRADE = "dnf update -y {name}"
+UNINSTALL = "dnf remove -y {name}"
 
-class Brew(Package):
+
+class Dnf(Package):
 
     def _get_version(self):
-        version_check = VERSION_CHECK.format(name=self.name)
-        return self.test(version_check)
+        version_check = "%s %s" % (VERSION_CHECK % self.name, QUERY_FORMAT)
+        output = self.test(version_check)
+        if output is None:
+            return None
+        return output
 
     def get_default_timeout(self):
         return TIMEOUT
-
-    def plan(self):
-        super().plan()
 
     def apply(self):
         which = None

@@ -30,3 +30,6 @@ class Action(object):
 
     def __str__(self):
         return str(self.do)
+
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__, do=self.do)

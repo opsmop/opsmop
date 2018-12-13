@@ -79,7 +79,7 @@ Community and Contributions
 ===========================
 
 The purpose of the Opsmop community is to come together to build the ultimate configuration tool we all want to use.
-If this project seems interesting to you, we highly recommend joining the [forum](https://talk.msphere.io).
+If this project seems interesting to you, we highly recommend joining the [forum](https://talk.msphere.io). By contributing, users certify that they agree with the terms in [CONTRIBUTING.md](https://github.com/opsmop/opsmop/blob/master/CONTRIBUTING.md).
 
 Twitter
 =======

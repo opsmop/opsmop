@@ -12,24 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.template import Template
-from opsmop.lookups.lookup import Lookup
+import os
+import toml
+from opsmop.core.errors import InventoryError
+from opsmop.inventory.inventory import Inventory
 
-class Eval(Lookup):
+import logging
+logger = logging.getLogger('toml')
 
-    """
-    when=Eval("a > b")
-    """
 
-    def __init__(self, expr):
+class TomlInventory(Inventory):
+
+    def __init__(self, filename):
         super().__init__()
-        self.expr = expr
+        self._path = os.path.expanduser(os.path.expandvars(filename))
 
-    def evaluate(self, resource):
-        return Template.native_eval(self.expr, resource)
+    def load(self):
+        if self._loaded:
+            return self
+        if not os.path.exists(self._path):
+            raise InventoryError(msg="TOML inventory does not exist at: %s" % self._path)
+        data = open(self._path).read()
+        data = toml.loads(data)
+        self.accumulate(data)
+        return self
 
-    def __str__(self):
-        return "Eval: <'%s'>" % self.expr
 
-    def to_dict(self):
-        return dict(cls=self.__class__.__name__, expr=self.expr)
+        
+

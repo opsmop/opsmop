@@ -13,31 +13,61 @@
 # limitations under the License.
 
 import sys
+import inspect
+import json
+import os
 
-from opsmop.core.callback import BaseCallback
+import logging
+import logging.handlers
+
+from opsmop.callbacks.callback import BaseCallback
 from opsmop.core.role import Role
 from opsmop.types.type import Type
+from opsmop.core.errors import CommandError
+from opsmop.core.context import Context
+from opsmop.client.user_defaults import UserDefaults
+
+LOG_FILENAME = os.path.expanduser("~/.opsmop.log")
 
 # NOTE: this interface is subject to change
 
 INDENT="  "
 
-class CliCallbacks(BaseCallback):
+Context = Context()
+
+class LocalCliCallbacks(BaseCallback):
 
     """
     Callback class for the default CLI implementation.
     Improvements are welcome.
     """
 
-    __slots__ = [ 'dry_run', 'role', 'last_role', 'phase', 'count' ]
+    __slots__ = [ 'phase', 'count', 'logger' ]
 
     def __init__(self):
         super()
-        self.dry_run = False
-        self.role = None
-        self.last_role = None
         self.phase = None
         self.count = 0
+        self.logger = None
+        self.setup_logger()
+
+    def setup_logger(self):
+
+        path = UserDefaults.log_path()
+        dirname = os.path.dirname(path)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname, 0o770)
+
+        if self.logger is not None:
+            return
+        self.logger = logging.getLogger('opsmop')
+        self.logger.setLevel(logging.DEBUG)
+        handler = logging.handlers.RotatingFileHandler(
+              path, maxBytes=1024*5000, backupCount=5)
+        formatter = logging.Formatter(UserDefaults.log_format())
+        handler.setFormatter(formatter)
+
+        self.logger.addHandler(handler)
 
     def set_phase(self, phase):
         self.phase = phase
@@ -54,55 +84,47 @@ class CliCallbacks(BaseCallback):
         if big:
             self.i1(sep)
 
-    def on_command_echo(self, echo):
+    def on_command_echo(self, provider, echo):
         if echo == "":
             return
         self.i5("| %s" % echo.rstrip())
 
-    def on_echo(self, echo):
-        self.i5("| %s" % echo)
+    def on_echo(self, provider, echo):
+        if not provider or not provider.very_quiet():
+            self.i5("| %s" % echo)
+        else:
+            self.i3(echo)
 
-    def on_execute_command(self, command):
+    def on_execute_command(self, provider, command):
         if command.echo:
             self.i5("# %s" % command.cmd)
 
     def on_plan(self, provider):
-        self.provider = provider
-        if self.provider.skip_plan_stage():
-            return
         self.i3("planning...")
-
+ 
     def on_apply(self, provider):
-        self.i3(provider.verb())
+        return
     
-    def on_planned_actions(self, provider, actions_planned):
-        if self.provider.skip_plan_stage():
+    def on_needs(self, provider, action):
+        if provider.skip_plan_stage():
             return
-        self.provider = provider
-        if len(actions_planned):
-            self.i3("planned:")
-            for x in actions_planned:
-                self.i5("| %s" % x)
-        else:
-            self.i3("no changes needed")
+        if Context.is_check():
+            self.i3("needs: %s" % action.do)
+
+    def on_do(self, provider, action):
+        if Context.is_apply():
+            self.i3("do: %s" % action.do)
 
     def on_taken_actions(self, provider, actions_taken):
         if provider.skip_plan_stage():
             return
-        self.provider = provider
-        taken = sorted([ str(x) for x in provider.actions_taken ])
-        planned = sorted([ str(x) for x in provider.actions_planned ])
-        if (taken != planned):
-            self.i5("ERROR: actions planned do not equal actions taken: %s" % taken)
-            self.on_fatal()
-        self.i3("actions:")
-        for x in actions_taken:
-            self.i5("| %s" % str(x))
 
-    def on_result(self, result):
+    def on_result(self, provider, result):
+        if result.provider.quiet():
+            return
         self.i3(str(result))
 
-    def on_command_result(self, result):
+    def on_command_result(self, provider, result):
         self.i5("= %s" % result)
 
     def on_skipped(self, skipped, is_handler=False):
@@ -121,20 +143,39 @@ class CliCallbacks(BaseCallback):
     def on_resource(self, resource, is_handler):
         if self.phase == 'validate':
             return
+
+        # print the resource name / banner
         self.i1("")
         role = resource.role()
         self.count = self.count + 1
-        self.banner("{count} :: {role} :: {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
+        self.banner("{count}. {role} => {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
         self.i1("")
-        if is_handler:
-            self.i3("handler")
 
-    def on_flagged(self, flagged):
-        self.i3("flagged: %s" % flagged)
+        # show the keys for each resource, name first
+        # FIXME: refactor coercion of output into provider code
+        if not resource.quiet():
+            keys = resource.kwargs.keys()
+            keys = [ k for k in sorted(keys) if (k != 'name') ]
+            if keys:
+                self.i3("parameters:")
+                for k in keys:
+                    v = resource.kwargs[k]
+                    if k == 'mode' and type(v) == int:
+                        # remove this hack to print modes as octal, move this into
+                        # type code and make it generic
+                        v = "0o{0:o}".format(v)
+                    self.i5("| %s: %s" % (k,v))
+
+        # show if this resource is a handler
+        if is_handler:
+            self.i3("(handler)")
+
+    def on_signaled(self, resource, event_name):
+        self.i3("signaled: %s" % event_name)
 
     def on_complete(self, policy):
         self.i1("")
-        self.i1("complete!")
+        self.banner("complete!")
         self.summarize()
 
     def on_role(self, role):
@@ -144,20 +185,19 @@ class CliCallbacks(BaseCallback):
         # TODO: reimplement the counter and percentages summary
         pass
 
-    def on_fatal(self, msg=None):
+    def on_fatal(self, provider, msg=None):
+        self.i1("")
         if msg:
             self.i1("FAILED: %s" % msg)
         else:
             self.i1("FAILED")
+        self.i1("")
         self.summarize()
-        # TODO: we should not exit here but raise an Exception, Api and PullApi will want to catch it.
-        # TODO: further, run_callbacks in Context() should catch any exceptions from *ALL* callbacks and re-raise
-        sys.exit(1)
 
     def on_update_variables(self, variables):
         self.i3("registered:")
         for (k,v) in variables.items():
-            self.on_echo("%s => %s" % (k,v))
+            self.on_echo(None, "%s => %s" % (k,v))
 
     def i1(self, msg):
         # indent methods
@@ -178,3 +218,4 @@ class CliCallbacks(BaseCallback):
     def _indent(self, level, msg):
         spc = INDENT * level
         print("%s%s" % (spc, msg))
+        self.logger.info(msg)

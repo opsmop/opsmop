@@ -15,12 +15,16 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
+from opsmop.providers.debug import Debug as DebugProvider
 
 class Debug(Type):
 
     def __init__(self, *args, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(variable_names=args, evals=original, **common)
+
+    def quiet(self):
+        return True
 
     def fields(self):
         return Fields(
@@ -30,5 +34,4 @@ class Debug(Type):
         )
 
     def default_provider(self):
-        from opsmop.providers.debug import Debug
-        return Debug
+        return DebugProvider

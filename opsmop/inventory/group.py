@@ -12,27 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.field import Field
-from opsmop.core.fields import Fields
-from opsmop.types.type import Type
+class Group(object):
 
-class Echo(Type):
+    def __init__(self, name, variables=None):
+        self.name = name
+        if variables is None:
+            variables = dict()
+        self.variables = variables
+        self._hosts = dict()
 
-    def __init__(self, msg, *args, **kwargs):
-        self.setup(msg=msg, **kwargs)
+    def update_variables(self, variables):
+        self.variables.update(variables)
 
-    def quiet(self):
-        return True
+    def add_host(self, host):
+        self._hosts[host.name] = host
+    
+    def hosts(self):
+        return [ h for h in self._hosts.values() ]
 
-    def fields(self):
-        return Fields(
-            self,
-            msg = Field(kind=str, allow_none=False, help="string to print")
-        )
+        
 
-    def validate(self):
-        pass
-
-    def default_provider(self):
-        from opsmop.providers.echo import Echo
-        return Echo

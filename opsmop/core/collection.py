@@ -62,19 +62,19 @@ class Collection(Resource):
         kid_scope = my_scope.deeper_scope_for(resource)
         resource.set_scope(kid_scope)
 
-    def _on_walk(self, context):
+    def _on_walk(self):
         """
         A hook that fires on traversal of each object inside walk_children.
         """
         pass
 
-    def get_children(self, mode):
+    def get_children(self):
         """
         Returns child objects, mode may be 'resources' or 'handlers'
         """
         return self.items
 
-    def walk_children(self, items=None, context=None, which=None, mode=None, fn=None, handlers=False):
+    def walk_children(self, items=None, which=None, fn=None, handlers=False, tags=None):
 
         """
         A relatively complex iterator used by Executor() code.
@@ -83,52 +83,54 @@ class Collection(Resource):
         items - the kids to start the iteration with
         context - a Context() object for callback tracking
         which - 'resources' or 'handlers'
-        mode - 'validate', 'check', or 'apply'
         fn - the function to call on each object
         """
 
-        self._on_walk(context)
+        self._on_walk()
         items_type = type(items)
  
         if items is None:
             return
 
-        validate = (mode == 'validate')
+        def maybe(v):
+            # we'll visit every resource but only call the function on items if tags are *not* engaged
+            if not tags or v.has_tag(tags):
+                fn(v)
        
         if issubclass(items_type, Collection):            
             self.attach_child_scope_for(items)
-            proceed = items.conditions_true(context, validate=validate)
+            proceed = items.conditions_true()
             if proceed:
-                return items.walk_children(items=items.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                return items.walk_children(items=items.get_children(), which=which, fn=fn, tags=tags)
             else:
-                context.on_skipped(items, is_handler=handlers)
+                Callbacks.on_skipped(items, is_handler=handlers)
 
         elif issubclass(items_type, Resource):
             self.attach_child_scope_for(items)
-            if items.conditions_true(context, validate=validate):
-                return fn(items)
+            if items.conditions_true():
+                return maybe(items)
             else:
-                context.on_skipped(items, is_handler=handlers)
+                Callbacks.on_skipped(items, is_handler=handlers)
 
         elif items_type == list:
             for x in items:        
                 self.attach_child_scope_for(x)
-                if x.conditions_true(context, validate=validate):
+                if x.conditions_true():
                     if issubclass(type(x), Collection):
-                        x.walk_children(items=x.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                        x.walk_children(items=x.get_children(), fn=fn, tags=tags)
                     else:
-                        fn(x)
+                        maybe(x)
                 else:
-                    context.on_skipped(items, is_handler=handlers)
+                    Callbacks.on_skipped(items, is_handler=handlers)
 
         elif items_type == dict:
             for (k,v) in items.items():
                 self.attach_child_scope_for(v)
-                if v.conditions_true(context, validate=validate):
+                if v.conditions_true():
                     if issubclass(type(v), Collection):
-                        items.walk_children(items=v.get_children(mode), mode=mode, which=which, context=context, fn=fn)
+                        items.walk_children(items=v.get_children(),which=which, fn=fn, tags=tags)
                     else:
                         v.handles = k
-                        fn(v)
+                        maybe(v)
                 else:
-                    context.on_skipped(items, is_handler=handlers)
+                    Callbacks.on_skipped(items, is_handler=handlers)

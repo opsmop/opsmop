@@ -23,9 +23,6 @@ class Stop(Provider):
     def plan(self):
         self.needs('stop')
 
-    def verb(self):
-        return "aborting..."
-
     def skip_plan_stage(self):
         return True
 

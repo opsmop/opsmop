@@ -19,6 +19,7 @@ import subprocess
 
 from opsmop.core.common import memoize
 from opsmop.core.result import Result
+from opsmop.callbacks.callbacks import Callbacks
 
 
 class Command(object):
@@ -29,9 +30,9 @@ class Command(object):
     returns an "opsmop.core.result.Result" object.
     """
 
-    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env' ]
+    __slots__ = [ 'provider', 'cmd', 'timeout', 'echo', 'loud', 'fatal', 'input_text', 'env', 'ignore_lines', 'primary' ]
 
-    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False):
+    def __init__(self, cmd, provider, env=None, input_text=None, timeout=None, echo=True, loud=False, fatal=False, ignore_lines=None, primary=False):
 
         """
         Constructs but does not execute a command.
@@ -44,6 +45,8 @@ class Command(object):
         echo: whether to show the command names + return codes + output on the screen using whatever callback class is set in the system
         fatal: whether any errors should fail the resource execution
         loud: whether to ignore 'quiet' preferences for just the output (but not command name or return codes)
+        ignore_lines: don't echo any lines starting with these items (takes a list of strings)
+        primary: if True, this command invocation is the sole purpose of the provider (example: the shell module) and failure status be controlled by ignore_errors/failed_when/etc.
         """
         self.cmd = cmd
         self.provider = provider
@@ -53,6 +56,11 @@ class Command(object):
         self.fatal = fatal
         self.input_text = input_text
         self.env = env
+        self.ignore_lines = ignore_lines
+        self.primary = primary
+
+    def to_dict(self):
+        return dict(cls=self.__class__.__name__, cmd=self.cmd, timeout=self.timeout, env=self.env)
 
     @memoize
     def get_timeout(self):
@@ -77,8 +85,7 @@ class Command(object):
         because there are no database objects.
         """
 
-        context = self.provider.context()
-        context.on_execute_command(self)
+        Callbacks.on_execute_command(self.provider, self)
         
         command = self.cmd
         timeout_cmd = self.get_timeout()
@@ -117,11 +124,11 @@ class Command(object):
 
         output = ""
         for line in stdout:
-            if self.echo or self.loud:
-                context.on_command_echo(line)
+            if (self.echo or self.loud) and (not self.ignore_lines or not self.should_ignore(line)):
+                Callbacks.on_command_echo(self.provider, line)
             output = output + line
         if output.strip() == "":
-            context.on_command_echo("(no output)")
+            Callbacks.on_command_echo(self.provider, "(no output)")
 
 
         process.wait()
@@ -129,9 +136,18 @@ class Command(object):
         res = None
         rc = process.returncode
         if rc != 0:
-            res = Result(self.provider, rc=rc, data=output, fatal=self.fatal)
+            res = Result(self.provider, rc=rc, data=output, fatal=self.fatal, primary=self.primary)
         else:
-            res = Result(self.provider, rc=rc, data=output, fatal=False)
+            res = Result(self.provider, rc=rc, data=output, fatal=False, primary=self.primary)
         # this callback will, depending on implementation, usually note fatal result objects and raise an exception
-        context.on_command_result(res)
+        Callbacks.on_command_result(self.provider, res)
         return res
+
+    def should_ignore(self, line):
+        # used for ignoring output on the console like "(Reading database 20% ...)" which is common for 'apt'
+        # this may be modified to also do regular expressions in the future.
+        for x in self.ignore_lines:
+            if line.startswith(x):
+                return True
+        return False
+

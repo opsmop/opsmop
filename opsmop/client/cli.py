@@ -15,32 +15,34 @@
 
 import sys
 import argparse
+import os
 
-from opsmop.client.callbacks import CliCallbacks
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.callbacks.local import LocalCliCallbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.api import Api
-
-# import argparse
-
+from opsmop.core.errors import OpsMopError
 
 USAGE = """
 |
 | opsmop - (C) 2018, Michael DeHaan LLC
 |
 | opsmop --validate demo/policy.py 
-| opsmop --check demo/policy.py
-| opsmop --apply demo/policy.py  
+| opsmop --check demo/policy.py [--local|--push]
+| opsmop --apply demo/policy.py [--local|--push]
 |
 """
 
 class Cli(object):
 
-    __slots__ = [ 'args' ]
-
-    def __init__(self, args):
+    def __init__(self, policy):
         """
         The CLI is constructed with the sys.argv command line, see bin/opsmop
         """
-        self.args = args
+        self.policy = policy
+        self.args = sys.argv
+        self.go()
  
     def go(self):
        
@@ -50,38 +52,65 @@ class Cli(object):
 
         mode = self.args[1]
         path = sys.argv[2]
-        callbacks = [ CliCallbacks() ]
-
+        callbacks = None
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('--validate', help='policy file to validate')
-        parser.add_argument('--apply', help="policy file to apply")
-        parser.add_argument('--check', help="policy file to check")
+        parser.add_argument('--validate', action='store_true', help='policy file to validate')
+        parser.add_argument('--apply', action='store_true', help="policy file to apply")
+        parser.add_argument('--check', action='store_true', help="policy file to check")
+        parser.add_argument('--tags', help='optional comma seperated list of tags')
+        parser.add_argument('--push', action='store_true', help='run in push mode')
+        parser.add_argument('--local', action='store_true', help='run in local mode')
+        parser.add_argument('--event-stream', action='store_true', help=argparse.SUPPRESS)
 
         args = parser.parse_args(self.args[1:])
 
         all_modes = [ args.validate, args.apply, args.check ]
-        selected_modes = [ x for x in all_modes if x is not None ]
+        selected_modes = [ x for x in all_modes if x is True ]
+        if len(selected_modes) != 1:
+            print(selected_modes)
+            print(USAGE)
+            sys.exit(1)
+
+        all_modes = [ args.push, args.local ]
+        selected_modes = [ x for x in all_modes if x is True ]
         if len(selected_modes) != 1:
             print(USAGE)
             sys.exit(1)
 
-        path = args.validate or args.apply or args.check
-
-        api = Api.from_file(path=path, callbacks=callbacks)
-        
-        if args.validate:
-            # just check for missing files and invalid types
-            api.validate()
-        elif args.check:
-            # operate in dry-run mode
-            api.check()
-        elif args.apply:
-            # configure everything
-            api.apply()
+        if not args.event_stream:
+            Callbacks.set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         else:
-            print(USAGE)
+            Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
+
+        tags = None
+        if args.tags is not None:
+            tags = args.tags.strip().split(",")
+
+        api = Api(policies=[self.policy], tags=tags, push=args.push)
+
+        abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
+        os.chdir(os.path.dirname(abspath))
+
+        try:
+            if args.validate:
+                # just check for missing files and invalid types
+                api.validate()
+            elif args.check:
+                # operate in dry-run mode
+                api.check()
+            elif args.apply:
+                # configure everything
+                api.apply()
+            else:
+                print(USAGE)
+                sys.exit(1)
+        except OpsMopError as ome:
+            print("")
+            print(str(ome))
+            print("")
             sys.exit(1)
-   
+
+
         print("")
         sys.exit(0)

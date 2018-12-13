@@ -12,36 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.collection import Collection
-from opsmop.core.context import Context
+from opsmop.core.context import Context, VALIDATE, APPLY, CHECK
 from opsmop.core.result import Result
+from opsmop.core.role import Role
+from opsmop.core.roles import Roles
+from opsmop.push.connections import ConnectionManager
+from opsmop.push.batch import Batch
+from opsmop.lookups.lookup import Lookup
+from opsmop.inventory.host import Host
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.common import CommonCallbacks
 
-# ---------------------------------------------------------------
-
-# Run mode constants.
-
-CHECK='check'
-APPLY='apply'
-VALIDATE='validate'
+import time
 
 # ---------------------------------------------------------------
 
 class Executor(object):
 
-    __slots__ = [ '_policies', '_callbacks' ]
+    __slots__ = [ '_policies', '_tags', '_push', '_local_host', 'connection_manager' ]
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies=None, callbacks=None):
+    def __init__(self, policies, local_host=None, tags=None, push=False):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
         """
   
         assert type(policies) == list
-        assert type(callbacks) == list
         self._policies = policies
-        self._callbacks = callbacks
+        self._tags = tags
+        self._push = push
+        if local_host is None:
+            local_host = Host("127.0.0.1")
+        self._local_host = local_host
+        self.connection_manager = None
 
     # ---------------------------------------------------------------
 
@@ -50,7 +58,7 @@ class Executor(object):
         Validate runs the .validate() method on every resource to check for argument consistency.
         This can catch inconsistent arguments and missing files
         """
-        return self.run_all_policies(mode=VALIDATE)
+        self.run_all_policies(mode=VALIDATE)
 
     # ---------------------------------------------------------------
 
@@ -59,7 +67,7 @@ class Executor(object):
         check runs the .plan() method on every resource tree and reports what resources would
         be changed, but does not make changes.  This is a dry-run mode.
         """
-        return self.run_all_policies(mode=CHECK)
+        self.run_all_policies(mode=CHECK)
 
     # ---------------------------------------------------------------
 
@@ -68,47 +76,40 @@ class Executor(object):
         apply runs .plan() and then .apply() provider methods and will actually
         make changes, as opposed to check(), which is a simulation.
         """
-        return self.run_all_policies(mode=APPLY)
+        self.run_all_policies(mode=APPLY)
 
     # ---------------------------------------------------------------
 
-    def run_all_policies(self, mode):
+    def run_all_policies(self, mode=None):
         """
         Runs all policies in the specified mode
         """
+        Context.set_mode(mode)
+        for policy in self._policies:     
+            if self._push:
+                self.connection_manager = ConnectionManager(policy)
+            self.run_policy(policy=policy)
 
-        contexts = []
-        context = None
-
-        for policy in self._policies:
-            # the context holds some types of state, such as signalled events
-            # and is cleared between each policy execution
-            context = Context(callbacks=self._callbacks)
-            # actual running of the policy here:
-            self.run_policy(policy=policy, context=context, mode=mode)
-            contexts.append(context)
-
-        return contexts
 
     # ---------------------------------------------------------------
 
-    def run_policy(self, policy=None, context=None, mode=None):
+    def run_policy(self, policy=None):
         """
         Runs one specific policy in VALIDATE, CHECK, or APPLY mode
         """
         # assign a new top scope to the policy object.
-        policy.init_scope(context)
-
+        policy.init_scope()
         roles = policy.get_roles()
-        # this is a Roles object, not a list
         for role in roles.items:
-            self.process_role(policy, role, context=context, mode=mode)
-        
-        context.on_complete(policy)
+            if not self._push:
+                self.process_local_role(policy, role)
+            else:
+                self.process_remote_role(policy, role)
+        Callbacks.on_complete(policy)
 
     # ---------------------------------------------------------------
 
-    def validate_role(self, role, context=None):
+    def validate_role(self, role):
         """
         Validates inputs for one role
         """
@@ -118,78 +119,106 @@ class Executor(object):
         
         # resources and handlers must be processed seperately
         # the validate method will raise exceptions when problems are found
-        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=validate, mode=VALIDATE)
-        role.walk_children(items=role.get_children('handlers'), context=context, which='handlers', fn=validate, mode=VALIDATE)
+        original_mode = Context.mode()
+        Context.set_mode(VALIDATE)
+        role.walk_children(items=role.get_children('resources'), which='resources', fn=validate, tags=self._tags)
+        role.walk_children(items=role.get_children('handlers'), which='handlers', fn=validate)
+        if original_mode:
+            Context.set_mode(original_mode)
 
     # ---------------------------------------------------------------
 
-    def process_role(self, policy, role, context=None, mode=None):
+    def process_remote_role(self, policy, role):
         """
         Processes one role in any mode
         """
-        # run any user hooks
+
+        import dill
+
+        with self.connection_manager.router:
+
+            hosts = role.inventory().hosts()
+            self.connection_manager.add_hosts(hosts)
+
+            batch_size = role.serial()
+            max_workers = UserDefaults.max_workers()
+
+            batch = Batch(hosts, batch_size=200)
+            def host_connector(host):
+                Context.set_host(host)
+                self.connection_manager.connect(host, role)
+            batch.apply_async(host_connector, max_workers=max_workers)
+
+            def role_runner(host):
+                self.connection_manager.process_remote_role(host, policy, role, Context.mode())
+            batch = Batch(hosts, batch_size=batch_size)
+            batch.apply(role_runner)
+
+            self.connection_manager.event_loop()
+          
+    # ---------------------------------------------------------------
+
+    def process_local_role(self, policy=None, role=None):
+
+        host = self._local_host
+
+        Context.set_host(host)
+
         role.pre()
         # set up the variable scope - this is done later by walk_handlers for lower-level objects in the tree
         policy.attach_child_scope_for(role)
         # tell the callbacks we are in validate mode - this may alter or quiet their output
-        context.on_validate()
+        Callbacks.on_validate()
         # always validate the role in every mode (VALIDATE, CHECK ,or APPLY)
-        self.validate_role(role, context=context)
+        self.validate_role(role)
         # skip the role if we need to
-        if not role.conditions_true(context):
-            context.on_skipped(role)
+        if not role.conditions_true():
+            Callbacks.on_skipped(role)
             return
         # process the tree for real for non-validate modes
-        if mode != VALIDATE:
-            self.execute_role_resources(role, context=context, mode=mode)
-            self.execute_role_handlers(role, context=context, mode=mode)
+        if not Context.is_validate():
+            self.execute_role_resources(host, role)
+            self.execute_role_handlers(host, role)
         # run any user hooks
         role.post()
 
+
     # ---------------------------------------------------------------
 
-    def execute_role_resources(self, role, context=None, mode=None):
+    def execute_role_resources(self, host, role):
         """ 
         Processes non-handler resources for one role for CHECK or APPLY mode
         """
         # tell the context we are processing resources now, which may change their behavior
         # of certain methods like on_resource()
-        context.on_begin_role(role)
+        Callbacks.on_begin_role(role)
         def execute_resource(resource):
             # execute each resource through plan() and if needed apply() stages, but before and after
             # doing so, run any user pre() or post() hooks implemented on that object.
             resource.pre()
-            result = self.execute_resource(resource=resource, context=context, mode=mode)
+            result = self.execute_resource(host=host, resource=resource)
             resource.post()
             return result
-        role.walk_children(items=role.get_children('resources'), context=context, which='resources', fn=execute_resource, mode=mode)
+        role.walk_children(items=role.get_children('resources'), which='resources', fn=execute_resource, tags=self._tags)
 
     # ---------------------------------------------------------------
 
-    def execute_role_handlers(self, role, context=None, mode=None):
+    def execute_role_handlers(self, host, role):
         """
         Processes handler resources for one role for CHECK or APPLY mode
         """
         # see comments for prior method for details
-        context.on_begin_handlers()
+        Callbacks.on_begin_handlers()
         def execute_handler(handler):
             handler.pre()
-            result = self.execute_resource(resource=handler, context=context, mode=mode, handlers=True)
+            result = self.execute_resource(host=host, resource=handler, handlers=True)
             handler.post()
             return result
-        role.walk_children(items=role.get_children('handlers'), context=context, which='handlers', fn=execute_handler, mode=mode)
+        role.walk_children(items=role.get_children('handlers'), which='handlers', fn=execute_handler, tags=self._tags)
 
     # ---------------------------------------------------------------
 
-    def is_collection(self, resource):
-        """
-        Is the resource a collection?
-        """
-        return issubclass(type(resource), Collection)
-
-    # ---------------------------------------------------------------
-
-    def plan(self, resource, context):
+    def do_plan(self, resource):
         """
         Ask a resource for the provider, and then see what the planned actions should be.
         The planned actions are kept on the provider object. We don't need to obtain the plan.
@@ -197,18 +226,14 @@ class Executor(object):
         """
         # ask the resource for a provider instance
         provider = resource.provider()
-        # the provider needs to have access to the context so it can invoke
-        # callbacks, such as on_echo()
-        provider.set_context(context)
 
         if provider.skip_plan_stage():
             return provider
         
         # tell the context object we are about to run the plan stage.
-        context.on_plan(provider)
+        Callbacks.on_plan(provider)
         # compute the plan
         provider.plan()
-        context.on_planned_actions(provider, provider.actions_planned)
         # copy the list of planned actions into the 'to do' list for the apply method
         # on the provider
         provider.commit_to_plan()
@@ -217,7 +242,7 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def do_apply(self, provider, context, handlers):
+    def do_apply(self, host, provider, handlers):
         """
         Once a provider has a plan generated, see if we need to run the plan.
         If so, also run any actions associated witht he apply step, which mostly means registering
@@ -231,31 +256,48 @@ class Executor(object):
             return False
                 
         # indicate we are about take some actions
-        context.on_apply(provider)
+        Callbacks.on_apply(provider)
         # take them
         result = provider.apply()
         if not handlers:
             # let the callbacks now we have taken some actions
-            context.on_taken_actions(provider, provider.actions_taken)
+            Callbacks.on_taken_actions(provider, provider.actions_taken)
             
         # all Provider apply() methods need to return Result objects or raise
         # exceptions
         assert issubclass(type(result), Result)
 
         # the 'register' feature saves results into variable scope
-        if provider.resource.register is not None:
-            provider.handle_registration(context=context, result=result)
+        resource = provider.resource
+        if resource.register is not None:
+            provider.handle_registration(result)
+
+        # determine if there was a failure
+        fatal = False
+        cond = resource.failed_when
+        if cond is not None:
+            if issubclass(type(cond), Lookup):
+                fatal = cond.evaluate(resource)
+                result.reason = cond
+            else:
+                fatal = cond
+        elif result.fatal:
+            fatal = True
+        result.fatal = fatal
 
         # tell the callbacks about the result
-        context.on_result(result)
-        if result.fatal:
-            context.on_fatal(result)
+        Callbacks.on_result(provider, result)
+
+        # if there was a failure, handle it
+        # (common callbacks should abort execution)
+        if fatal:
+            Callbacks.on_fatal(provider, result)
 
         return True
 
     # ---------------------------------------------------------------
 
-    def do_simulate(self, provider, context):
+    def do_simulate(self, host, provider):
         """
         This is the version of apply() that runs in CHECK mode.
         """
@@ -263,46 +305,49 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def signal_changes(self, provider, resource=None, context=None):
+    def signal_changes(self, host=None, provider=None, resource=None):
         """
-        If any events were signalled, add them to the context here.
-        """
+        If any events were signaled, add them to the context here.
+        """    
+        assert host is not None
         if not provider.has_changed():
             return
         if resource.signals:
-            # record the list of all events signalled while processing this role
-            context.add_signal(resource.signals)
+            # record the list of all events signaled while processing this role
+            Context.add_signal(host, resource.signals)
             # tell the callbacks that a signal occurred
-            context.on_flagged(resource.signals)
+            Callbacks.on_signaled(resource, resource.signals)
 
     # ---------------------------------------------------------------
 
-    def execute_resource(self, resource=None, context=None, mode=None, handlers=False):
+    def execute_resource(self, host, resource, handlers=False):
         """
         This handles the plan/apply intercharge for a given resource in the resource tree.
         It is called recursively via walk_children to run against all resources.
         """
+        assert host is not None
+
         # we only care about processing leaf node objects
-        if self.is_collection(resource):
+        if issubclass(type(resource), Collection):
             return
 
-        # if in handler mode we do not process the handler unless it was signalled
-        if handlers and not context.has_seen_any_signal(resource.all_handles()):
-            context.on_skipped(resource, is_handler=handlers)
+        # if in handler mode we do not process the handler unless it was signaled
+        if handlers and not Context.has_seen_any_signal(host, resource.all_handles()):
+            Callbacks.on_skipped(resource, is_handler=handlers)
             return
 
         # tell the callbacks we are about to process a resource
         # they may use this to print information about the resource
-        context.on_resource(resource, handlers)
+        Callbacks.on_resource(resource, handlers)
 
         # plan always, apply() only if not in check mode, else assume
         # the plan was executed.
-        provider = self.plan(resource, context)
+        provider = self.do_plan(resource)
         assert provider is not None
-        if mode == APPLY:
-            self.do_apply(provider, context, handlers)
-        else:
-            self.do_simulate(provider, context)
+        if Context.is_apply():
+            self.do_apply(host, provider, handlers)
+        else: # is_check
+            self.do_simulate(host, provider)
 
         # if anything has changed, let the callbacks know about it
-        self.signal_changes(provider=provider, resource=resource, context=context)
+        self.signal_changes(host=host, provider=provider, resource=resource)

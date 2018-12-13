@@ -22,12 +22,15 @@ from opsmop.core.policy import Policy
 from opsmop.core.resources import Resources
 from opsmop.core.role import Role
 from opsmop.core.roles import Roles
+
 from opsmop.facts.chaos import Chaos
 from opsmop.facts.filetests import FileTests
 from opsmop.facts.platform import Platform
 from opsmop.facts.user_facts import UserFacts
+
 from opsmop.lookups.eval import Eval
 from opsmop.lookups.template import T
+
 from opsmop.types.asserts import Asserts
 from opsmop.types.debug import Debug
 from opsmop.types.debug_facts import DebugFacts
@@ -42,6 +45,10 @@ from opsmop.types.stop import Stop
 from opsmop.types.user import User
 from opsmop.types.group import Group
 
+from opsmop.inventory.toml import TomlInventory
+from opsmop.client.cli import Cli
+
+
 __all__ = [
     # common resources
     'Policy', 'Roles', 'Role', 'Resources', 'Handlers', 
@@ -55,5 +62,11 @@ __all__ = [
     # common types
     'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 
     'Set', 'Stop', 'Asserts', 'Debug', 'DebugFacts', 'User',
-    'Group'
+    'Group',
+
+    # inventory
+    'TomlInventory',
+
+    # cli
+    'Cli'
 ]

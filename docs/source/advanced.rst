@@ -241,7 +241,7 @@ This value is entered into local scope:
             Shell('date', register='date'),
             Debug('date'),
             Echo("{{ date.rc }}"),
-            Echo("{{ date.data }})
+            Echo("{{ date.data }}")
         ])
         return resources
 
@@ -267,6 +267,33 @@ Some of these examples are shown in the 'opsmop-demo' repo.
     registration only works for tasks at the same level of depth. A solution should be provided in the
     near future.
 
+.. _tags:
+
+Tags
+====
+
+OpsMop Tags are a feature where any certain resources in OpsMop can be selectively triggered without running all
+of the other resources in the policy file.  
+
+.. code-block:: python
+
+    class DemoPolicy(Policy):
+    
+        def set_roles(self):
+
+            return Roles(
+                Security(tags=['security']),
+                WebServer(tags=['webserver'])
+            )
+
+In the above example, if the opsmop binary was invoked with "-\\-tags=security", only the security role
+would be processed.
+
+The special tag name 'any' triggers regardless of what is specified with '-\\-tags'.  
+
+Tags can be assigned to any resource or collection and automatically apply to all contained resources.
+This is best demonstrated by the `tags.py <https://github.com/opsmop/opsmop-demo/blob/master/content/basics.py>`_ demo in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo.
+
 .. _ignore_errors:
 
 Ignore Errors
@@ -290,70 +317,53 @@ command.  This is demoed in the :ref:`module_shell` documentation.
 Change Reporting Control
 ========================
 
-.. note::
-   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
-
-A resource will mark itself as containing changes if it performs any actions to the system.
-These changes are used to decide whether to notify :ref:`handlers`.
+Normally, a resource will mark itself as containing changes if it performs any actions to the system.
+Presence of these changes are used to decide whether to notify :ref:`handlers`.
 
 Sometimes, particularly for shell commands, this is not appropriate, and the changed status
 should possibly depend on specific return codes or output. The state can be overriden as follows:
 
 .. code-block:: python
 
-    Shell("/bin/foo --args", register="x", ignore_errors=True, changed_when="'changed' in x.data", notify="some_step")
+    Shell("/bin/foo --args", register="x", changed_when=Eval("'changed' in x.data"), notify="some_step")
 
-If not using handlers, the change reporting isn't too significant, but it will affect CLI output counts at
-the end of the policy execution.  Some users like their policies to report no changes when nothing really
-happened, and that's a good practice.
+If not using handlers, the change reporting isn't too significant, but is still useful to record whether or not
+the policy evaluation made any changes. 
+
+If no 'changed_when' clause is added to the Shell resource, it will always record that it made a change.
 
 .. _failed_when:
 
 Failure Status Overrides
 ========================
 
-.. note::
-   This is a pending feature not quite yet in the codebase - this feature will be released shortly.
+By default, if a resource returns a fatal error, the program will halt at that point. What causes an error like this? 
+Errors could be a non-zero exit code from the :ref:`module_shell`, or any other time a provider might return a failed result that is not
+a runtime exception. 
 
-By default if a command returns a fatal error, the program will halt at this step.  This is not
-always good, as sometimes, failure should depend on something other than that error status.
+The problem is, sometimes return codes are not reliable.  Other times, return codes are not enough.
 
-At the most basic level, 'failed_when' is equivalent to 'ignore_errors':
+Here are a few examples of controlling when a resource should be considered failed:
+
+.. code-block:: python
+
+    Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 5")
 
 .. code-block:: python
     
-    Shell("/bin/foo --args", register="x", failed_when=False)
-
-In a more practical example, suppose we have a shell command that is programmed incorrectly and 
-returns 5 on success. To deal with that, we might do this:
-
-.. code-block:: python
-
-    Shell("/bin/foo --args", register="x", failed_when="x.rc != 5")
-
-What if we have a shell command that we should consider failed if it doesn't contain the word "SUCCESS" in the output?
-We might do this:
-
-.. code-block:: python
-    
-    Shell("/bin/foo --args", register="x", failed_when="not 'SUCCESS' in data")
+    Shell("/bin/foo --args", register="x", failed_when=Eval("x.rc != 0 or not 'SUCCESS' in x.data"))
 
 It may also be clearer to save that conditional string to a class or
 package variable and use it this way:
 
 .. code-block:: python
 
-    SUCCESS_IN_OUTPUT = "not 'SUCCESS' in data"
+    SUCCESS_IN_OUTPUT = Eval("x.rc != 0 or not 'SUCCESS' in x.data")
     # ...
     def set_resources(self):
         # ...
         Shell("/bin/foo --args", register="x", failed_when=SUCCESS_IN_OUTPUT)
         # ...
-
-.. note::
-
-    Because OpsMop is pure Python it is very easy to assign variables, so when possible do so
-    to increase readability.
 
 .. _hooks:
 
