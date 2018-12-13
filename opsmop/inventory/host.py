@@ -67,9 +67,9 @@ class Host(object):
         
         (role_sudo_username, role_sudo_password) = role.sudo_as()
         if role_sudo_username is None:
-            role_sudo_username = host.sudo_username()
+            role_sudo_username = self.sudo_username()
         if role_sudo_password is None:
-            role_sudo_password = host.sudo_password()
+            role_sudo_password = self.sudo_password()
 
         (role_ssh_username, role_ssh_password) = role.ssh_as()
         if role_ssh_username is None:
