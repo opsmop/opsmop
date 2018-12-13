@@ -38,17 +38,24 @@ class ConnectionManager(object):
         """
         self.broker = mitogen.master.Broker()
         self.router = mitogen.master.Router(self.broker)
+        self.file_service = mitogen.service.FileService(self.router)
+        self.pool = mitogen.service.Pool(self.router, services=[self.file_service])
+
         self.events_select = mitogen.select.Select(oneshot=False)
         self.replay_callbacks = ReplayCallbacks()
 
         self.calls_sel = mitogen.select.Select()
         self.status_recv = mitogen.core.Receiver(self.router)
+        self.myself = mitogen.core.Context(self.router, mitogen.context_id)
+
         self.hosts_by_context = dict()
 
-        # self.calls_select = mitogen.select.Select(oneshot=False)
         self.connections = dict()
         self.hosts = dict()
         self.context = dict()
+
+        self.register_files(self.file_service)
+
 
     def add_hosts(self, new_hosts):
         """
@@ -130,25 +137,10 @@ class ConnectionManager(object):
         self.events_select.add(receiver)
         sender = self.status_recv.to_sender()
 
-
-        # file_service = mitogen.service.FileService(conn.router)
-        file_service = mitogen.service.FileService(self.router)
-
-
-        # Start the pool.
-        pool = mitogen.service.Pool(conn.router, services=[file_service])
-
-        self.register_files(file_service)
-
-        # myself = mitogen.core.Context(conn.router, mitogen.context_id)
-        myself = mitogen.core.Context(self.router, mitogen.context_id)
-
-
-        call_recv = conn.call_async(remote_fn, myself, dill.dumps(host), dill.dumps(policy), dill.dumps(role), mode, sender)
+        call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(host), dill.dumps(policy), dill.dumps(role), mode, sender)
         self.calls_sel.add(call_recv)
 
         # stop the fileserver or this will hang
-        pool.stop(join=True)
 
         return True
 
@@ -184,6 +176,8 @@ class ConnectionManager(object):
                     # all done for host
                 except mitogen.core.CallError as e:
                     print('Task failed on host %s: %s' % (host.name, e))
+
+        self.pool.stop(join=True)
 
 
 def remote_fn(caller, host, policy, role, mode, sender):
