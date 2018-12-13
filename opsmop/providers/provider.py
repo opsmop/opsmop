@@ -24,6 +24,7 @@ from opsmop.core.context import Context
 import mitogen
 import io
 import logging
+import os
 
 logger = logging.getLogger("opsmop")
 
@@ -54,6 +55,7 @@ class Provider(object):
         if caller:
             # PUSH MODE
             bio = io.BytesIO()            
+            src = os.path.join(Context.relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if ok:
                 fd = open(dest, "w")
@@ -75,6 +77,7 @@ class Provider(object):
         if caller:
             bio = io.BytesIO()
             logger.debug("slurp: %s" % src)
+            src = os.path.join(Context.relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             logger.debug("slurp ok!")
             data = bio.getvalue()

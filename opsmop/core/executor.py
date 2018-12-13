@@ -108,9 +108,9 @@ class Executor(object):
         Runs all policies in the specified mode
         """
         Context.set_mode(mode)
-        if self._push:
-            self.connection_manager = ConnectionManager()
         for policy in self._policies:     
+            if self._push:
+                self.connection_manager = ConnectionManager(policy)
             self.run_policy(policy=policy)
 
 

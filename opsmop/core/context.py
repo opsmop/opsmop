@@ -44,6 +44,16 @@ class Context(object):
         HOST = host
 
     @classmethod
+    def relative_root(cls):
+        global RELATIVE_ROOT
+        return RELATIVE_ROOT
+
+    @classmethod
+    def set_relative_root(cls, root):
+        global RELATIVE_ROOT
+        RELATIVE_ROOT = root
+
+    @classmethod
     def host(cls):
         return host
 

@@ -29,10 +29,11 @@ import mitogen.service
 
 import time
 import os
+import sys
 
 class ConnectionManager(object):
 
-    def __init__(self):
+    def __init__(self, policy):
         """
         Constructor.  Establishes mitogen router/broker.
         """
@@ -53,6 +54,9 @@ class ConnectionManager(object):
         self.connections = dict()
         self.hosts = dict()
         self.context = dict()
+
+        abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
+        self.relative_root = os.path.dirname(abspath)
 
         self.register_files(self.file_service)
 
@@ -122,8 +126,7 @@ class ConnectionManager(object):
         return result
 
     def register_files(self, file_service):
-        cwd = os.getcwd()
-        for root, dirs, files in os.walk(cwd):
+        for root, dirs, files in os.walk(self.relative_root):
             for f in files:
                 path = os.path.join(root, f)
                 print("Registering file: %s" % path)
@@ -131,16 +134,26 @@ class ConnectionManager(object):
 
     def process_remote_role(self, host, policy, role, mode):
 
+        fileserving_paths = role.fileserving_paths()
+        for p in fileserving_paths:
+            self.register_files(p)
+
         import dill
         conn = self.connect(host, role)
         receiver = mitogen.core.Receiver(self.router)
         self.events_select.add(receiver)
         sender = self.status_recv.to_sender()
 
-        call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(host), dill.dumps(policy), dill.dumps(role), mode, sender)
-        self.calls_sel.add(call_recv)
+        params = dict(
+            host = host,
+            policy = policy,
+            role = role, 
+            mode = mode,
+            relative_root = self.relative_root
+        )
 
-        # stop the fileserver or this will hang
+        call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(params), sender)
+        self.calls_sel.add(call_recv)
 
         return True
 
@@ -180,7 +193,7 @@ class ConnectionManager(object):
         self.pool.stop(join=True)
 
 
-def remote_fn(caller, host, policy, role, mode, sender):
+def remote_fn(caller, params, sender):
     """
     This is the remote function used for mitogen calls
     """
@@ -188,11 +201,17 @@ def remote_fn(caller, host, policy, role, mode, sender):
     import dill
     from opsmop.core.executor import Executor
 
-    host = dill.loads(host)
-    policy = dill.loads(policy)
-    role = dill.loads(role)
+    params = dill.loads(params)
+    host = params['host']
+    policy = params['policy']
+    role = params['role']
+    mode = params['mode']
+    relative_root = params['relative_root']
+
     Context.set_mode(mode)
     Context.set_caller(caller)
+    Context.set_relative_root(relative_root)
+    
     policy.items = Roles(role)
     Callbacks.set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
     executor = Executor([ policy ], local_host=host, push=False) # remove single_role
