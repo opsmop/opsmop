@@ -53,8 +53,9 @@ class Provider(object):
         """
         caller = Context.caller()
         if caller:
-            bio = open(dest, "wb", buffering=0)         
-            src = os.path.join(Context.relative_root(), src)
+            bio = open(dest, "wb", buffering=0)     
+            if not src.startswith('/'):    
+                src = os.path.join(Context.relative_root(), src)
             logger.debug("SRC:%s" % src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if not ok:
@@ -70,7 +71,8 @@ class Provider(object):
         if caller:
             bio = io.BytesIO()
             logger.debug("slurp: %s" % src)
-            src = os.path.join(Context.relative_root(), src)
+            if not src.startswith('/'):    
+                src = os.path.join(Context.relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             logger.debug("slurp ok!")
             data = bio.getvalue().decode('utf-8')

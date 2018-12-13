@@ -56,7 +56,7 @@ class Role(Collection):
     def set_handlers(self):
         return Handlers()
 
-    def fileserving_paths(self):
+    def allow_fileserving_paths(self):
         return []
 
     def sudo(self):

@@ -30,6 +30,7 @@ import mitogen.service
 import time
 import os
 import sys
+import fnmatch
 
 class ConnectionManager(object):
 
@@ -58,7 +59,8 @@ class ConnectionManager(object):
         abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
         self.relative_root = os.path.dirname(abspath)
 
-        self.register_files(self.file_service)
+        self.allow_patterns = policy.allow_fileserving_patterns()
+        self.deny_patterns  = policy.deny_fileserving_patterns()
 
 
     def add_hosts(self, new_hosts):
@@ -125,17 +127,34 @@ class ConnectionManager(object):
             self.hosts_by_context[result.context_id] = host
         return result
 
-    def register_files(self, file_service):
-        for root, dirs, files in os.walk(self.relative_root):
+    def is_allowed_to_serve(self, path):
+        allowed = False
+        for pattern in self.allow_patterns:
+            if fnmatch.fnmatch(path, pattern):
+                allowed = True
+                continue
+        if not allowed:
+            return False
+        for pattern in self.deny_patterns:
+            if fnmatch.fnmatch(path, pattern):
+                return False
+        return True
+
+    def register_files(self, path):
+        for root, dirs, files in os.walk(path):
             for f in files:
                 path = os.path.join(root, f)
-                print("Registering file: %s" % path)
-                file_service.register(path)
+                if self.is_allowed_to_serve(path):
+                     self.file_service.register(path)
 
     def process_remote_role(self, host, policy, role, mode):
 
-        fileserving_paths = role.fileserving_paths()
+        fileserving_paths = role.allow_fileserving_paths()
+        if fileserving_paths is None:
+            fileserving_paths = policy.allow_fileserving_paths()
         for p in fileserving_paths:
+            if p == '.':
+                p = self.relative_root
             self.register_files(p)
 
         import dill

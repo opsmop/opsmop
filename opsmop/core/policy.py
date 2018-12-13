@@ -25,6 +25,8 @@ from opsmop.facts.chaos import Chaos
 
 class Policy(Collection):
 
+    DEFAULT_DENY_FILESERVING_PATTERNS = [ '*.py', "*__pycache__*", '*.pyo', '*.pyc', '.git', '.bak', '.swp' ]
+
     def __init__(self, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
@@ -52,6 +54,17 @@ class Policy(Collection):
 
     def get_children(self):
         return self.roles
+
+    def allow_fileserving_paths(self):
+        # "." means the directory where the policy file is.
+        return [ '.' ]
+
+    def allow_fileserving_patterns(self):
+        # ex: [ '*.j2', '*.txt' ]
+        return [ '*' ]
+
+    def deny_fileserving_patterns(self):
+        return self.DEFAULT_DENY_FILESERVING_PATTERNS
 
     @memoize
     def fact_context(self):
