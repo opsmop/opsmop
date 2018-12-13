@@ -31,16 +31,16 @@ class File(Provider):
    
     def should_replace_using_template(self):
         """ for from_template , should we write the template? """
-        print("SRUT")
-        if not FileTests.exists(self.name):
-            return True
+
         if not self.overwrite:
             return False
-        logger.debug("debug: before slurping!!!")
+
         data = self.slurp(self.from_template)
-        logger.debug("debug: after slurping done!!!")
 
         self.evaluated_template = Template.from_string(data, self.resource)
+        
+        if not FileTests.exists(self.name):
+            return True
         c1 = FileTests.string_checksum(self.evaluated_template)
         c2 = FileTests.checksum(self.name)
         return c1 != c2
@@ -74,6 +74,7 @@ class File(Provider):
 
     def plan(self):
         """ what actions are needed? """
+
 
         exists = FileTests.exists(self.name)
 

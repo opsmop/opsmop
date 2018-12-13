@@ -26,13 +26,12 @@ class TomlInventory(Inventory):
     def __init__(self, filename):
         super().__init__()
         self._path = os.path.expanduser(os.path.expandvars(filename))
-        if not self._loaded and not os.path.exists(self._path):
-            raise InventoryError(msg="TOML inventory does not exist at: %s" % self._path)
-        self.load()
 
     def load(self):
         if self._loaded:
             return self
+        if not os.path.exists(self._path):
+            raise InventoryError(msg="TOML inventory does not exist at: %s" % self._path)
         data = open(self._path).read()
         data = toml.loads(data)
         self.accumulate(data)

@@ -56,12 +56,18 @@ class Provider(object):
             # PUSH MODE
             bio = io.BytesIO()            
             src = os.path.join(Context.relative_root(), src)
+            logger.debug("SRC:%s" % src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if ok:
-                fd = open(dest, "w")
+                fd = open(dest, "wb")
                 data = bio.read(512)
+                logger.debug(data)
+                fd.write(data)
+                logger.debug("~")
                 while data:
                     fd.write(data)
+                    logger.debug(data)
+                    logger.debug("~")
                     data = bio.read(512)
                 fd.close()
             else:
@@ -80,7 +86,7 @@ class Provider(object):
             src = os.path.join(Context.relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             logger.debug("slurp ok!")
-            data = bio.getvalue()
+            data = bio.getvalue().decode('utf-8')
             bio.close()
             return data
         else:

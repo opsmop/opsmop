@@ -15,6 +15,7 @@
 
 import sys
 import argparse
+import os
 
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.local import LocalCliCallbacks
@@ -22,9 +23,6 @@ from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.api import Api
 from opsmop.core.errors import OpsMopError
-
-# import argparse
-
 
 USAGE = """
 |
@@ -90,6 +88,10 @@ class Cli(object):
             tags = args.tags.strip().split(",")
 
         api = Api(policies=[self.policy], tags=tags, push=args.push)
+
+        abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
+        os.chdir(os.path.dirname(abspath))
+
         try:
             if args.validate:
                 # just check for missing files and invalid types

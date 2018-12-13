@@ -153,6 +153,9 @@ class Inventory(object):
     def hosts(self):
         return self._hosts
 
+    def all(self):
+        return self.filter()
+
     def filter(self, groups=None, hosts=None):
         """
         Given a list of fnmatch-style group patterns and fnmatch-style host patterns,
