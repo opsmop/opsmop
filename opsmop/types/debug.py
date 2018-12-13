@@ -15,6 +15,7 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
+from opsmop.providers.debug import Debug as DebugProvider
 
 class Debug(Type):
 
@@ -33,5 +34,4 @@ class Debug(Type):
         )
 
     def default_provider(self):
-        from opsmop.providers.debug import Debug
-        return Debug
+        return DebugProvider

@@ -53,25 +53,12 @@ class Provider(object):
         """
         caller = Context.caller()
         if caller:
-            # PUSH MODE
-            bio = io.BytesIO()            
+            bio = open(dest, "wb", buffering=0)         
             src = os.path.join(Context.relative_root(), src)
             logger.debug("SRC:%s" % src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
-            if ok:
-                fd = open(dest, "wb")
-                data = bio.read(512)
-                logger.debug(data)
-                fd.write(data)
-                logger.debug("~")
-                while data:
-                    fd.write(data)
-                    logger.debug(data)
-                    logger.debug("~")
-                    data = bio.read(512)
-                fd.close()
-            else:
-                raise Exception("not ok")
+            if not ok:
+               raise Exception("file transfer failed")
         else:
             shutil.copy2(src, dest)
 

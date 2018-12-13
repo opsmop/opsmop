@@ -26,30 +26,7 @@ from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 
-#import mitogen.core
-#import mitogen.master
-#import mitogen.select
-#import mitogen.utils
-
 import time
-
-
-def remote_fn(host, policy, role, mode, sender):
-    """
-    This is the remote function used for mitogen calls
-    """
-    import dill
-    host = dill.loads(host)
-    policy = dill.loads(policy)
-    role = dill.loads(role)
-    Context.set_mode(mode)
-    policy.items = Roles(role)
-    Callbacks.set_callbacks([ EventStreamCallbacks(sender=sender), CommonCallbacks() ])
-    executor = Executor([ policy ], push=False) # remove single_role
-    # FIXME: care about mode
-    executor.apply()
-
-      
 
 # ---------------------------------------------------------------
 
