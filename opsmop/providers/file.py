@@ -15,11 +15,15 @@
 import os
 import shutil
 from pathlib import Path
+import logging
 
 from opsmop.core.errors import ProviderError
 from opsmop.facts.filetests import FileTests
 from opsmop.core.template import Template
 from opsmop.providers.provider import Provider
+from opsmop.core.context import Context
+
+logger = logging.getLogger('opsmop')
 
 class File(Provider):
 
@@ -27,11 +31,16 @@ class File(Provider):
    
     def should_replace_using_template(self):
         """ for from_template , should we write the template? """
+        print("SRUT")
         if not FileTests.exists(self.name):
             return True
         if not self.overwrite:
             return False
-        self.evaluated_template = Template.from_file(self.from_template, self.resource)
+        logger.debug("debug: before slurping!!!")
+        data = self.slurp(self.from_template)
+        logger.debug("debug: after slurping done!!!")
+
+        self.evaluated_template = Template.from_string(data, self.resource)
         c1 = FileTests.string_checksum(self.evaluated_template)
         c2 = FileTests.checksum(self.name)
         return c1 != c2
@@ -56,6 +65,9 @@ class File(Provider):
             return True
         if not self.overwrite:
             return False
+        if Context.caller():
+            # currently, push mode would have to download the file to checksum it
+            return True
         return not FileTests.same_contents(self.name, self.from_file)
 
     # ---------------------------------------------------------------
@@ -114,7 +126,7 @@ class File(Provider):
 
         elif self.should('copy_file'):
             self.do('copy_file')
-            shutil.copy2(self.from_file, self.name)
+            self.copy_file(self.from_file, self.name)
 
         elif self.should('copy_template'):
             self.do('copy_template')

@@ -15,6 +15,7 @@
 HOST = None
 HOST_SIGNALS = dict()
 MODE = None
+CALLER = None
 
 VALIDATE = 'validate'
 CHECK = 'check'
@@ -27,6 +28,15 @@ class Context(object):
         global MODE
         assert mode in [ VALIDATE, CHECK, APPLY ]
         MODE = mode
+
+    @classmethod
+    def set_caller(cls, caller):
+        global CALLER
+        CALLER = caller
+
+    @classmethod
+    def caller(cls):
+        return CALLER
 
     @classmethod
     def set_host(cls, host):

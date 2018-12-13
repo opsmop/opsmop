@@ -39,9 +39,6 @@ class File(Type):
     def validate(self):
         v = Validators(self)
         v.mutually_exclusive(['from_file', 'from_template', 'from_content'])
-        v.mutually_exclusive(['directory', 'from_file'])
-        v.mutually_exclusive(['directory', 'from_template'])
-        v.mutually_exclusive(['directory', 'from_content'])
         v.path_exists(self.from_file)
         v.path_exists(self.from_template)
 
