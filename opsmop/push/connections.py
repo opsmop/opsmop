@@ -118,8 +118,8 @@ class ConnectionManager(object):
         cwd = os.getcwd()
         for root, dirs, files in os.walk(cwd):
             for f in files:
-                print("Registering file: %s" % f)
                 path = os.path.join(root, f)
+                print("Registering file: %s" % path)
                 file_service.register(path)
 
     def process_remote_role(self, host, policy, role, mode):
@@ -131,14 +131,18 @@ class ConnectionManager(object):
         sender = self.status_recv.to_sender()
 
 
-        file_service = mitogen.service.FileService(conn.router)
+        # file_service = mitogen.service.FileService(conn.router)
+        file_service = mitogen.service.FileService(self.router)
+
 
         # Start the pool.
         pool = mitogen.service.Pool(conn.router, services=[file_service])
 
         self.register_files(file_service)
 
-        myself = mitogen.core.Context(conn.router, mitogen.context_id)
+        # myself = mitogen.core.Context(conn.router, mitogen.context_id)
+        myself = mitogen.core.Context(self.router, mitogen.context_id)
+
 
         call_recv = conn.call_async(remote_fn, myself, dill.dumps(host), dill.dumps(policy), dill.dumps(role), mode, sender)
         self.calls_sel.add(call_recv)

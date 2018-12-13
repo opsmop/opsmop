@@ -46,14 +46,15 @@ class Provider(object):
         # isn't this already copied over - safe to remove?
         # self.name = getattr(self.resource, 'name', None)
 
-    def copy(self, src, dest):
+    def copy_file(self, src, dest):
         """
         Copy a file in local mode, or download from the fileserver in push mode
         """
-        if Context.caller():
+        caller = Context.caller()
+        if caller:
             # PUSH MODE
             bio = io.BytesIO()            
-            ok, metadata = mitogen.service.FileService.get(context, dest, bio)
+            ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if ok:
                 fd = open(dest, "w")
                 data = bio.read(512)
@@ -61,6 +62,8 @@ class Provider(object):
                     fd.write(data)
                     data = bio.read(512)
                 fd.close()
+            else:
+                raise Exception("not ok")
         else:
             shutil.copy2(src, dest)
 
@@ -71,7 +74,7 @@ class Provider(object):
         caller = Context.caller()
         if caller:
             bio = io.BytesIO()
-            logger.debug("slurp!")
+            logger.debug("slurp: %s" % src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             logger.debug("slurp ok!")
             data = bio.getvalue()
