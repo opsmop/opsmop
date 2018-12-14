@@ -59,6 +59,9 @@ class EventStreamCallbacks(BaseCallbacks):
     def on_echo(self, provider, echo):
         self.event('echo', provider=provider, data=echo)
 
+    def on_complete(self, policy):
+        self.event('complete', policy=policy)
+
     def event(self, name, **kwargs):
         data = dict()
         data['evt'] = name

@@ -50,6 +50,7 @@ class Context(object):
 
     @classmethod
     def set_role(cls, role):
+        global ROLE
         ROLE = role
         return ROLE
 

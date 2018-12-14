@@ -110,14 +110,17 @@ class ConnectionManager(object):
         # a user that has full sudo privs.
 
         context = host.connection_context(role)
-        remote = self.router.ssh(
-            python_path=host.python_path(), 
-            hostname=context['hostname'], 
-            check_host_keys=context['check_host_keys'], 
-            username=context['username'], 
-            password=context['password'],
-            via=parent
-        )
+        if host.hostname() != "127.0.0.1":
+            remote = self.router.ssh(
+                python_path=host.python_path(), 
+                hostname=context['hostname'], 
+                check_host_keys=context['check_host_keys'], 
+                username=context['username'], 
+                password=context['password'],
+                via=parent
+            )
+        else:
+            remote = self.router.local()
         self.hosts_by_context[remote.context_id] = host
         self.connections[host.name] = remote
         self.context[host.name] = context
