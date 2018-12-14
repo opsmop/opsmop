@@ -165,14 +165,3 @@ class LocalCliCallbacks(BaseCallbacks):
 
     def on_host_exception(self, host, exc):
         pass
-
-    def on_terminate_with_host_list(self, failed_hosts):
-        
-        if len(failed_hosts) == 1 and failed_hosts[0].name == "127.0.0.1":
-            return
-
-        print("")
-        print("POLICY FAILED. The following hosts had failures: ")
-        for h in failed_hosts:
-            print("    - %s " % h.name)
-        print("")

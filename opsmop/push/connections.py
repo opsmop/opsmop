@@ -186,6 +186,7 @@ class ConnectionManager(object):
             return False
  
         target_host = self.actual_host(role, host)
+        target_host.reset_actions()
         
         import dill
         conn = self.connect(host, role)

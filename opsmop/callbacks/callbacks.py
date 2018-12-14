@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# NOTE: this interface is subject to change
-
 from opsmop.core.common import Singleton
+
+# TODO: __getattr__ this beast and eliminate all of these methods
 
 class Callbacks(metaclass=Singleton):
 
@@ -102,3 +102,7 @@ class Callbacks(metaclass=Singleton):
 
     def on_terminate_with_host_list(self, host_list):
         self._run_callbacks('on_terminate_with_host_list', host_list)
+
+    def on_host_changed_list(self, hosts):
+        self._run_callbacks('on_host_changed_list', hosts)
+

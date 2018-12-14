@@ -19,9 +19,9 @@ class Result(object):
     in which case there should be an array of results (FIXME?)   
     """
 
-    __slots__ = [ 'rc', 'provider', 'resource', 'data', 'fatal', 'message', 'data', 'primary', 'reason' ]
+    __slots__ = [ 'rc', 'provider', 'resource', 'data', 'fatal', 'message', 'data', 'primary', 'reason', 'changed', 'actions' ]
 
-    def __init__(self, provider, changed=True, message=None, rc=None, data=None, fatal=False, primary=True, reason=None):
+    def __init__(self, provider, changed=None, message=None, rc=None, data=None, fatal=False, primary=True, reason=None, actions=None):
 
         """
         A result can be constructed with many parameters, most of which have reasonable defaults:
@@ -33,6 +33,8 @@ class Result(object):
         fatal - a flag that indicates the result should probably end the program, but it is up to the callback code
         primary - indicates that the result is the final return of a module, as opposed to an intermediate command result
         reason - if set, the lookup used in evaluating the failure status of the result (for failed_when, etc). 
+        changed - did any resources change?
+        actions - what actions were run?
         """
         self.provider = provider
         self.resource = provider.resource
@@ -41,6 +43,8 @@ class Result(object):
         self.fatal = fatal
         self.message = message
         self.primary = primary
+        self.changed = changed
+        self.actions = actions
         self.reason = None
 
     def is_ok(self):
@@ -64,4 +68,4 @@ class Result(object):
         reason = self.reason
         if self.reason is not None:
             reason = self.reason.to_dict()
-        return dict(cls=self.__class__.__name__, rc=self.rc, data=self.data, fatal=self.fatal, message=self.message, reason=reason)
+        return dict(cls=self.__class__.__name__, rc=self.rc, data=self.data, actions=self.actions, changed=self.changed, fatal=self.fatal, message=self.message, reason=reason)

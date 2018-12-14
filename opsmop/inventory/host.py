@@ -17,12 +17,24 @@ from opsmop.client.user_defaults import UserDefaults
 
 class Host(object):
 
+    __slots__ = [ 'name', 'variables', '_groups', '_actions' ]
+
     def __init__(self, name, variables=None):
         self.name = name
         if variables is None:
             variables = dict()
         self.variables = variables
         self._groups = dict()
+        self._actions = []
+
+    def record_actions(self, actions):
+        self._actions.extend(actions)
+
+    def reset_actions(self):
+        self._actions = []
+
+    def actions(self):
+        return self._actions
 
     def update_variables(self, variables):
         self.variables.update(variables)

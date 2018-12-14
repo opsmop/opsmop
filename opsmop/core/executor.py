@@ -17,6 +17,7 @@ import time
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.replay import ReplayCallbacks
 from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.collection import Collection
 from opsmop.core.context import APPLY, CHECK, VALIDATE, Context
@@ -74,7 +75,7 @@ class Executor(object):
 
     def apply(self):
         """
-        apply runs .plan() and then .apply() provider methods and will actually
+        apply runs .plan() and then () provider methods and will actually
         make changes, as opposed to check(), which is a simulation.
         """
         self.run_all_policies(mode=APPLY)
@@ -158,11 +159,16 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def process_failed_hosts(self, hosts):
+    def process_summary(self, hosts):
         failures = Context().host_failures()
         failed_hosts = [ f for f in failures.keys() ]
+        changed_hosts = [ h for h in hosts if h.actions() ]
+        
+        if len(changed_hosts):
+            ReplayCallbacks().on_host_changed_list(hosts)
+
         if len(failed_hosts):
-            Callbacks().on_terminate_with_host_list(failed_hosts)
+            ReplayCallbacks().on_terminate_with_host_list(failed_hosts)
             raise OpsMopStop()
 
     # ---------------------------------------------------------------
@@ -186,7 +192,7 @@ class Executor(object):
         self.connection_manager.prepare_for_role(role)
         self.run_roles_on_all_hosts(hosts, policy, role, batch_size)
         self.connection_manager.event_loop()
-        self.process_failed_hosts(hosts)
+        self.process_summary(hosts)
 
     # ---------------------------------------------------------------
 
@@ -316,6 +322,12 @@ class Executor(object):
         elif result.fatal:
             fatal = True
         result.fatal = fatal
+        result.changed = provider.has_changed()
+        # TODO: eliminate the actions class
+        if result.changed:
+            result.actions = [ x.do for x in provider.actions_taken ]
+        else:
+            result.actions = []
 
         # tell the callbacks about the result
         Callbacks().on_result(provider, result)

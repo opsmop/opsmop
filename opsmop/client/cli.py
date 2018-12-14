@@ -17,6 +17,8 @@ import argparse
 import os
 import sys
 
+from colorama import init as colorama_init
+
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
@@ -46,6 +48,8 @@ class Cli(object):
         self.go()
  
     def go(self):
+
+        colorama_init()
        
         if len(self.args) < 3 or sys.argv[1] == "--help":
             print(USAGE)
