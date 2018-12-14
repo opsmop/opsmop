@@ -89,7 +89,7 @@ class Executor(object):
         Context().set_mode(mode)
         for policy in self._policies:     
             if self._push:
-                self.connection_manager = ConnectionManager(policy)
+                self.connection_manager = ConnectionManager(policy, self._tags)
             self.run_policy(policy=policy)
 
 

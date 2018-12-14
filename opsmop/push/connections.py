@@ -36,7 +36,7 @@ from opsmop.inventory.host import Host
 
 class ConnectionManager(object):
 
-    def __init__(self, policy):
+    def __init__(self, policy, tags):
         """
         Constructor.  Establishes mitogen router/broker.
         """
@@ -47,6 +47,7 @@ class ConnectionManager(object):
         self.connections = dict()
         self.hosts = dict()
         self.context = dict()
+        self.tags = tags
         self.allow_patterns = policy.allow_fileserving_patterns()
         self.deny_patterns  = policy.deny_fileserving_patterns()
         abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
@@ -199,7 +200,8 @@ class ConnectionManager(object):
             policy = policy,
             role = role, 
             mode = mode,
-            relative_root = self.relative_root
+            relative_root = self.relative_root,
+            tags = self.tags
         )
 
         call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(params), sender)
@@ -272,15 +274,17 @@ def remote_fn(caller, params, sender):
     policy = params['policy']
     role = params['role']
     mode = params['mode']
+    tags = params['tags']
     relative_root = params['relative_root']
 
     Context().set_mode(mode)
     Context().set_caller(caller)
     Context().set_relative_root(relative_root)
+
     
     policy.roles = Roles(role)
 
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
-    executor = Executor([ policy ], local_host=host, push=False) # remove single_role
+    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags']) # remove single_role
     # FIXME: care about mode
     executor.apply()
