@@ -38,6 +38,7 @@ class ConnectionManager(object):
         """
         Constructor.  Establishes mitogen router/broker.
         """
+        self.policy = policy
         self.broker = mitogen.master.Broker()
         self.router = mitogen.master.Router(self.broker)
         self.hosts_by_context = dict()
@@ -58,6 +59,14 @@ class ConnectionManager(object):
         self.calls_sel = mitogen.select.Select()
         self.status_recv = mitogen.core.Receiver(self.router)
         self.myself = mitogen.core.Context(self.router, mitogen.context_id)
+
+        fileserving_paths = role.allow_fileserving_paths()
+        if fileserving_paths is None:
+            fileserving_paths = self.policy.allow_fileserving_paths()
+        for p in fileserving_paths:
+            if p == '.':
+                p = self.relative_root
+            self.register_files(p)
 
     def add_hosts(self, new_hosts):
         """
@@ -143,20 +152,8 @@ class ConnectionManager(object):
                 if self.is_allowed_to_serve(path):
                      self.file_service.register(path)
 
-    def process_remote_role(self, host, policy, role, mode):
-
-        self.prepare_for_role(role)
-
-        Callbacks.on_resource(role, False)
+    def remotify_role(self, host, policy, role, mode):
         
-        fileserving_paths = role.allow_fileserving_paths()
-        if fileserving_paths is None:
-            fileserving_paths = policy.allow_fileserving_paths()
-        for p in fileserving_paths:
-            if p == '.':
-                p = self.relative_root
-            self.register_files(p)
-
         import dill
         conn = self.connect(host, role)
         receiver = mitogen.core.Receiver(self.router)
@@ -214,17 +211,17 @@ class ConnectionManager(object):
                         Context.record_host_failure(host, e)
 
                         if 'opsmop.core.errors' in str(e):
-                            # it's cool, callbacks should have already eaten it
+                            # callbacks should have already eaten it
                             pass
                         else:                          
                             raise e
-                        #print(dir(e))
-                        #print(e.__traceback__)
-                        #print(type(e))
-                        #print('Task failed on host %s: %s' % (host.name, e))
+
             
         finally:
+            print("CLOSING")
             both_sel.close()
+            self.calls_sel.close()
+            self.status_recv.close()
 
         self.pool.stop(join=True)
 

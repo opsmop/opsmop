@@ -57,7 +57,6 @@ class Provider(object):
             bio = open(dest, "wb", buffering=0)     
             if not src.startswith('/'):    
                 src = os.path.join(Context.relative_root(), src)
-            logger.debug("SRC:%s" % src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if not ok:
                raise Exception("file transfer failed")
@@ -71,11 +70,9 @@ class Provider(object):
         caller = Context.caller()
         if caller:
             bio = io.BytesIO()
-            logger.debug("slurp: %s" % src)
             if not src.startswith('/'):    
                 src = os.path.join(Context.relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
-            logger.debug("slurp ok!")
             data = bio.getvalue().decode('utf-8')
             bio.close()
             return data

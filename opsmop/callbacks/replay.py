@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from opsmop.callbacks.callback import BaseCallbacks
+from opsmop.core.context import Context
 
 class ReplayCallbacks(BaseCallbacks):
    
@@ -21,19 +22,32 @@ class ReplayCallbacks(BaseCallbacks):
         self.info(host, self.resource(evt))
 
     def on_execute_command(self, host, evt):
+        if not Context.verbose():
+            return
         self.info(host, self.command(evt))
 
     def on_complete(self, host, evt):
         self.info(host, 'complete')
 
     def on_result(self, host, evt):
-        self.info(host, self.result(evt))
+        self.info(host, self.result(evt), sep='=')
 
     def on_default(self, host, evt):
-        print(f"** DEBUG: {host.name} : {evt}")
+        #print(f"** DEBUG: {host.name} : {evt}")
+        pass
 
     def on_fatal(self, host, evt):
         self.info(host, "failed")
+
+    def on_command_echo(self, host, evt):
+        if not Context.verbose():
+            return
+        self.info(host, "| %s" % evt['data'])
+
+    def on_echo(self, host, evt):
+        if not Context.verbose():
+            return
+        self.info(host, "| %s" % evt['data'])
 
     def on_signaled(self, host, evt):
         self.info(host, self.signaled(evt))
@@ -41,7 +55,14 @@ class ReplayCallbacks(BaseCallbacks):
     # ----
 
     def resource(self, evt):
-        return "processing: %s" % evt['resource']['cls']
+        caption = evt['resource']['cls']
+        name = evt['resource'].get('name', None)
+        if name:
+            caption = caption + " (%s)" % name
+        if evt['is_handler']:
+            return "handler: %s" % caption
+        else:
+            return "resource: %s" % caption
 
     def command(self, evt):
         cmd = evt['data']['cmd']
@@ -61,16 +82,17 @@ class ReplayCallbacks(BaseCallbacks):
             caption = caption + ", rc=%s" % rc
         if message is not None:
             caption = caption + ", %s" % message
-        return "result: %s" % caption
+        return "%s" % caption
 
     def signaled(self, evt):
-        return "signaled: %s" % str(evt)
+        return "signaled: %s" % evt['data']
 
-    def info(self, host, msg):
+    def info(self, host, msg, sep=':'):
         hostname = host.hostname()
         caption = host.name
         if host.name != hostname:
             caption = "%s (%s)" % (host.name, hostname)
-        self.i3("%s => %s" % (caption, msg))
+        self.i3("%s %s %s" % (caption, sep, msg))
+
 
     

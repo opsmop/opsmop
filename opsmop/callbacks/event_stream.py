@@ -49,6 +49,15 @@ class EventStreamCallbacks(BaseCallbacks):
     def on_fatal(self, provider, msg=None):
         self.event('fatal', provider=provider, data=msg)
 
+    def on_command_result(self, provider, result):
+        self.event('command_result', provider=provider, data=result)
+
+    def on_command_echo(self, provider, echo):
+        self.event('command_echo', provider=provider, data=echo)
+
+    def on_echo(self, provider, echo):
+        self.event('echo', provider=provider, data=echo)
+
     def event(self, name, **kwargs):
         data = dict()
         data['evt'] = name

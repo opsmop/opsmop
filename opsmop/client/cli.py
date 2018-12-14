@@ -21,6 +21,7 @@ from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
+from opsmop.core.context import Context
 from opsmop.core.api import Api
 from opsmop.core.errors import OpsMopError, OpsMopStop
 
@@ -62,6 +63,7 @@ class Cli(object):
         parser.add_argument('--push', action='store_true', help='run in push mode')
         parser.add_argument('--local', action='store_true', help='run in local mode')
         parser.add_argument('--event-stream', action='store_true', help=argparse.SUPPRESS)
+        parser.add_argument('--verbose', action='store_true', help='increase verbosity (for remote modes)')
 
         args = parser.parse_args(self.args[1:])
 
@@ -82,6 +84,8 @@ class Cli(object):
             Callbacks.set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         else:
             Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
+
+        Context.set_verbose(args.verbose)
 
         tags = None
         if args.tags is not None:

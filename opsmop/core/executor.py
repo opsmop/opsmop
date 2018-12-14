@@ -136,6 +136,13 @@ class Executor(object):
 
         import dill
 
+        print("----------")
+        print(role)
+        print("")
+
+        # this hack is intended to reset the queue for subsequent roles and should NOT be required
+        self.connection_manager = ConnectionManager(policy)
+
         with self.connection_manager.router:
 
             hosts = role.inventory().hosts()
@@ -150,8 +157,10 @@ class Executor(object):
                 self.connection_manager.connect(host, role)
             batch.apply_async(host_connector, max_workers=max_workers)
 
+            self.connection_manager.prepare_for_role(role)
+
             def role_runner(host):
-                self.connection_manager.process_remote_role(host, policy, role, Context.mode())
+                self.connection_manager.remotify_role(host, policy, role, Context.mode())
             batch = Batch(hosts, batch_size=batch_size)
             batch.apply(role_runner)
 
@@ -162,6 +171,7 @@ class Executor(object):
             if len(failed_hosts):
                 Callbacks.on_terminate_with_host_list(failed_hosts)
                 raise OpsMopStop()
+
           
     # ---------------------------------------------------------------
 
@@ -196,6 +206,7 @@ class Executor(object):
         """ 
         Processes non-handler resources for one role for CHECK or APPLY mode
         """
+        print("ERR: %s" % role)
         # tell the context we are processing resources now, which may change their behavior
         # of certain methods like on_resource()
         Callbacks.on_begin_role(role)

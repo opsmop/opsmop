@@ -148,10 +148,10 @@ class Inventory(object):
         self._process_groups(data)
 
     def groups(self):
-        return self._groups
+        return self._groups.copy()
 
     def hosts(self):
-        return self._hosts
+        return self._hosts.copy()
 
     def all(self):
         return self.filter()
@@ -167,7 +167,7 @@ class Inventory(object):
         if not self._loaded:
             self.load()
             self.loaded = True
-
+ 
         new_groups = dict()
         new_hosts = dict()
 

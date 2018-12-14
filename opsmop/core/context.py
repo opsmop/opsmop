@@ -17,6 +17,7 @@ HOST_FAILURES = dict()
 HOST_SIGNALS = dict()
 MODE = None
 CALLER = None
+VERBOSE = False
 
 VALIDATE = 'validate'
 CHECK = 'check'
@@ -37,7 +38,18 @@ class Context(object):
 
     @classmethod
     def caller(cls):
+        global CALLER
         return CALLER
+
+    @classmethod
+    def verbose(cls):
+        global VERBOSE
+        return VERBOSE
+
+    @classmethod
+    def set_verbose(cls, value):
+        global VERBOSE
+        VERBOSE = value
 
     @classmethod
     def set_host(cls, host):
