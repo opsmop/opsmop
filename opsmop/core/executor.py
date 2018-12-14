@@ -136,41 +136,36 @@ class Executor(object):
 
         import dill
 
-        print("----------")
-        print(role)
-        print("")
+        self.connection_manager.announce_role(role)
 
         # this hack is intended to reset the queue for subsequent roles and should NOT be required
-        self.connection_manager = ConnectionManager(policy)
 
-        with self.connection_manager.router:
+        hosts = role.inventory().hosts()
+        self.connection_manager.add_hosts(hosts)
 
-            hosts = role.inventory().hosts()
-            self.connection_manager.add_hosts(hosts)
+        batch_size = role.serial()
+        max_workers = UserDefaults.max_workers()
 
-            batch_size = role.serial()
-            max_workers = UserDefaults.max_workers()
+        batch = Batch(hosts, batch_size=200)
+        def host_connector(host):
+            Context.set_host(host)
+            self.connection_manager.connect(host, role)
+        batch.apply_async(host_connector, max_workers=max_workers)
 
-            batch = Batch(hosts, batch_size=200)
-            def host_connector(host):
-                Context.set_host(host)
-                self.connection_manager.connect(host, role)
-            batch.apply_async(host_connector, max_workers=max_workers)
+        self.connection_manager.prepare_for_role(role)
 
-            self.connection_manager.prepare_for_role(role)
+        def role_runner(host):
+            self.connection_manager.remotify_role(host, policy, role, Context.mode())
+        batch = Batch(hosts, batch_size=batch_size)
+        batch.apply(role_runner)
 
-            def role_runner(host):
-                self.connection_manager.remotify_role(host, policy, role, Context.mode())
-            batch = Batch(hosts, batch_size=batch_size)
-            batch.apply(role_runner)
+        self.connection_manager.event_loop()
 
-            self.connection_manager.event_loop()
-
-            failures = Context.host_failures()
-            failed_hosts = [ f for f in failures.keys() ]
-            if len(failed_hosts):
-                Callbacks.on_terminate_with_host_list(failed_hosts)
-                raise OpsMopStop()
+        failures = Context.host_failures()
+        failed_hosts = [ f for f in failures.keys() ]
+        if len(failed_hosts):
+            Callbacks.on_terminate_with_host_list(failed_hosts)
+            raise OpsMopStop()
 
           
     # ---------------------------------------------------------------
@@ -206,7 +201,6 @@ class Executor(object):
         """ 
         Processes non-handler resources for one role for CHECK or APPLY mode
         """
-        print("ERR: %s" % role)
         # tell the context we are processing resources now, which may change their behavior
         # of certain methods like on_resource()
         Callbacks.on_begin_role(role)

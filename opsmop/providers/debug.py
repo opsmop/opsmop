@@ -20,6 +20,9 @@ class Debug(Provider):
     def quiet(self):
         return True
 
+    def very_quiet(self):
+        return True
+
     def skip_plan_stage(self):
         return True
  

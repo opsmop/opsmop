@@ -68,6 +68,11 @@ class ConnectionManager(object):
                 p = self.relative_root
             self.register_files(p)
 
+    def announce_role(self, role):
+        print()
+        print(role)
+        print()
+
     def add_hosts(self, new_hosts):
         """
         Extends the list of hosts that *MAY* be connected to with more hosts
@@ -153,7 +158,6 @@ class ConnectionManager(object):
                      self.file_service.register(path)
 
     def remotify_role(self, host, policy, role, mode):
-        print("REMOTIFY: %s, %s" % (host, role))
         
         import dill
         conn = self.connect(host, role)
@@ -219,7 +223,6 @@ class ConnectionManager(object):
 
             
         finally:
-            print("CLOSING")
             both_sel.close()
             self.calls_sel.close()
             self.status_recv.close()

@@ -49,16 +49,9 @@ class LocalCliCallbacks(BaseCallbacks):
         self.phase = phase
 
     def banner(self, msg, big=False):
-        msg_len = len(msg)
-        sep = None
-        if big:
-            sep = "=" * msg_len
-        else:
-            sep = "-" * msg_len
-        self.i1(sep)
+        #self.i1("")# sep)
         self.i1(msg)
-        if big:
-            self.i1(sep)
+
 
     def on_command_echo(self, provider, echo):
         if echo == "":
@@ -76,7 +69,7 @@ class LocalCliCallbacks(BaseCallbacks):
             self.i5("# %s" % command.cmd)
 
     def on_plan(self, provider):
-        self.i3("planning...")
+        self.i3("planning")
  
     def on_apply(self, provider):
         return
@@ -125,7 +118,7 @@ class LocalCliCallbacks(BaseCallbacks):
         self.i1("")
         role = resource.role()
         self.count = self.count + 1
-        self.banner("{count}. {role} => {resource}".format(count=self.count, role=role.__class__.__name__, resource=resource))
+        self.banner("{count}. {role} => {resource}:".format(count=self.count, role=role.__class__.__name__, resource=resource))
         self.i1("")
 
         # show the keys for each resource, name first
