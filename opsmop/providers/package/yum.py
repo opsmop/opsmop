@@ -48,5 +48,3 @@ class Yum(Package):
         if which:
             return self.run(which)
         return self.ok()
-
-

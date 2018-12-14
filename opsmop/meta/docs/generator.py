@@ -19,6 +19,7 @@ from opsmop.meta.docs.exparser import Record
 from opsmop.meta.docs.index import Index
 from opsmop.meta.docs.page import Page
 
+
 class Generator(object):
 
     def __init__(self, examples_dir=None, dest_dir=None):

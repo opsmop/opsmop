@@ -14,6 +14,7 @@
 
 from opsmop.providers.provider import Provider
 
+
 class Package(Provider):
 
     def _get_version(self):

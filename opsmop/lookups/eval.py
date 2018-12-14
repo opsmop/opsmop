@@ -15,6 +15,7 @@
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
 
+
 class Eval(Lookup):
 
     """

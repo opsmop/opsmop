@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
+import json
+
 from opsmop.core.resource import Resource
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
 
-import json
-import inspect
 
 class Type(Resource):
 
@@ -100,4 +101,3 @@ class Type(Resource):
         else:
             str_name = self.__class__.__name__
         return str_name
-

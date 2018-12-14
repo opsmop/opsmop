@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.errors import InventoryError
-from opsmop.inventory.host import Host
-from opsmop.inventory.group import Group
-
+import fnmatch
 import json
 import shlex
-import fnmatch
+
+from opsmop.core.errors import InventoryError
+from opsmop.inventory.group import Group
+from opsmop.inventory.host import Host
 
 # inventory structure for ALL inventory subclasses implementations
 
@@ -206,8 +206,3 @@ class Inventory(object):
 
 
         return Inventory(hosts=new_hosts, groups=new_groups, loaded=True)
-
-           
-
-
-

@@ -23,6 +23,8 @@ VALIDATE = 'validate'
 CHECK = 'check'
 APPLY = 'apply'
 
+# TODO: this was done a bit quickly, should convert to Borg pattern to make code more clear
+
 class Context(object):
 
     @classmethod
@@ -40,6 +42,16 @@ class Context(object):
     def caller(cls):
         global CALLER
         return CALLER
+
+    @classmethod
+    def role(cls):
+        global ROLE
+        return ROLE
+
+    @classmethod
+    def set_role(cls, role):
+        ROLE = role
+        return ROLE
 
     @classmethod
     def verbose(cls):
@@ -115,4 +127,3 @@ class Context(object):
             if x in signals:
                 return True
         return False
-   

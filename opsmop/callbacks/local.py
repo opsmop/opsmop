@@ -12,21 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import inspect
 import json
-import os
-
 import logging
 import logging.handlers
+import os
+import sys
 
 from opsmop.callbacks.callback import BaseCallbacks
+from opsmop.client.user_defaults import UserDefaults
+from opsmop.core.context import Context
+from opsmop.core.errors import CommandError, OpsMopStop
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.errors import CommandError, OpsMopStop
-from opsmop.core.context import Context
-from opsmop.client.user_defaults import UserDefaults
-
 
 Context = Context()
 

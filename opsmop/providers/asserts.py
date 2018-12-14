@@ -16,6 +16,7 @@ from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
 from opsmop.providers.provider import Provider
 
+
 class Asserts(Provider):
 
     def quiet(self):

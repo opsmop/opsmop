@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.fields import COMMON_FIELDS
 import jinja2
+
+from opsmop.core.fields import COMMON_FIELDS
+
 
 class Resource(object):
 
@@ -241,4 +243,3 @@ class Resource(object):
             result[k] = v
         print("TO DICT=%s" % result)
         return result
-

@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import os
 import stat
-import hashlib
 
 from opsmop.facts.facts import Facts
+
 
 class FileTestFacts(Facts):
     

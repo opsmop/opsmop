@@ -14,6 +14,7 @@
 
 import glob
 import subprocess
+
 import yaml
 
 from opsmop.facts.facts import Facts

@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+
 import toml
+
 from opsmop.core.errors import InventoryError
 from opsmop.inventory.inventory import Inventory
 
-import logging
 logger = logging.getLogger('toml')
 
 
@@ -36,7 +38,3 @@ class TomlInventory(Inventory):
         data = toml.loads(data)
         self.accumulate(data)
         return self
-
-
-        
-

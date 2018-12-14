@@ -1,6 +1,8 @@
-from opsmop.core.common import memoize
 import os
+
 import toml
+
+from opsmop.core.common import memoize
 
 LOCAL_CONFIG = "~/.opsmop/defaults.toml"
 GLOBAL_CONFIG = "/etc/opsmop/defaults.toml"

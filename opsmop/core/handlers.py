@@ -17,6 +17,7 @@ from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
 
+
 class Handlers(Resources):
 
     def __init__(self, **kwargs):

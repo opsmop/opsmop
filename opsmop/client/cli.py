@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import argparse
 import os
+import sys
 
 from opsmop.callbacks.callbacks import Callbacks
-from opsmop.callbacks.local import LocalCliCallbacks
-from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
-from opsmop.core.context import Context
+from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.core.api import Api
+from opsmop.core.context import Context
 from opsmop.core.errors import OpsMopError, OpsMopStop
 
 USAGE = """

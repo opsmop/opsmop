@@ -120,4 +120,3 @@ class Callbacks(object):
     @classmethod
     def on_terminate_with_host_list(cls, host_list):
         cls._run_callbacks('on_terminate_with_host_list', host_list)
-        

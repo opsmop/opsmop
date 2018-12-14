@@ -15,6 +15,7 @@
 from opsmop.core.fields import Fields
 from opsmop.types.type import Type
 
+
 class DebugFacts(Type):
 
     def __init__(self, *args, **kwargs):

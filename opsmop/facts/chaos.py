@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import platform
+import random as prandom
 
 from opsmop.core.common import memoize
 from opsmop.facts.facts import Facts
-import random as prandom
 
 prandom.seed()
 

@@ -57,8 +57,3 @@ class UserAdd(Provider):
             if self.shell:
                 cmd = cmd + " --shell=%s" % self.shell
             return self.run(cmd)
-
-
-    
-
-

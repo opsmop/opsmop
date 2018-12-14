@@ -14,6 +14,7 @@
 
 from opsmop.client.user_defaults import UserDefaults
 
+
 class Host(object):
 
     def __init__(self, name, variables=None):

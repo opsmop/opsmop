@@ -14,6 +14,7 @@
 
 import concurrent
 
+
 class Batch(object):
 
     def __init__(self, hosts, batch_size=10):
@@ -57,5 +58,3 @@ class Batch(object):
                 return
             for host in batch:
                 fn(host)
-
-

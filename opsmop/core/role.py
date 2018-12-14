@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.collection import Collection
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.handlers import Handlers
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
-from opsmop.callbacks.callbacks import Callbacks
-from opsmop.client.user_defaults import UserDefaults
+
 
 class Role(Collection):
 
@@ -74,6 +75,18 @@ class Role(Collection):
 
     def check_host_keys(self):
         return UserDefaults.ssh_check_host_keys()
+
+    def get_delegate_host(self, host_obj):
+        return host_obj # or name, either is ok.
+
+    def before_contact(self, host):
+        return True
+
+    def should_contact(self, host):
+        return True
+
+    def after_contact(self, host):
+        return True
 
     def get_children(self, mode):
         if mode == 'resources':

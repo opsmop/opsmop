@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
+
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.callbacks.common import CommonCallbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.collection import Collection
-from opsmop.core.context import Context, VALIDATE, APPLY, CHECK
+from opsmop.core.context import APPLY, CHECK, VALIDATE, Context
+from opsmop.core.errors import OpsMopStop
 from opsmop.core.result import Result
 from opsmop.core.role import Role
 from opsmop.core.roles import Roles
-from opsmop.push.connections import ConnectionManager
-from opsmop.push.batch import Batch
-from opsmop.lookups.lookup import Lookup
 from opsmop.inventory.host import Host
-from opsmop.callbacks.callbacks import Callbacks
-from opsmop.callbacks.event_stream import EventStreamCallbacks
-from opsmop.callbacks.common import CommonCallbacks
-from opsmop.core.errors import OpsMopStop
-
-import time
+from opsmop.lookups.lookup import Lookup
+from opsmop.push.batch import Batch
+from opsmop.push.connections import ConnectionManager
 
 # ---------------------------------------------------------------
 
@@ -102,6 +102,7 @@ class Executor(object):
         policy.init_scope()
         roles = policy.get_roles()
         for role in roles.items:
+            Context.set_role(role)
             if not self._push:
                 self.process_local_role(policy, role)
             else:

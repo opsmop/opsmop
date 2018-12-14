@@ -17,9 +17,9 @@ import os
 import shutil
 import subprocess
 
+from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.common import memoize
 from opsmop.core.result import Result
-from opsmop.callbacks.callbacks import Callbacks
 
 
 class Command(object):
@@ -150,4 +150,3 @@ class Command(object):
             if line.startswith(x):
                 return True
         return False
-

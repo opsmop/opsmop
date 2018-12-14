@@ -18,10 +18,11 @@ from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.role import Role
 from opsmop.core.scope import Scope
+from opsmop.facts.chaos import Chaos
 from opsmop.facts.filetests import FileTests
 from opsmop.facts.platform import Platform
 from opsmop.facts.user_facts import UserFacts
-from opsmop.facts.chaos import Chaos
+
 
 class Policy(Collection):
 

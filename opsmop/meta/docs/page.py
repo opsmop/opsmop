@@ -18,6 +18,7 @@ import os
 
 from opsmop.core.fields import Fields
 
+
 class Page(object):
 
     def __init__(self, record, dest_dir):

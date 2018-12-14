@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.action import Action
-from opsmop.core.command import Command
-from opsmop.core.result import Result
-from opsmop.core.template import Template
-from opsmop.core.errors import ProviderError
-from opsmop.lookups.lookup import Lookup
-from opsmop.callbacks.callbacks import Callbacks
-from opsmop.core.context import Context
-
-import mitogen
 import io
 import logging
 import os
 import shutil
+
+import mitogen
+
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.core.action import Action
+from opsmop.core.command import Command
+from opsmop.core.context import Context
+from opsmop.core.errors import ProviderError
+from opsmop.core.result import Result
+from opsmop.core.template import Template
+from opsmop.lookups.lookup import Lookup
 
 logger = logging.getLogger("opsmop")
 

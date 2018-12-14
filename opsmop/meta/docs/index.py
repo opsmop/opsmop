@@ -16,6 +16,7 @@
 
 import os
 
+
 class Index(object):
 
     def __init__(self, records, dest_dir):

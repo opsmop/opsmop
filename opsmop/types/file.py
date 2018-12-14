@@ -17,6 +17,7 @@ from opsmop.core.fields import Fields
 from opsmop.core.validators import Validators
 from opsmop.types.type import Type
 
+
 class File(Type):
 
     def __init__(self, name=None, **kwargs):

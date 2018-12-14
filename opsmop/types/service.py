@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from opsmop.core.errors import NoSuchProviderError, ValidationError
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
-from opsmop.types.type import Type
 from opsmop.facts.platform import Platform
-from opsmop.core.errors import ValidationError, NoSuchProviderError
+from opsmop.types.type import Type
+
 
 class Service(Type):
 
@@ -50,5 +51,3 @@ class Service(Type):
 
     def default_provider(self):
         return Platform.default_service_manager()
-
-

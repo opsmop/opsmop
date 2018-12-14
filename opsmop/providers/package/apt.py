@@ -69,5 +69,3 @@ class Apt(Package):
             self.run(which, ignore_lines=IGNORE_LINES)
 
         return self.ok()
-
-

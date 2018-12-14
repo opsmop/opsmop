@@ -12,25 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.errors import InventoryError
-from opsmop.core.context import Context
-from opsmop.callbacks.callbacks import Callbacks
-from opsmop.callbacks.event_stream import EventStreamCallbacks
-from opsmop.callbacks.common import CommonCallbacks
-from opsmop.core.roles import Roles
-from opsmop.callbacks.replay import ReplayCallbacks
-from opsmop.callbacks.local import LocalCliCallbacks
+import fnmatch
+import os
+import sys
+import time
 
 import mitogen.core
 import mitogen.master
 import mitogen.select
-import mitogen.utils
 import mitogen.service
+import mitogen.utils
 
-import time
-import os
-import sys
-import fnmatch
+from opsmop.callbacks.callbacks import Callbacks
+from opsmop.callbacks.common import CommonCallbacks
+from opsmop.callbacks.event_stream import EventStreamCallbacks
+from opsmop.callbacks.local import LocalCliCallbacks
+from opsmop.callbacks.replay import ReplayCallbacks
+from opsmop.core.context import Context
+from opsmop.core.errors import InventoryError
+from opsmop.core.roles import Roles
+from opsmop.inventory.host import Host
+
 
 class ConnectionManager(object):
 
@@ -157,7 +159,30 @@ class ConnectionManager(object):
                 if self.is_allowed_to_serve(path):
                      self.file_service.register(path)
 
+    def actual_host(self, role, host):
+
+        which = role.get_delegate_host(host)
+        if type(host) != Host:
+            return self._hosts[host.name]
+        return host
+
     def remotify_role(self, host, policy, role, mode):
+
+        try:
+        
+            if not role.should_contact(host):
+                Callbacks.on_skipped(role)
+                return True
+            else:
+                role.before_contact(host)
+
+        except Exception as e:
+
+            print(str(e))
+            Context.record_host_failure(host, e)
+            return False
+ 
+        target_host = self.actual_host(role, host)
         
         import dill
         conn = self.connect(host, role)
@@ -166,7 +191,7 @@ class ConnectionManager(object):
         sender = self.status_recv.to_sender()
 
         params = dict(
-            host = host,
+            host = target_host,
             policy = policy,
             role = role, 
             mode = mode,
@@ -255,4 +280,3 @@ def remote_fn(caller, params, sender):
     executor = Executor([ policy ], local_host=host, push=False) # remove single_role
     # FIXME: care about mode
     executor.apply()
-

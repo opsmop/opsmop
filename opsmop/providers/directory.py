@@ -20,6 +20,7 @@ from opsmop.core.errors import ProviderError
 from opsmop.facts.filetests import FileTests
 from opsmop.providers.provider import Provider
 
+
 class Directory(Provider):
 
     # ---------------------------------------------------------------

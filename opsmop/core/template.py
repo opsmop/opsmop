@@ -15,6 +15,7 @@
 from jinja2 import BaseLoader, Environment, FileSystemLoader, StrictUndefined
 from jinja2.nativetypes import NativeEnvironment
 
+
 class Template(object):
 
     __slots__ = []

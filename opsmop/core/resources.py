@@ -14,6 +14,7 @@
 
 from opsmop.core.collection import Collection
 
+
 class Resources(Collection):
 
     """

@@ -14,6 +14,7 @@
 
 from opsmop.providers.provider import Provider
 
+
 class DebugFacts(Provider):
 
     def quiet(self):

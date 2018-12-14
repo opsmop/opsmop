@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import argparse
-from opsmop.push.api import PushApi
+import sys
+
 from opsmop.core.errors import OpsMopError
+from opsmop.push.api import PushApi
 
 USAGE = """
 |

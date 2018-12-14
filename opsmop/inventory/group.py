@@ -29,6 +29,3 @@ class Group(object):
     
     def hosts(self):
         return [ h for h in self._hosts.values() ]
-
-        
-

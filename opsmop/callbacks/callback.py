@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.client.user_defaults import UserDefaults
-import os
 import logging
+import os
+
+from opsmop.client.user_defaults import UserDefaults
 
 LOG_FILENAME = os.path.expanduser("~/.opsmop.log")
 LOGGER = None

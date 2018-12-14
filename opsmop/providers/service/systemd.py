@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.providers.service.service import Service
 from opsmop.core.errors import ProviderError
+from opsmop.providers.service.service import Service
 
 STATUS = "systemctl status {name}"
 IS_ENABLED = "systemctl is-enabled {name}"

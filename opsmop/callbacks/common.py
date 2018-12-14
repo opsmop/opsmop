@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import inspect
 import json
+import sys
 
 from opsmop.callbacks.callback import BaseCallbacks
+from opsmop.core.errors import CommandError, OpsMopError, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.errors import OpsMopError, CommandError, ProviderError
+
 
 class CommonCallbacks(BaseCallbacks):
 
@@ -58,4 +59,3 @@ class CommonCallbacks(BaseCallbacks):
 
     def on_host_exception(self, host, exc):
         Context.record_host_failure(host, exc)
-

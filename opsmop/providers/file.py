@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import shutil
 from pathlib import Path
-import logging
 
-from opsmop.core.errors import ProviderError
-from opsmop.facts.filetests import FileTests
-from opsmop.core.template import Template
-from opsmop.providers.provider import Provider
 from opsmop.core.context import Context
+from opsmop.core.errors import ProviderError
+from opsmop.core.template import Template
+from opsmop.facts.filetests import FileTests
+from opsmop.providers.provider import Provider
 
 logger = logging.getLogger('opsmop')
 

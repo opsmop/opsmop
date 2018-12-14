@@ -15,6 +15,7 @@
 from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.core.context import Context
 
+
 class ReplayCallbacks(BaseCallbacks):
    
     def on_resource(self, host, evt):
@@ -27,6 +28,12 @@ class ReplayCallbacks(BaseCallbacks):
         self.info(host, self.command(evt))
 
     def on_complete(self, host, evt):
+        try:
+            Context.role().after_contact(host)
+        except Exception as e:
+            print(str(e))
+            Context.record_host_failure(host, e)
+
         self.info(host, 'complete')
 
     def on_result(self, host, evt):
@@ -93,6 +100,3 @@ class ReplayCallbacks(BaseCallbacks):
         if host.name != hostname:
             caption = "%s (%s)" % (host.name, hostname)
         self.i3("%s %s %s" % (caption, sep, msg))
-
-
-    

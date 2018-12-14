@@ -48,8 +48,3 @@ class GroupAdd(Provider):
             if self.system:
                 cmd = cmd + " --system"
             return self.run(cmd)
-
-
-    
-
-
