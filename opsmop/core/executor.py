@@ -25,6 +25,7 @@ from opsmop.inventory.host import Host
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
+from opsmop.core.errors import OpsMopStop
 
 import time
 
@@ -155,6 +156,12 @@ class Executor(object):
             batch.apply(role_runner)
 
             self.connection_manager.event_loop()
+
+            failures = Context.host_failures()
+            failed_hosts = [ f for f in failures.keys() ]
+            if len(failed_hosts):
+                Callbacks.on_terminate_with_host_list(failed_hosts)
+                raise OpsMopStop()
           
     # ---------------------------------------------------------------
 
@@ -290,8 +297,8 @@ class Executor(object):
 
         # if there was a failure, handle it
         # (common callbacks should abort execution)
-        if fatal:
-            Callbacks.on_fatal(provider, result)
+        #if fatal:
+        #    Callbacks.on_fatal(provider, result)
 
         return True
 

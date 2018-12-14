@@ -20,22 +20,17 @@ import os
 import logging
 import logging.handlers
 
-from opsmop.callbacks.callback import BaseCallback
+from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.errors import CommandError
+from opsmop.core.errors import CommandError, OpsMopStop
 from opsmop.core.context import Context
 from opsmop.client.user_defaults import UserDefaults
 
-LOG_FILENAME = os.path.expanduser("~/.opsmop.log")
-
-# NOTE: this interface is subject to change
-
-INDENT="  "
 
 Context = Context()
 
-class LocalCliCallbacks(BaseCallback):
+class LocalCliCallbacks(BaseCallbacks):
 
     """
     Callback class for the default CLI implementation.
@@ -45,29 +40,10 @@ class LocalCliCallbacks(BaseCallback):
     __slots__ = [ 'phase', 'count', 'logger' ]
 
     def __init__(self):
-        super()
+        super().__init__()
         self.phase = None
         self.count = 0
-        self.logger = None
-        self.setup_logger()
-
-    def setup_logger(self):
-
-        path = UserDefaults.log_path()
-        dirname = os.path.dirname(path)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname, 0o770)
-
-        if self.logger is not None:
-            return
-        self.logger = logging.getLogger('opsmop')
-        self.logger.setLevel(logging.DEBUG)
-        handler = logging.handlers.RotatingFileHandler(
-              path, maxBytes=1024*5000, backupCount=5)
-        formatter = logging.Formatter(UserDefaults.log_format())
-        handler.setFormatter(formatter)
-
-        self.logger.addHandler(handler)
+ 
 
     def set_phase(self, phase):
         self.phase = phase
@@ -133,6 +109,7 @@ class LocalCliCallbacks(BaseCallback):
 
     def on_begin_role(self, role):
         self.phase = 'resource'
+        self.role = role
 
     def on_validate(self):
         self.phase = 'validate'
@@ -178,9 +155,6 @@ class LocalCliCallbacks(BaseCallback):
         self.banner("complete!")
         self.summarize()
 
-    def on_role(self, role):
-        self.role = role
-
     def summarize(self):
         # TODO: reimplement the counter and percentages summary
         pass
@@ -193,29 +167,23 @@ class LocalCliCallbacks(BaseCallback):
             self.i1("FAILED")
         self.i1("")
         self.summarize()
+        raise OpsMopStop()
 
     def on_update_variables(self, variables):
         self.i3("registered:")
         for (k,v) in variables.items():
             self.on_echo(None, "%s => %s" % (k,v))
 
-    def i1(self, msg):
-        # indent methods
-        self._indent(0, msg)
+    def on_host_exception(self, host, exc):
+        pass
 
-    def i2(self, msg):
-        self._indent(1, msg)
+    def on_terminate_with_host_list(self, failed_hosts):
+        
+        if len(failed_hosts) == 1 and failed_hosts[0].name == "127.0.0.1":
+            return
 
-    def i3(self, msg):
-        self._indent(2, msg)
-
-    def i4(self, msg):
-        self._indent(3, msg)
-
-    def i5(self, msg):
-        self._indent(4, msg)
-    
-    def _indent(self, level, msg):
-        spc = INDENT * level
-        print("%s%s" % (spc, msg))
-        self.logger.info(msg)
+        print("")
+        print("POLICY FAILED. The following hosts had failures: ")
+        for h in failed_hosts:
+            print("    - %s " % h.name)
+        print("")

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 HOST = None
+HOST_FAILURES = dict()
 HOST_SIGNALS = dict()
 MODE = None
 CALLER = None
@@ -61,6 +62,16 @@ class Context(object):
     def mode(cls):
         global MODE
         return MODE
+
+    @classmethod
+    def record_host_failure(cls, host, exc):
+        global HOST_FAILURES
+        HOST_FAILURES[host] = exc
+
+    @classmethod
+    def host_failures(cls):
+        global HOST_FAILURES
+        return HOST_FAILURES
 
     @classmethod
     def is_validate(cls):

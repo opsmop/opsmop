@@ -12,66 +12,65 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class ReplayCallbacks(object):
-    
-    def __init__(self):
-        pass
+from opsmop.callbacks.callback import BaseCallbacks
 
-    def on_validate(self, host, evt):
-        pass
-
-    def on_role(self, host, evt):
-        pass
-
-    def on_begin_role(self, host, evt):
-        pass
-
+class ReplayCallbacks(BaseCallbacks):
+   
     def on_resource(self, host, evt):
         # {'evt': 'resource', 'resource': {'cls': 'Debug', 'variable_names': (), 'evals': {}}, 'is_handler': False}
-        print(f"{host.name} : {evt['resource']['cls']}")
-        pass
-
-    def on_apply(self, host, evt):
-        pass
-
-    def on_echo(self, host, evt):
-        pass
-
-    def on_taken(self, host, evt):
-        pass
-
-    def on_plan(self, host, evt):
-        pass
-
-    def on_needs(self, host, evt):
-        pass
-
-    def on_apply(self, host, evt):
-        pass
-    
-    def on_do(self, host, evt):
-        pass
+        self.info(host, self.resource(evt))
 
     def on_execute_command(self, host, evt):
-        pass
-
-    def on_command_echo(self, host, evt):
-        pass
-
-    def on_command_result(self, host, evt):
-        pass
+        self.info(host, self.command(evt))
 
     def on_complete(self, host, evt):
-        pass
+        self.info(host, 'complete')
 
     def on_result(self, host, evt):
-        # {'evt': 'result', 'provider': {'cls': 'Debug'}, 'data': {'cls': 'Result', 'rc': None, 'data': None, 'fatal': False, 'message': None, 'reason': None}}
-        print(f"{host.name} : {evt['data']}")
+        self.info(host, self.result(evt))
 
     def on_default(self, host, evt):
-        print(f"{host.name} : {evt}")
+        print(f"** DEBUG: {host.name} : {evt}")
 
     def on_fatal(self, host, evt):
-        print('task failed on host %s: %s' % (host.name, e))
+        self.info(host, "failed")
+
+    def on_signaled(self, host, evt):
+        self.info(host, self.signaled(evt))
+
+    # ----
+
+    def resource(self, evt):
+        return "processing: %s" % evt['resource']['cls']
+
+    def command(self, evt):
+        cmd = evt['data']['cmd']
+        return "executing: %s" % str(cmd)
+
+    def result(self, evt):
+        caption = "ok"
+        data = evt['data']
+        fatal = data['fatal']
+        message = data['message']
+        rc = data['rc']
+        if fatal:
+            caption = "fatal"
+        else:
+            caption = "ok"
+        if rc is not None:
+            caption = caption + ", rc=%s" % rc
+        if message is not None:
+            caption = caption + ", %s" % message
+        return "result: %s" % caption
+
+    def signaled(self, evt):
+        return "signaled: %s" % str(evt)
+
+    def info(self, host, msg):
+        hostname = host.hostname()
+        caption = host.name
+        if host.name != hostname:
+            caption = "%s (%s)" % (host.name, hostname)
+        self.i3("%s => %s" % (caption, msg))
 
     

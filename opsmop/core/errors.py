@@ -23,6 +23,9 @@ class OpsMopError(Exception):
     def __init__(self, msg):
         self.msg = msg
 
+class OpsMopStop(Exception):
+    pass
+
 class ValidationError(OpsMopError):
 
     """

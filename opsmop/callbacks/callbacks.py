@@ -30,8 +30,9 @@ class Callbacks(object):
         """
         global CALLBACKS
         for c in CALLBACKS:
-            attr = getattr(c, cb_method)
-            attr(*args)
+            attr = getattr(c, cb_method, None)
+            if attr:
+                attr(*args)
 
     @classmethod
     def on_apply(cls, provider):
@@ -48,10 +49,6 @@ class Callbacks(object):
     @classmethod
     def on_plan(cls, provider):
         cls._run_callbacks('on_plan', provider)
-
-    @classmethod
-    def on_role(cls, role):
-        cls._run_callbacks('on_role', role)
 
     @classmethod
     def on_command_echo(cls, provider, value):
@@ -114,3 +111,13 @@ class Callbacks(object):
     @classmethod
     def on_validate(cls):
         cls._run_callbacks('on_validate')
+
+    @classmethod
+    def on_host_exception(cls, host, exc):
+        # is this needed?
+        cls._run_callbacks('on_failed_host', host, exc)
+
+    @classmethod
+    def on_terminate_with_host_list(cls, host_list):
+        cls._run_callbacks('on_terminate_with_host_list', host_list)
+        

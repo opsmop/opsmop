@@ -147,6 +147,8 @@ class ConnectionManager(object):
 
         self.prepare_for_role(role)
 
+        Callbacks.on_resource(role, False)
+        
         fileserving_paths = role.allow_fileserving_paths()
         if fileserving_paths is None:
             fileserving_paths = policy.allow_fileserving_paths()
@@ -178,34 +180,51 @@ class ConnectionManager(object):
     
         both_sel = mitogen.select.Select([self.status_recv, self.calls_sel], oneshot=False)
 
-        while self.calls_sel:
-            try:
-                msg = both_sel.get(timeout=60.0)
-            except mitogen.core.TimeoutError:
-                print("No update in 60 seconds, something's broke?")
-                raise Exception("boom")
-
-            host = self.hosts_by_context[msg.src_id]
-
-            if msg.receiver is self.status_recv:   
-                # https://mitogen.readthedocs.io/en/stable/api.html#mitogen.core.Message.receiver
-                # handle a status update
-                
-                response = msg.unpickle()
-                event = response['evt']
-                cb_func = getattr(self.replay_callbacks, "on_%s" % event, None)
-                if cb_func:
-                    cb_func(host, response)
-                else:
-                    self.replay_callbacks.on_default(host, response)
-
-            elif msg.receiver is self.calls_sel:  
-                # handle a function call result.
+        try:
+            while self.calls_sel:
                 try:
-                    msg.unpickle()
-                    # all done for host
-                except mitogen.core.CallError as e:
-                    print('Task failed on host %s: %s' % (host.name, e))
+                    msg = both_sel.get(timeout=60.0)
+                except mitogen.core.TimeoutError:
+                    print("No update in 60 seconds, something's broke?")
+                    raise Exception("boom")
+
+                host = self.hosts_by_context[msg.src_id]
+
+                if msg.receiver is self.status_recv:   
+                    # https://mitogen.readthedocs.io/en/stable/api.html#mitogen.core.Message.receiver
+                    # handle a status update
+                
+                    try:
+                        response = msg.unpickle()
+                    except Exception as e:
+                        self.replay_callbacks.on_failed_host(host, e) 
+                    event = response['evt']
+                    cb_func = getattr(self.replay_callbacks, "on_%s" % event, None)
+                    if cb_func:
+                        cb_func(host, response)
+                    else:
+                        self.replay_callbacks.on_default(host, response)
+
+                elif msg.receiver is self.calls_sel:  
+                    # handle a function call result.
+                    try:
+                        msg.unpickle()
+                        # all done for host
+                    except mitogen.core.CallError as e:
+                        Context.record_host_failure(host, e)
+
+                        if 'opsmop.core.errors' in str(e):
+                            # it's cool, callbacks should have already eaten it
+                            pass
+                        else:                          
+                            raise e
+                        #print(dir(e))
+                        #print(e.__traceback__)
+                        #print(type(e))
+                        #print('Task failed on host %s: %s' % (host.name, e))
+            
+        finally:
+            both_sel.close()
 
         self.pool.stop(join=True)
 

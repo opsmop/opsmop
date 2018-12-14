@@ -16,14 +16,12 @@ import sys
 import inspect
 import json
 
-from opsmop.callbacks.callback import BaseCallback
+from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.errors import CommandError, ProviderError
+from opsmop.core.errors import OpsMopError, CommandError, ProviderError
 
-INDENT="  "
-
-class CommonCallbacks(BaseCallback):
+class CommonCallbacks(BaseCallbacks):
 
     """
     Regardless of output modes, some behavior needs to happen after
@@ -32,32 +30,8 @@ class CommonCallbacks(BaseCallback):
     in the main Executor code.
     """
 
-    def __init__(self):
-        super()
-
     def set_phase(self, phase):
         self.phase = phase
-
-    def on_command_echo(self, provider, echo):
-        pass
-
-    def on_echo(self, provider, echo):
-        pass
-
-    def on_execute_command(self, provider, command):
-        pass
-
-    def on_plan(self, provider):
-        pass
- 
-    def on_apply(self, provider):
-        pass
-
-    def on_needs(self, provider, action):
-        pass
-
-    def on_do(self, provider, action):
-        pass
 
     def on_taken_actions(self, provider, actions_taken):
         if provider.skip_plan_stage():
@@ -65,48 +39,23 @@ class CommonCallbacks(BaseCallback):
         taken = sorted([ str(x) for x in provider.actions_taken ])
         planned = sorted([ str(x) for x in provider.actions_planned ])
         if (taken != planned):
-            raise ProviderError(provider, "actions taken (%s) do not equal planned (%s)" % (taken, planned))
-
-    def on_result(self, provider, result):
-        pass
+            err = ProviderError(provider, "actions taken (%s) do not equal planned (%s)" % (taken, planned))
+            self.record_host_failure(Context.host(), err)
+            raise err
 
     def on_command_result(self, provider, result):
         if not result.primary and result.fatal:
             # only process intermediate command results here, if the command result is to be the final
             # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
             # effect
-            raise CommandError(provider, "command failed", result)
-
-    def on_skipped(self, skipped, is_handler=False):
-        pass
-
-    def on_begin_role(self, role):
-        pass
-
-    def on_validate(self):
-        pass
-
-    def on_begin_handlers(self):
-        pass
-
-    def on_resource(self, resource, is_handler):
-        pass
-
-    def on_signaled(self, resource, event_name):
-        pass
-
-    def on_complete(self, policy):
-        pass
-
-    def on_role(self, role):
-        pass
-
-    def summarize(self):
-        pass
+            err = CommandError(provider, "command failed", result)
+            self.record_host_failure(Context.host(), err)
+            raise err
 
     def on_fatal(self, provider, msg=None):
-        sys.exit(1)
-
-    def on_update_variables(self, variables):
+        #raise OpsMopError("failed")
         pass
+
+    def on_host_exception(self, host, exc):
+        Context.record_host_failure(host, exc)
 

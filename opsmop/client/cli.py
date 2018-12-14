@@ -22,7 +22,7 @@ from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.common import CommonCallbacks
 from opsmop.core.api import Api
-from opsmop.core.errors import OpsMopError
+from opsmop.core.errors import OpsMopError, OpsMopStop
 
 USAGE = """
 |
@@ -105,6 +105,8 @@ class Cli(object):
             else:
                 print(USAGE)
                 sys.exit(1)
+        except OpsMopStop as oms:
+            sys.exit(1)
         except OpsMopError as ome:
             print("")
             print(str(ome))

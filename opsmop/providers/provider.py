@@ -25,6 +25,7 @@ import mitogen
 import io
 import logging
 import os
+import shutil
 
 logger = logging.getLogger("opsmop")
 

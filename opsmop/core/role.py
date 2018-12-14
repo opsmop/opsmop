@@ -57,7 +57,11 @@ class Role(Collection):
         return Handlers()
 
     def allow_fileserving_paths(self):
-        return []
+        # returning None means ask the policy, return [] for
+        return None
+
+    def role(self):
+        return self
 
     def sudo(self):
         return False
@@ -70,9 +74,6 @@ class Role(Collection):
 
     def check_host_keys(self):
         return UserDefaults.ssh_check_host_keys()
-
-    def _on_walk(self):
-        Callbacks.on_role(self)
 
     def get_children(self, mode):
         if mode == 'resources':
