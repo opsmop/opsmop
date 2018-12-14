@@ -1,5 +1,5 @@
 PyYAML>=3.13
 toml>=0.10
--e git://github.com/dw/mitogen.git@cd01957995f2d887b99f377f0ae10024614a1f80#egg=mitogen
+-e git://github.com/dw/mitogen.git@1eb08fb5c5483fb7519893f65fb6a477c57045d1#egg=mitogen
 jinja2>=2.10
 dill>=0.2.8.2

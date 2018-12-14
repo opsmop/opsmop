@@ -60,7 +60,7 @@ class ConnectionManager(object):
         self.replay_callbacks = ReplayCallbacks()
         self.calls_sel = mitogen.select.Select()
         self.status_recv = mitogen.core.Receiver(self.router)
-        self.myself = mitogen.core.Context(self.router, mitogen.context_id)
+        self.myself = self.router.myself()
 
         fileserving_paths = role.allow_fileserving_paths()
         if fileserving_paths is None:
