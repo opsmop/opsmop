@@ -153,6 +153,7 @@ class ConnectionManager(object):
                      self.file_service.register(path)
 
     def remotify_role(self, host, policy, role, mode):
+        print("REMOTIFY: %s, %s" % (host, role))
         
         import dill
         conn = self.connect(host, role)
@@ -245,7 +246,8 @@ def remote_fn(caller, params, sender):
     Context.set_caller(caller)
     Context.set_relative_root(relative_root)
     
-    policy.items = Roles(role)
+    policy.roles = Roles(role)
+
     Callbacks.set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
     executor = Executor([ policy ], local_host=host, push=False) # remove single_role
     # FIXME: care about mode
