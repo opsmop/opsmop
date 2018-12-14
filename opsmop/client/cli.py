@@ -62,7 +62,6 @@ class Cli(object):
         parser.add_argument('--tags', help='optional comma seperated list of tags')
         parser.add_argument('--push', action='store_true', help='run in push mode')
         parser.add_argument('--local', action='store_true', help='run in local mode')
-        parser.add_argument('--event-stream', action='store_true', help=argparse.SUPPRESS)
         parser.add_argument('--verbose', action='store_true', help='increase verbosity (for remote modes)')
 
         args = parser.parse_args(self.args[1:])
@@ -80,11 +79,7 @@ class Cli(object):
             print(USAGE)
             sys.exit(1)
 
-        if not args.event_stream:
-            Callbacks.set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
-        else:
-            Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
-
+        Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
         Context.set_verbose(args.verbose)
 
         tags = None
