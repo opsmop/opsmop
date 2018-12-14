@@ -79,8 +79,8 @@ class Cli(object):
             print(USAGE)
             sys.exit(1)
 
-        Callbacks.set_callbacks([ EventStreamCallbacks(), CommonCallbacks() ])
-        Context.set_verbose(args.verbose)
+        Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
+        Context().set_verbose(args.verbose)
 
         tags = None
         if args.tags is not None:

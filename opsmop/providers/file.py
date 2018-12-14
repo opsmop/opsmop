@@ -65,7 +65,7 @@ class File(Provider):
             return True
         if not self.overwrite:
             return False
-        if Context.caller():
+        if Context().caller():
             # currently, push mode would have to download the file to checksum it
             return True
         return not FileTests.same_contents(self.name, self.from_file)

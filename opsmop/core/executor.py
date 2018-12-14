@@ -85,7 +85,7 @@ class Executor(object):
         """
         Runs all policies in the specified mode
         """
-        Context.set_mode(mode)
+        Context().set_mode(mode)
         for policy in self._policies:     
             if self._push:
                 self.connection_manager = ConnectionManager(policy)
@@ -102,12 +102,12 @@ class Executor(object):
         policy.init_scope()
         roles = policy.get_roles()
         for role in roles.items:
-            Context.set_role(role)
+            Context().set_role(role)
             if not self._push:
                 self.process_local_role(policy, role)
             else:
                 self.process_remote_role(policy, role)
-        Callbacks.on_complete(policy)
+        Callbacks().on_complete(policy)
 
     # ---------------------------------------------------------------
 
@@ -121,12 +121,49 @@ class Executor(object):
         
         # resources and handlers must be processed seperately
         # the validate method will raise exceptions when problems are found
-        original_mode = Context.mode()
-        Context.set_mode(VALIDATE)
+        original_mode = Context().mode()
+        Context().set_mode(VALIDATE)
         role.walk_children(items=role.get_children('resources'), which='resources', fn=validate, tags=self._tags)
         role.walk_children(items=role.get_children('handlers'), which='handlers', fn=validate)
         if original_mode:
-            Context.set_mode(original_mode)
+            Context().set_mode(original_mode)
+
+    # ---------------------------------------------------------------
+
+    def compute_max_hostname_length(self, hosts):
+        hostname_length = 0
+        for host in hosts:
+            length = len(host.display_name())
+            if length > hostname_length:
+               hostname_length = length
+        Callbacks().set_hostname_length(hostname_length)
+
+    # ---------------------------------------------------------------
+
+    def connect_to_all_hosts(self, hosts, role, max_workers):
+        batch = Batch(hosts, batch_size=200)
+        def host_connector(host):
+            Context().set_host(host)
+            self.connection_manager.connect(host, role)
+        batch.apply_async(host_connector, max_workers=max_workers)
+
+    # ---------------------------------------------------------------
+
+    def run_roles_on_all_hosts(self, hosts, policy, role, batch_size):
+        def role_runner(host):
+            mode = Context().mode()
+            self.connection_manager.remotify_role(host, policy, role, mode)
+        batch = Batch(hosts, batch_size=batch_size)
+        batch.apply(role_runner)
+
+    # ---------------------------------------------------------------
+
+    def process_failed_hosts(self, hosts):
+        failures = Context().host_failures()
+        failed_hosts = [ f for f in failures.keys() ]
+        if len(failed_hosts):
+            Callbacks().on_terminate_with_host_list(failed_hosts)
+            raise OpsMopStop()
 
     # ---------------------------------------------------------------
 
@@ -138,58 +175,40 @@ class Executor(object):
         import dill
 
         self.connection_manager.announce_role(role)
-
-        # this hack is intended to reset the queue for subsequent roles and should NOT be required
-
         hosts = role.inventory().hosts()
         self.connection_manager.add_hosts(hosts)
 
         batch_size = role.serial()
         max_workers = UserDefaults.max_workers()
 
-        batch = Batch(hosts, batch_size=200)
-        def host_connector(host):
-            Context.set_host(host)
-            self.connection_manager.connect(host, role)
-        batch.apply_async(host_connector, max_workers=max_workers)
-
+        self.compute_max_hostname_length(hosts)
+        self.connect_to_all_hosts(hosts, role, max_workers)
         self.connection_manager.prepare_for_role(role)
-
-        def role_runner(host):
-            self.connection_manager.remotify_role(host, policy, role, Context.mode())
-        batch = Batch(hosts, batch_size=batch_size)
-        batch.apply(role_runner)
-
+        self.run_roles_on_all_hosts(hosts, policy, role, batch_size)
         self.connection_manager.event_loop()
+        self.process_failed_hosts(hosts)
 
-        failures = Context.host_failures()
-        failed_hosts = [ f for f in failures.keys() ]
-        if len(failed_hosts):
-            Callbacks.on_terminate_with_host_list(failed_hosts)
-            raise OpsMopStop()
-
-          
     # ---------------------------------------------------------------
 
     def process_local_role(self, policy=None, role=None):
 
         host = self._local_host
 
-        Context.set_host(host)
+        Context().set_host(host)
 
         role.pre()
         # set up the variable scope - this is done later by walk_handlers for lower-level objects in the tree
         policy.attach_child_scope_for(role)
         # tell the callbacks we are in validate mode - this may alter or quiet their output
-        Callbacks.on_validate()
+        Callbacks().on_validate()
         # always validate the role in every mode (VALIDATE, CHECK ,or APPLY)
         self.validate_role(role)
         # skip the role if we need to
         if not role.conditions_true():
-            Callbacks.on_skipped(role)
+            Callbacks().on_skipped(role)
             return
         # process the tree for real for non-validate modes
-        if not Context.is_validate():
+        if not Context().is_validate():
             self.execute_role_resources(host, role)
             self.execute_role_handlers(host, role)
         # run any user hooks
@@ -204,7 +223,7 @@ class Executor(object):
         """
         # tell the context we are processing resources now, which may change their behavior
         # of certain methods like on_resource()
-        Callbacks.on_begin_role(role)
+        Callbacks().on_begin_role(role)
         def execute_resource(resource):
             # execute each resource through plan() and if needed apply() stages, but before and after
             # doing so, run any user pre() or post() hooks implemented on that object.
@@ -221,7 +240,7 @@ class Executor(object):
         Processes handler resources for one role for CHECK or APPLY mode
         """
         # see comments for prior method for details
-        Callbacks.on_begin_handlers()
+        Callbacks().on_begin_handlers()
         def execute_handler(handler):
             handler.pre()
             result = self.execute_resource(host=host, resource=handler, handlers=True)
@@ -244,7 +263,7 @@ class Executor(object):
             return provider
         
         # tell the context object we are about to run the plan stage.
-        Callbacks.on_plan(provider)
+        Callbacks().on_plan(provider)
         # compute the plan
         provider.plan()
         # copy the list of planned actions into the 'to do' list for the apply method
@@ -269,12 +288,12 @@ class Executor(object):
             return False
                 
         # indicate we are about take some actions
-        Callbacks.on_apply(provider)
+        Callbacks().on_apply(provider)
         # take them
         result = provider.apply()
         if not handlers:
             # let the callbacks now we have taken some actions
-            Callbacks.on_taken_actions(provider, provider.actions_taken)
+            Callbacks().on_taken_actions(provider, provider.actions_taken)
             
         # all Provider apply() methods need to return Result objects or raise
         # exceptions
@@ -299,12 +318,12 @@ class Executor(object):
         result.fatal = fatal
 
         # tell the callbacks about the result
-        Callbacks.on_result(provider, result)
+        Callbacks().on_result(provider, result)
 
         # if there was a failure, handle it
         # (common callbacks should abort execution)
         #if fatal:
-        #    Callbacks.on_fatal(provider, result)
+        #    Callbacks().on_fatal(provider, result)
 
         return True
 
@@ -327,9 +346,9 @@ class Executor(object):
             return
         if resource.signals:
             # record the list of all events signaled while processing this role
-            Context.add_signal(host, resource.signals)
+            Context().add_signal(host, resource.signals)
             # tell the callbacks that a signal occurred
-            Callbacks.on_signaled(resource, resource.signals)
+            Callbacks().on_signaled(resource, resource.signals)
 
     # ---------------------------------------------------------------
 
@@ -345,19 +364,19 @@ class Executor(object):
             return
 
         # if in handler mode we do not process the handler unless it was signaled
-        if handlers and not Context.has_seen_any_signal(host, resource.all_handles()):
-            Callbacks.on_skipped(resource, is_handler=handlers)
+        if handlers and not Context().has_seen_any_signal(host, resource.all_handles()):
+            Callbacks().on_skipped(resource, is_handler=handlers)
             return
 
         # tell the callbacks we are about to process a resource
         # they may use this to print information about the resource
-        Callbacks.on_resource(resource, handlers)
+        Callbacks().on_resource(resource, handlers)
 
         # plan always, apply() only if not in check mode, else assume
         # the plan was executed.
         provider = self.do_plan(resource)
         assert provider is not None
-        if Context.is_apply():
+        if Context().is_apply():
             self.do_apply(host, provider, handlers)
         else: # is_check
             self.do_simulate(host, provider)

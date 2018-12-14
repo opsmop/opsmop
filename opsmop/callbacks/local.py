@@ -26,8 +26,6 @@ from opsmop.core.errors import CommandError, OpsMopStop
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
-Context = Context()
-
 class LocalCliCallbacks(BaseCallbacks):
 
     """
@@ -75,11 +73,11 @@ class LocalCliCallbacks(BaseCallbacks):
     def on_needs(self, provider, action):
         if provider.skip_plan_stage():
             return
-        if Context.is_check():
+        if Context().is_check():
             self.i3("needs: %s" % action.do)
 
     def on_do(self, provider, action):
-        if Context.is_apply():
+        if Context().is_apply():
             self.i3("do: %s" % action.do)
 
     def on_taken_actions(self, provider, actions_taken):

@@ -78,7 +78,8 @@ class EventStreamCallbacks(BaseCallbacks):
                 if hasattr(v, 'to_dict'):
                     v = v.to_dict()
             data[k] = v
-        if not self.sender:
-            print(json.dumps(data))
-        else:
-            self.sender.send(data)
+        #if self.sender:
+        #    # print(json.dumps(data))
+        #    pass
+        #else:
+        self.sender.send(data)

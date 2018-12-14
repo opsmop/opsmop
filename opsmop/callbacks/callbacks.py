@@ -14,109 +14,91 @@
 
 # NOTE: this interface is subject to change
 
-CALLBACKS = []
+from opsmop.core.common import Singleton
 
-class Callbacks(object):
+class Callbacks(metaclass=Singleton):
 
-    @classmethod
-    def set_callbacks(cls, callbacks):
-        global CALLBACKS
-        CALLBACKS = callbacks
+    def set_callbacks(self, callbacks):
+        self._callbacks = callbacks
+        self._hostname_length = 0
+
+    def set_hostname_length(self, length):
+        self._hostname_length = length
+
+    def hostname_length(self):
+        return self._hostname_length
             
-    @classmethod
-    def _run_callbacks(cls, cb_method, *args):
+    def _run_callbacks(self, cb_method, *args):
         """ 
         Run a named callback method against all attached callback classes, in order.
         """
-        global CALLBACKS
-        for c in CALLBACKS:
+        for c in self._callbacks:
             attr = getattr(c, cb_method, None)
             if attr:
                 attr(*args)
 
-    @classmethod
-    def on_apply(cls, provider):
-        cls._run_callbacks('on_apply', provider)
+    def on_apply(self, provider):
+        self._run_callbacks('on_apply', provider)
 
-    @classmethod
-    def on_finished(cls, value):
-        cls._run_callbacks('on_finished')
+    def on_finished(self, value):
+        self._run_callbacks('on_finished')
 
-    @classmethod
-    def on_echo(cls, provider, value):
-        cls._run_callbacks('on_echo', provider, value)
+    def on_echo(self, provider, value):
+        self._run_callbacks('on_echo', provider, value)
 
-    @classmethod
-    def on_plan(cls, provider):
-        cls._run_callbacks('on_plan', provider)
+    def on_plan(self, provider):
+        self._run_callbacks('on_plan', provider)
 
-    @classmethod
-    def on_command_echo(cls, provider, value):
-        cls._run_callbacks('on_command_echo', provider, value)
+    def on_command_echo(self, provider, value):
+        self._run_callbacks('on_command_echo', provider, value)
 
-    @classmethod
-    def on_execute_command(cls, provider, value):
-        cls._run_callbacks('on_execute_command', provider, value)
+    def on_execute_command(self, provider, value):
+        self._run_callbacks('on_execute_command', provider, value)
 
-    @classmethod
-    def on_resource(cls, resource, is_handler):
-        cls._run_callbacks('on_resource', resource, is_handler)
+    def on_resource(self, resource, is_handler):
+        self._run_callbacks('on_resource', resource, is_handler)
 
-    @classmethod
-    def on_command_result(cls, provider, value):
-        cls._run_callbacks('on_command_result', provider, value)
+    def on_command_result(self, provider, value):
+        self._run_callbacks('on_command_result', provider, value)
 
-    @classmethod
-    def on_needs(cls, provider, action):
-        cls._run_callbacks('on_needs', provider, action)
+    def on_needs(self, provider, action):
+        self._run_callbacks('on_needs', provider, action)
 
-    @classmethod
-    def on_do(cls, provider, action):
-        cls._run_callbacks('on_do', provider, action)
+    def on_do(self, provider, action):
+        self._run_callbacks('on_do', provider, action)
 
-    @classmethod
-    def on_taken_actions(cls, provider, actions_list):
-        cls._run_callbacks('on_taken_actions', provider, actions_list)
+    def on_taken_actions(self, provider, actions_list):
+        self._run_callbacks('on_taken_actions', provider, actions_list)
 
-    @classmethod
-    def on_result(cls, provider, result):
-        cls._run_callbacks('on_result', provider, result)
+    def on_result(self, provider, result):
+        self._run_callbacks('on_result', provider, result)
         if result.fatal:
-            cls._run_callbacks('on_fatal', provider, result)
+            self._run_callbacks('on_fatal', provider, result)
 
-    @classmethod
-    def on_skipped(cls, value, is_handler=False):
-        cls._run_callbacks('on_skipped', value, is_handler)
+    def on_skipped(self, value, is_handler=False):
+        self._run_callbacks('on_skipped', value, is_handler)
 
-    @classmethod
-    def on_signaled(cls, resource, event_name):
-        cls._run_callbacks('on_signaled', resource, event_name)
+    def on_signaled(self, resource, event_name):
+        self._run_callbacks('on_signaled', resource, event_name)
 
-    @classmethod
-    def on_complete(cls, policy):
-        cls._run_callbacks('on_complete', policy)
+    def on_complete(self, policy):
+        self._run_callbacks('on_complete', policy)
 
-    @classmethod
-    def on_update_variables(cls, variables):
-        cls._run_callbacks('on_update_variables', variables)
+    def on_update_variables(self, variables):
+        self._run_callbacks('on_update_variables', variables)
 
-    @classmethod
-    def on_begin_role(cls, role):
-        cls._run_callbacks('on_begin_role', role)
+    def on_begin_role(self, role):
+        self._run_callbacks('on_begin_role', role)
 
-    @classmethod
-    def on_begin_handlers(cls):
-        cls._run_callbacks('on_begin_handlers')
+    def on_begin_handlers(self):
+        self._run_callbacks('on_begin_handlers')
 
-    @classmethod
-    def on_validate(cls):
-        cls._run_callbacks('on_validate')
+    def on_validate(self):
+        self._run_callbacks('on_validate')
 
-    @classmethod
-    def on_host_exception(cls, host, exc):
+    def on_host_exception(self, host, exc):
         # is this needed?
-        cls._run_callbacks('on_failed_host', host, exc)
+        self._run_callbacks('on_failed_host', host, exc)
 
-    @classmethod
-    def on_terminate_with_host_list(cls, host_list):
-        cls._run_callbacks('on_terminate_with_host_list', host_list)
+    def on_terminate_with_host_list(self, host_list):
+        self._run_callbacks('on_terminate_with_host_list', host_list)

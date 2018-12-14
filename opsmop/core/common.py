@@ -16,6 +16,13 @@ import functools
 
 # while we want to keep this miminal, the common class contains some useful functions usable by many providers.
 
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
 def memoize(func):
     """
     The second time the decorated function is called, return the previous response value

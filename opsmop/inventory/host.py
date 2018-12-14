@@ -61,6 +61,14 @@ class Host(object):
     def python_path(self):
         return self.variables.get('opsmop_python_path', UserDefaults.python_path())
       
+    def display_name(self):
+        hostname = self.hostname()
+        msg = self.name
+        if self.name != hostname:
+            return "%s (%s)" % (self.name, hostname)
+        else:
+            return msg
+
     def connection_context(self, role):
         
         hostname = self.hostname()

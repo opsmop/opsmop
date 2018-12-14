@@ -174,7 +174,7 @@ class ConnectionManager(object):
         try:
         
             if not role.should_contact(host):
-                Callbacks.on_skipped(role)
+                Callbacks().on_skipped(role)
                 return True
             else:
                 role.before_contact(host)
@@ -182,7 +182,7 @@ class ConnectionManager(object):
         except Exception as e:
 
             print(str(e))
-            Context.record_host_failure(host, e)
+            Context().record_host_failure(host, e)
             return False
  
         target_host = self.actual_host(role, host)
@@ -241,7 +241,7 @@ class ConnectionManager(object):
                         msg.unpickle()
                         # all done for host
                     except mitogen.core.CallError as e:
-                        Context.record_host_failure(host, e)
+                        Context().record_host_failure(host, e)
 
                         if 'opsmop.core.errors' in str(e):
                             # callbacks should have already eaten it
@@ -273,13 +273,13 @@ def remote_fn(caller, params, sender):
     mode = params['mode']
     relative_root = params['relative_root']
 
-    Context.set_mode(mode)
-    Context.set_caller(caller)
-    Context.set_relative_root(relative_root)
+    Context().set_mode(mode)
+    Context().set_caller(caller)
+    Context().set_relative_root(relative_root)
     
     policy.roles = Roles(role)
 
-    Callbacks.set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
+    Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
     executor = Executor([ policy ], local_host=host, push=False) # remove single_role
     # FIXME: care about mode
     executor.apply()

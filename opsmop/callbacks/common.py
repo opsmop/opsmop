@@ -41,7 +41,7 @@ class CommonCallbacks(BaseCallbacks):
         planned = sorted([ str(x) for x in provider.actions_planned ])
         if (taken != planned):
             err = ProviderError(provider, "actions taken (%s) do not equal planned (%s)" % (taken, planned))
-            self.record_host_failure(Context.host(), err)
+            self.record_host_failure(Context().host(), err)
             raise err
 
     def on_command_result(self, provider, result):
@@ -50,7 +50,7 @@ class CommonCallbacks(BaseCallbacks):
             # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
             # effect
             err = CommandError(provider, "command failed", result)
-            self.record_host_failure(Context.host(), err)
+            self.record_host_failure(Context().host(), err)
             raise err
 
     def on_fatal(self, provider, msg=None):
@@ -58,4 +58,4 @@ class CommonCallbacks(BaseCallbacks):
         pass
 
     def on_host_exception(self, host, exc):
-        Context.record_host_failure(host, exc)
+        Context().record_host_failure(host, exc)

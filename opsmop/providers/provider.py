@@ -53,11 +53,11 @@ class Provider(object):
         """
         Copy a file in local mode, or download from the fileserver in push mode
         """
-        caller = Context.caller()
+        caller = Context().caller()
         if caller:
             bio = open(dest, "wb", buffering=0)     
             if not src.startswith('/'):    
-                src = os.path.join(Context.relative_root(), src)
+                src = os.path.join(Context().relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             if not ok:
                raise Exception("file transfer failed")
@@ -68,11 +68,11 @@ class Provider(object):
         """
         Read a file into memory,  use the fileserver if in push mode, otherwise just use the filesystem.
         """
-        caller = Context.caller()
+        caller = Context().caller()
         if caller:
             bio = io.BytesIO()
             if not src.startswith('/'):    
-                src = os.path.join(Context.relative_root(), src)
+                src = os.path.join(Context().relative_root(), src)
             ok, metadata = mitogen.service.FileService.get(caller, src, bio)
             data = bio.getvalue().decode('utf-8')
             bio.close()
@@ -121,7 +121,7 @@ class Provider(object):
         """ declares than an action 'should' take place during an apply step """
         action = Action(action_name)
         self.actions_planned.append(action)
-        Callbacks.on_needs(self, action)
+        Callbacks().on_needs(self, action)
 
     def should(self, what):
         """ returns True if an action should take place during an apply step """
@@ -131,7 +131,7 @@ class Provider(object):
         """ marks off that an action has been completed. not marking off all planned actions (or any unplanned ones) will result in an error """
         action = Action(action_name)
         self.actions_taken.append(action)
-        Callbacks.on_do(self, action)
+        Callbacks().on_do(self, action)
 
 
     def get_command(self, cmd, input_text=None, timeout=None, echo=True, loud=False, fatal=True, ignore_lines=None, primary=False):
@@ -196,7 +196,7 @@ class Provider(object):
         assert result is not None
         va = dict()
         va[self.register] = result
-        Callbacks.on_update_variables(va)
+        Callbacks().on_update_variables(va)
         self.resource.update_variables(va)
         self.resource.update_parent_variables(va)
 
@@ -209,7 +209,7 @@ class Provider(object):
         self.actions_taken = self.actions_planned
 
     def echo(self, msg):
-        Callbacks.on_echo(self, msg)
+        Callbacks().on_echo(self, msg)
 
     def context(self):
         """

@@ -12,117 +12,88 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-HOST = None
-HOST_FAILURES = dict()
-HOST_SIGNALS = dict()
-MODE = None
-CALLER = None
-VERBOSE = False
+from opsmop.core.common import Singleton
 
 VALIDATE = 'validate'
 CHECK = 'check'
 APPLY = 'apply'
 
-# TODO: this was done a bit quickly, should convert to Borg pattern to make code more clear
+class Context(metaclass=Singleton):
 
-class Context(object):
+    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role' ]
 
-    @classmethod
-    def set_mode(cls, mode):
-        global MODE
+    def __init__(self):
+        self._host = None
+        self._host_failures = dict()
+        self._host_signals = dict()
+        self._mode = None
+        self._caller = None
+        self._verbose = False
+        self._role = None
+
+    def set_mode(self, mode):
         assert mode in [ VALIDATE, CHECK, APPLY ]
-        MODE = mode
+        self._mode = mode
 
-    @classmethod
-    def set_caller(cls, caller):
-        global CALLER
-        CALLER = caller
+    def mode(self):
+        return self._mode
 
-    @classmethod
-    def caller(cls):
-        global CALLER
-        return CALLER
+    def set_caller(self, caller):
+        self._caller = caller
 
-    @classmethod
-    def role(cls):
-        global ROLE
-        return ROLE
+    def caller(self):
+        return self._caller
 
-    @classmethod
-    def set_role(cls, role):
-        global ROLE
-        ROLE = role
-        return ROLE
+    def role(self):
+        return self._role
 
-    @classmethod
-    def verbose(cls):
-        global VERBOSE
-        return VERBOSE
+    def set_role(self, role):
+        self._role = role 
 
-    @classmethod
-    def set_verbose(cls, value):
-        global VERBOSE
-        VERBOSE = value
+    def verbose(self):
+        return self._verbose
 
-    @classmethod
-    def set_host(cls, host):
-        global HOST
-        HOST = host
+    def set_verbose(self, value):
+        self._verbose = value
 
-    @classmethod
-    def relative_root(cls):
-        global RELATIVE_ROOT
-        return RELATIVE_ROOT
+    def set_host(self, host):
+        self._host = host
 
-    @classmethod
-    def set_relative_root(cls, root):
-        global RELATIVE_ROOT
-        RELATIVE_ROOT = root
+    def relative_root(self):
+        return self._relative_root
 
-    @classmethod
-    def host(cls):
-        return host
+    def set_relative_root(self, root):
+        self._relative_root = root
 
-    @classmethod
-    def mode(cls):
-        global MODE
-        return MODE
+    def host(self):
+        return self._host
 
-    @classmethod
-    def record_host_failure(cls, host, exc):
-        global HOST_FAILURES
-        HOST_FAILURES[host] = exc
 
-    @classmethod
-    def host_failures(cls):
-        global HOST_FAILURES
-        return HOST_FAILURES
 
-    @classmethod
-    def is_validate(cls):
-        return MODE == VALIDATE
+    def record_host_failure(self, host, exc):
+        self._host_failures[host] = exc
 
-    @classmethod
-    def is_check(cls):
-        return MODE == CHECK
+    def host_failures(self):
+        return self._host_failures
 
-    @classmethod
-    def is_apply(cls):
-        return MODE == APPLY
+    def is_validate(self):
+        return self._mode == VALIDATE
 
-    @classmethod
-    def add_signal(cls, host, signal):
+    def is_check(self):
+        return self._mode == CHECK
 
-        global HOST_SIGNALS
-        if not host.name in HOST_SIGNALS:
-            HOST_SIGNALS[host.name] = []
-        HOST_SIGNALS[host.name].append(signal)
+    def is_apply(self):
+        return self._mode == APPLY
 
-    @classmethod
-    def has_seen_any_signal(cls, host, signals):
+    def add_signal(self, host, signal):
 
-        global HOST_SIGNALS
-        host_signals = HOST_SIGNALS.get(host.name, [])
+        if not host.name in self._host_signals:
+            self._host_signals[host.name] = []
+        self._host_signals[host.name].append(signal)
+
+    def has_seen_any_signal(self, host, signals):
+
+        host_signals = self._host_signals.get(host.name, [])
 
         for x in host_signals:
             if x in signals:

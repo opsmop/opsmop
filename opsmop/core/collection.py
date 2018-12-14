@@ -104,14 +104,14 @@ class Collection(Resource):
             if proceed:
                 return items.walk_children(items=items.get_children(), which=which, fn=fn, tags=tags)
             else:
-                Callbacks.on_skipped(items, is_handler=handlers)
+                Callbacks().on_skipped(items, is_handler=handlers)
 
         elif issubclass(items_type, Resource):
             self.attach_child_scope_for(items)
             if items.conditions_true():
                 return maybe(items)
             else:
-                Callbacks.on_skipped(items, is_handler=handlers)
+                Callbacks().on_skipped(items, is_handler=handlers)
 
         elif items_type == list:
             for x in items:        
@@ -122,7 +122,7 @@ class Collection(Resource):
                     else:
                         maybe(x)
                 else:
-                    Callbacks.on_skipped(items, is_handler=handlers)
+                    Callbacks().on_skipped(items, is_handler=handlers)
 
         elif items_type == dict:
             for (k,v) in items.items():
@@ -134,4 +134,4 @@ class Collection(Resource):
                         v.handles = k
                         maybe(v)
                 else:
-                    Callbacks.on_skipped(items, is_handler=handlers)
+                    Callbacks().on_skipped(items, is_handler=handlers)

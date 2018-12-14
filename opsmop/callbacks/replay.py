@@ -17,42 +17,40 @@ from opsmop.core.context import Context
 
 
 class ReplayCallbacks(BaseCallbacks):
-   
+  
     def on_resource(self, host, evt):
         # {'evt': 'resource', 'resource': {'cls': 'Debug', 'variable_names': (), 'evals': {}}, 'is_handler': False}
         self.info(host, self.resource(evt))
 
     def on_execute_command(self, host, evt):
-        if not Context.verbose():
+        if not Context().verbose():
             return
         self.info(host, self.command(evt))
 
     def on_complete(self, host, evt):
         try:
-            Context.role().after_contact(host)
+            Context().role().after_contact(host)
         except Exception as e:
             print(str(e))
-            Context.record_host_failure(host, e)
-
+            Context().record_host_failure(host, e)
         self.info(host, 'complete')
 
     def on_result(self, host, evt):
         self.info(host, self.result(evt), sep='=')
 
     def on_default(self, host, evt):
-        #print(f"** DEBUG: {host.name} : {evt}")
         pass
 
     def on_fatal(self, host, evt):
         self.info(host, "failed")
 
     def on_command_echo(self, host, evt):
-        if not Context.verbose():
+        if not Context().verbose():
             return
         self.info(host, "| %s" % evt['data'])
 
     def on_echo(self, host, evt):
-        if not Context.verbose():
+        if not Context().verbose():
             return
         self.info(host, "| %s" % evt['data'])
 
@@ -66,7 +64,7 @@ class ReplayCallbacks(BaseCallbacks):
         name = evt['resource'].get('name', None)
         if name:
             caption = caption + " (%s)" % name
-        if evt['is_handler']:
+        if evt.get('is_handler',False):
             return "handler: %s" % caption
         else:
             return "resource: %s" % caption
@@ -95,8 +93,9 @@ class ReplayCallbacks(BaseCallbacks):
         return "signaled: %s" % evt['data']
 
     def info(self, host, msg, sep=':'):
-        hostname = host.hostname()
-        caption = host.name
-        if host.name != hostname:
-            caption = "%s (%s)" % (host.name, hostname)
-        self.i3("%s %s %s" % (caption, sep, msg))
+
+        from opsmop.callbacks.callbacks import Callbacks
+        max_length = Callbacks().hostname_length()
+        fmt = f"%{max_length}s"
+        msg = "%s %s %s" % (fmt % host.display_name(), sep, msg)
+        self.i3(msg)
