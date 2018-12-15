@@ -21,7 +21,6 @@ from opsmop.core.errors import CommandError, OpsMopError, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
-
 class CommonCallbacks(BaseCallbacks):
 
     """

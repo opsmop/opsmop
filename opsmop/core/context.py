@@ -20,7 +20,7 @@ APPLY = 'apply'
 
 class Context(metaclass=Singleton):
 
-    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums' ]
+    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums', '_globals', '_extra_vars' ]
 
     def __init__(self):
         self._host = None
@@ -31,6 +31,14 @@ class Context(metaclass=Singleton):
         self._verbose = False
         self._role = None
         self._checksums = dict()
+        self._extra_vars = dict()
+        self._globals = dict()
+
+    def update_globals(self, variables):
+        self._globals.update(variables)
+
+    def globals(self):
+        return self._globals
 
     def set_mode(self, mode):
         assert mode in [ VALIDATE, CHECK, APPLY ]
@@ -41,6 +49,12 @@ class Context(metaclass=Singleton):
 
     def set_caller(self, caller):
         self._caller = caller
+
+    def set_extra_vars(self, extra_vars):
+        self._extra_vars = extra_vars
+
+    def extra_vars(self):
+        return self._extra_vars
 
     def caller(self):
         return self._caller

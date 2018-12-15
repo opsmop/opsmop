@@ -26,6 +26,7 @@ from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.core.api import Api
 from opsmop.core.context import Context
 from opsmop.core.errors import OpsMopError, OpsMopStop
+from opsmop.core.common import load_data_file, shlex_kv
 
 USAGE = """
 |
@@ -46,6 +47,16 @@ class Cli(object):
         self.policy = policy
         self.args = sys.argv
         self.go()
+
+    def handle_extra_vars(self, extra_vars):
+        data = None
+        # TODO: make some functions in common that do this generically
+        if extra_vars.startswith("@"):
+            extra_vars = extra_vars.replace("@","")
+            data = load_data_file(extra_vars)
+        else:
+            data = shlex_kv(extra_vars)
+        return data
  
     def go(self):
 
@@ -58,6 +69,7 @@ class Cli(object):
         mode = self.args[1]
         path = sys.argv[2]
         callbacks = None
+        extra_vars = dict()
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--validate', action='store_true', help='policy file to validate')
@@ -67,6 +79,7 @@ class Cli(object):
         parser.add_argument('--push', action='store_true', help='run in push mode')
         parser.add_argument('--local', action='store_true', help='run in local mode')
         parser.add_argument('--verbose', action='store_true', help='increase verbosity (for remote modes)')
+        parser.add_argument('--extra-vars', help="add extra variables from the command line")
 
         args = parser.parse_args(self.args[1:])
 
@@ -83,6 +96,9 @@ class Cli(object):
             print(USAGE)
             sys.exit(1)
 
+        if args.extra_vars is not None:
+            extra_vars = self.handle_extra_vars(args.extra_vars)
+
         Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         Context().set_verbose(args.verbose)
 
@@ -90,7 +106,7 @@ class Cli(object):
         if args.tags is not None:
             tags = args.tags.strip().split(",")
 
-        api = Api(policies=[self.policy], tags=tags, push=args.push)
+        api = Api(policies=[self.policy], tags=tags, push=args.push, extra_vars=extra_vars)
 
         abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
         os.chdir(os.path.dirname(abspath))

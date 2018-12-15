@@ -21,21 +21,22 @@ from opsmop.core.executor import Executor
 class Api(object):
 
 
-    __slots__ = [ '_policies', '_tags', '_push' ]
+    __slots__ = [ '_policies', '_tags', '_push', '_extra_vars' ]
 
-    def __init__(self, policies=None, tags=None, push=False):
+    def __init__(self, policies=None, tags=None, push=False, extra_vars=None):
 
         assert type(policies) == list
         self._policies = policies
         self._tags = tags
         self._push = push
+        self._extra_vars = extra_vars
         
     def validate(self):
         """
         This just checks for invalid types in the python file as well as missing files
         and non-sensical option combinations.
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push)
+        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars)
         contexts = executor.validate()
         return contexts
 
@@ -43,7 +44,7 @@ class Api(object):
         """
         This is dry-run mode
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push)
+        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars)
         contexts = executor.check()
         return contexts
 
@@ -51,6 +52,6 @@ class Api(object):
         """
         This is live-configuration mode.
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push)
+        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars)
         contexts = executor.apply()
         return contexts

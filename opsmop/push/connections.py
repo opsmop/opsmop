@@ -211,12 +211,11 @@ class ConnectionManager(object):
             relative_root = self.relative_root,
             tags = self.tags,
             checksums = self.checksums,
-            sender = sender,
-            myself = self.myself
+            hostvars = host.all_variables(),
+            extra_vars = Context().extra_vars()
         )
         params = zlib.compress(dill.dumps(params), level=9)
-        print("len=%s" % len(params))
-        call_recv = conn.call_async(remote_fn, params)
+        call_recv = conn.call_async(remote_fn, self.myself, params, sender)
         self.calls_sel.add(call_recv)
 
         return True
@@ -273,7 +272,7 @@ class ConnectionManager(object):
         self.pool.stop(join=True)
 
 
-def remote_fn(caller, params):
+def remote_fn(caller, params, sender):
     """
     This is the remote function used for mitogen calls
     """
@@ -288,19 +287,21 @@ def remote_fn(caller, params):
     role = params['role']
     mode = params['mode']
     tags = params['tags']
-    sender = params['sender']
-    myself = params['myself']
     checksums = params['checksums']
     relative_root = params['relative_root']
+    hostvars = params['hostvars']
+    extra_vars = params['extra_vars']
 
     Context().set_mode(mode)
     Context().set_caller(caller)
     Context().set_relative_root(relative_root)
     Context().set_checksums(checksums)
 
+    Context().update_globals(hostvars)
+
     policy.roles = Roles(role)
 
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
-    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags']) # remove single_role
+    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags'], extra_vars=extra_vars) # remove single_role
     # FIXME: care about mode
     executor.apply()

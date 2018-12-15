@@ -15,7 +15,7 @@
 import jinja2
 
 from opsmop.core.fields import COMMON_FIELDS
-
+from opsmop.core.context import Context
 
 class Resource(object):
 
@@ -93,8 +93,11 @@ class Resource(object):
         Get the full Jinja2 context available for templating at this resource.
         This includes facts + variables
         """
+        context = Context()
         results = self.get_variables()
+        results.update(context.globals())
         results.update(self.fact_context())
+        results.update(context.extra_vars())
         return results
 
     def fact_context(self):

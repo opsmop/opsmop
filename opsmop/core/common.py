@@ -13,6 +13,11 @@
 # limitations under the License.
 
 import functools
+import os
+import shlex
+
+import toml
+import yaml
 
 # while we want to keep this miminal, the common class contains some useful functions usable by many providers.
 
@@ -36,3 +41,27 @@ def memoize(func):
             cache[key] = func(*args, **kwargs)
         return cache[key]
     return memoized_func
+
+def shlex_kv(msg):
+    data = shlex.split(msg)
+    results = dict()
+    for item in data:
+        if '=' in item:
+            (k,v) = item.split("=",1)
+            results[k] = v
+        else:
+            raise Exception("invalid input: %s" % data)
+    return results
+
+def load_data_file(path):
+    path = os.path.abspath(os.path.expanduser(os.path.expandvars(path)))
+    if not os.path.exists(path):
+        raise Exception("path does not exist: %s" % path)
+    if path.endswith(".toml"):
+        return toml.load(path)
+    elif path.endswith(".json"):
+        return json.load(path)
+    elif path.endswith(".yaml"):
+        return yaml.load(path)
+    else:
+        raise Exception("unknown extension: %s" % path)

@@ -38,7 +38,7 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies, local_host=None, tags=None, push=False):
+    def __init__(self, policies, local_host=None, tags=None, push=False, extra_vars=None):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -51,6 +51,7 @@ class Executor(object):
         if local_host is None:
             local_host = Host("127.0.0.1")
         self._local_host = local_host
+        Context().set_extra_vars(extra_vars)
         self.connection_manager = None
 
     # ---------------------------------------------------------------

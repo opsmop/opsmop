@@ -22,10 +22,7 @@ class Template(object):
 
     @classmethod
     def _get_context(cls, resource):
-        context = resource.template_context()
-        variables = resource.get_variables()
-        variables.update(context)
-        return variables
+        return resource.template_context()
 
     @classmethod
     def from_string(cls, msg, resource):
