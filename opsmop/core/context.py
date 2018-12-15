@@ -20,7 +20,7 @@ APPLY = 'apply'
 
 class Context(metaclass=Singleton):
 
-    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role' ]
+    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums' ]
 
     def __init__(self):
         self._host = None
@@ -30,6 +30,7 @@ class Context(metaclass=Singleton):
         self._caller = None
         self._verbose = False
         self._role = None
+        self._checksums = dict()
 
     def set_mode(self, mode):
         assert mode in [ VALIDATE, CHECK, APPLY ]
@@ -68,6 +69,11 @@ class Context(metaclass=Singleton):
     def host(self):
         return self._host
 
+    def get_checksum(self, path):
+        return self._checksums[path]
+
+    def set_checksums(self, checksums):
+        self._checksums = checksums
 
 
     def record_host_failure(self, host, exc):

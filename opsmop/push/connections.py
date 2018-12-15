@@ -32,6 +32,7 @@ from opsmop.core.context import Context
 from opsmop.core.errors import InventoryError
 from opsmop.core.roles import Roles
 from opsmop.inventory.host import Host
+from opsmop.facts.filetests import FileTestFacts
 
 
 class ConnectionManager(object):
@@ -52,6 +53,7 @@ class ConnectionManager(object):
         self.deny_patterns  = policy.deny_fileserving_patterns()
         abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
         self.relative_root = os.path.dirname(abspath)
+        self.checksums = dict()
 
     def prepare_for_role(self, role):
 
@@ -162,6 +164,7 @@ class ConnectionManager(object):
                 path = os.path.join(root, f)
                 if self.is_allowed_to_serve(path):
                      self.file_service.register(path)
+                     self.checksums[path] = FileTestFacts().checksum(path)
 
     def actual_host(self, role, host):
 
@@ -201,7 +204,8 @@ class ConnectionManager(object):
             role = role, 
             mode = mode,
             relative_root = self.relative_root,
-            tags = self.tags
+            tags = self.tags,
+            checksums = self.checksums
         )
 
         call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(params), sender)
@@ -270,18 +274,21 @@ def remote_fn(caller, params, sender):
     from opsmop.core.executor import Executor
 
     params = dill.loads(params)
+    
     host = params['host']
     policy = params['policy']
     role = params['role']
     mode = params['mode']
     tags = params['tags']
+    checksums = params['checksums']
+
     relative_root = params['relative_root']
 
     Context().set_mode(mode)
     Context().set_caller(caller)
     Context().set_relative_root(relative_root)
+    Context().set_checksums(checksums)
 
-    
     policy.roles = Roles(role)
 
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])

@@ -64,12 +64,12 @@ class Provider(object):
         else:
             shutil.copy2(src, dest)
 
-    def slurp(self, src):
+    def slurp(self, src, remote=False):
         """
         Read a file into memory,  use the fileserver if in push mode, otherwise just use the filesystem.
         """
         caller = Context().caller()
-        if caller:
+        if caller and remote:
             bio = io.BytesIO()
             if not src.startswith('/'):    
                 src = os.path.join(Context().relative_root(), src)

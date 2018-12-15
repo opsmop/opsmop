@@ -35,15 +35,15 @@ class File(Provider):
         if not self.overwrite:
             return False
 
-        data = self.slurp(self.from_template)
+        data = self.slurp(self.from_template, remote=True)
 
         self.evaluated_template = Template.from_string(data, self.resource)
         
         if not FileTests.exists(self.name):
             return True
-        c1 = FileTests.string_checksum(self.evaluated_template)
-        c2 = FileTests.checksum(self.name)
-        return c1 != c2
+        original = self.slurp(self.name)
+
+        return original != self.evaluated_template
     
     # ---------------------------------------------------------------
 
@@ -53,9 +53,8 @@ class File(Provider):
             return True
         if not self.overwrite:
             return False
-        c1 = FileTests.string_checksum(self.from_content)
-        c2 = FileTests.checksum(self.name)
-        return c1 != c2
+        original = self.slurp(self.name)
+        return original != self.from_content
 
     # ---------------------------------------------------------------
 
@@ -65,10 +64,11 @@ class File(Provider):
             return True
         if not self.overwrite:
             return False
+        remote = False
         if Context().caller():
-            # currently, push mode would have to download the file to checksum it
-            return True
-        return not FileTests.same_contents(self.name, self.from_file)
+            remote = True
+        same = FileTests.same_contents(self.name, self.from_file, remote=remote)
+        return not same
 
     # ---------------------------------------------------------------
 

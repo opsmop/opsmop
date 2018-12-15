@@ -16,8 +16,8 @@ import hashlib
 import os
 import stat
 
+from opsmop.core.context import Context
 from opsmop.facts.facts import Facts
-
 
 class FileTestFacts(Facts):
     
@@ -82,12 +82,19 @@ class FileTestFacts(Facts):
         m.update(msg.encode())
         return m.hexdigest()
 
-    def same_contents(self, a, b):
-        if not self.exists(b):
+    def same_contents(self, dest, src, remote=False):
+        if not self.exists(dest):
             return False
         m = hashlib.sha256()
-        c1 = self.checksum(a)
-        c2 = self.checksum(b)
+        c1 = self.checksum(dest)
+        c2 = None
+        if not remote:
+            c2 = self.checksum(src)
+        else:
+            # FIXME: this is slightly duplicated with provider code
+            if not src.startswith('/'):
+                src = os.path.join(Context().relative_root(), src)
+            c2 = Context().get_checksum(src)
         return (c1 == c2)        
 
 FileTests = FileTestFacts()
