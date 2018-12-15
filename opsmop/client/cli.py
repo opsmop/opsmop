@@ -103,14 +103,22 @@ class Cli(object):
         Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         Context().set_verbose(args.verbose)
 
+        abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
+        relative_root = os.path.dirname(abspath)
+        os.chdir(os.path.dirname(abspath))
+
         tags = None
         if args.tags is not None:
             tags = args.tags.strip().split(",")
 
-        api = Api(policies=[self.policy], tags=tags, push=args.push, extra_vars=extra_vars, limit_groups=args.limit_groups, limit_hosts=args.limit_hosts)
-
-        abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
-        os.chdir(os.path.dirname(abspath))
+        api = Api(
+            policies=[self.policy], 
+            tags=tags, 
+            push=args.push, 
+            extra_vars=extra_vars, 
+            limit_groups=args.limit_groups, 
+            limit_hosts=args.limit_hosts,
+            relative_root=relative_root)
 
         try:
             if args.validate:

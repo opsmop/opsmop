@@ -17,13 +17,14 @@ from runpy import run_path
 
 from opsmop.core.executor import Executor
 
+# FIXME: this class is becoming a thin layer on executor. Do we need it still? Executor may become the new API class.
 
 class Api(object):
 
 
-    __slots__ = [ '_policies', '_tags', '_push', '_extra_vars', '_limit_groups', '_limit_hosts' ]
+    __slots__ = [ '_policies', '_tags', '_push', '_extra_vars', '_limit_groups', '_limit_hosts', '_relative_root' ]
 
-    def __init__(self, policies=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None):
+    def __init__(self, policies=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
 
         assert type(policies) == list
         self._policies = policies
@@ -32,13 +33,25 @@ class Api(object):
         self._limit_groups = limit_groups
         self._limit_hosts = limit_hosts
         self._extra_vars = extra_vars
+        self._relative_root = relative_root
+
+    def get_executor(self):
+        return Executor(
+            self._policies, 
+            tags=self._tags, 
+            push=self._push, 
+            extra_vars=self._extra_vars, 
+            limit_groups=self._limit_groups, 
+            limit_hosts=self._limit_hosts,
+            relative_root=self._relative_root
+        )
         
     def validate(self):
         """
         This just checks for invalid types in the python file as well as missing files
         and non-sensical option combinations.
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars, limit_groups=self._limit_groups, limit_hosts=self._limit_hosts)
+        executor = self.get_executor()
         contexts = executor.validate()
         return contexts
 
@@ -46,7 +59,7 @@ class Api(object):
         """
         This is dry-run mode
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars, limit_groups=self._limit_groups, limit_hosts=self._limit_hosts)
+        executor = self.get_executor()
         contexts = executor.check()
         return contexts
 
@@ -54,6 +67,6 @@ class Api(object):
         """
         This is live-configuration mode.
         """
-        executor = Executor(self._policies, tags=self._tags, push=self._push, extra_vars=self._extra_vars, limit_groups=self._limit_groups, limit_hosts=self._limit_hosts)
+        executor = self.get_executor()
         contexts = executor.apply()
         return contexts

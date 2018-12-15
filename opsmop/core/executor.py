@@ -38,7 +38,7 @@ class Executor(object):
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies, local_host=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None):
+    def __init__(self, policies, local_host=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
 
         """
         The Executor runs a list of policies in either CHECK, APPLY, or VALIDATE modes
@@ -54,6 +54,7 @@ class Executor(object):
             local_host = Host("127.0.0.1")
         self._local_host = local_host
         Context().set_extra_vars(extra_vars)
+        Context().set_relative_root(relative_root)
         self.connection_manager = None
 
     # ---------------------------------------------------------------
@@ -191,8 +192,8 @@ class Executor(object):
         max_workers = UserDefaults.max_workers()
 
         self.compute_max_hostname_length(hosts)
-        self.connect_to_all_hosts(hosts, role, max_workers)
         self.connection_manager.prepare_for_role(role)
+        self.connect_to_all_hosts(hosts, role, max_workers)
         self.run_roles_on_all_hosts(hosts, policy, role, batch_size)
         self.connection_manager.event_loop()
         self.process_summary(hosts)

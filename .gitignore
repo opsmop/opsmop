@@ -1,3 +1,7 @@
+build/
+dist/
+opsmop.egg-info/
+src/
 .DS_Store
 *.pyc
 *.pyo

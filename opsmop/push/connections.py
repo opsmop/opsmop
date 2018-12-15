@@ -56,8 +56,6 @@ class ConnectionManager(object):
         self.tags = tags
         self.allow_patterns = policy.allow_fileserving_patterns()
         self.deny_patterns  = policy.deny_fileserving_patterns()
-        abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
-        self.relative_root = os.path.dirname(abspath)
         self.checksums = dict()
         self._limit_groups = limit_groups
         self._limit_hosts = limit_hosts
@@ -77,7 +75,7 @@ class ConnectionManager(object):
             fileserving_paths = self.policy.allow_fileserving_paths()
         for p in fileserving_paths:
             if p == '.':
-                p = self.relative_root
+                p = Context().relative_root()
             self.register_files(p)
 
     def announce_role(self, role):
@@ -234,7 +232,7 @@ class ConnectionManager(object):
             policy = policy,
             role = role, 
             mode = mode,
-            relative_root = self.relative_root,
+            relative_root = Context().relative_root(),
             tags = self.tags,
             checksums = self.checksums,
             hostvars = host.all_variables(),
@@ -303,6 +301,10 @@ def remote_fn(caller, params, sender):
     This is the remote function used for mitogen calls
     """
     
+    # FIXME: REFACTOR: we have a bit of a growing inconsistency between what is a constructor parameter and what is passed around in Context.
+    # we should change this to have context objects that have more meat, but also get passed around versus acting globally, and smaller
+    # function signatures across the board.
+
     import dill
     from opsmop.core.executor import Executor
 
@@ -320,7 +322,7 @@ def remote_fn(caller, params, sender):
 
     Context().set_mode(mode)
     Context().set_caller(caller)
-    Context().set_relative_root(relative_root)
+    assert relative_root is not None
     Context().set_checksums(checksums)
 
     Context().update_globals(hostvars)
@@ -328,6 +330,6 @@ def remote_fn(caller, params, sender):
     policy.roles = Roles(role)
 
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
-    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags'], extra_vars=extra_vars) # remove single_role
+    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags'], extra_vars=extra_vars, relative_root=relative_root) # remove single_role
     # FIXME: care about mode
     executor.apply()
