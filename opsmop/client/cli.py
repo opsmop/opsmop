@@ -78,9 +78,10 @@ class Cli(object):
         parser.add_argument('--tags', help='optional comma seperated list of tags')
         parser.add_argument('--push', action='store_true', help='run in push mode')
         parser.add_argument('--local', action='store_true', help='run in local mode')
-        parser.add_argument('--verbose', action='store_true', help='increase verbosity (for remote modes)')
+        parser.add_argument('--verbose', action='store_true', help='(with --push) increase verbosity')
         parser.add_argument('--extra-vars', help="add extra variables from the command line")
-
+        parser.add_argument('--limit-groups', help="(with --push) limit groups executed to this comma-separated list of patterns")
+        parser.add_argument('--limit-hosts', help="(with --push) limit hosts executed to this comma-separated list of patterns")
         args = parser.parse_args(self.args[1:])
 
         all_modes = [ args.validate, args.apply, args.check ]
@@ -106,7 +107,7 @@ class Cli(object):
         if args.tags is not None:
             tags = args.tags.strip().split(",")
 
-        api = Api(policies=[self.policy], tags=tags, push=args.push, extra_vars=extra_vars)
+        api = Api(policies=[self.policy], tags=tags, push=args.push, extra_vars=extra_vars, limit_groups=args.limit_groups, limit_hosts=args.limit_hosts)
 
         abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
         os.chdir(os.path.dirname(abspath))

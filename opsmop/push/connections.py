@@ -39,7 +39,7 @@ from opsmop.facts.filetests import FileTestFacts
 
 class ConnectionManager(object):
 
-    def __init__(self, policy, tags):
+    def __init__(self, policy, tags, limit_groups=None, limit_hosts=None):
         """
         Constructor.  Establishes mitogen router/broker.
         """
@@ -59,6 +59,8 @@ class ConnectionManager(object):
         abspath = os.path.abspath(sys.modules[policy.__module__].__file__)
         self.relative_root = os.path.dirname(abspath)
         self.checksums = dict()
+        self._limit_groups = limit_groups
+        self._limit_hosts = limit_hosts
 
     def prepare_for_role(self, role):
 
@@ -178,7 +180,31 @@ class ConnectionManager(object):
             return self._hosts[host.name]
         return host
 
+    def should_exclude_from_limits(self, host):
+        # processing for --limit-groups and --limit-hosts
+        block = True
+        if self._limit_hosts:
+            host_patterns = [ x.strip() for x in self._limit_hosts.split(",") ]
+            for pattern in host_patterns:
+                if fnmatch.fnmatch(host.name, pattern):
+                    block = False
+            if block:
+                return True
+        if self._limit_groups:
+            # FIXME: reduce duplication
+            group_patterns = [ x.strip() for x in self._limit_groups.split(",") ]
+            for pattern in group_patterns:
+                for group in host.groups():
+                    if fnmatch.fnmatch(group.name, pattern):
+                        return False
+            return True
+        return False
+
+
     def remotify_role(self, host, policy, role, mode):
+
+        if self.should_exclude_from_limits(host):
+            return
 
         try:
         

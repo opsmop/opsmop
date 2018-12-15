@@ -27,6 +27,9 @@ class Host(object):
         self._groups = dict()
         self._actions = []
 
+    def groups(self):
+        return [ g for g in self._groups.values() ]
+
     def record_actions(self, actions):
         self._actions.extend(actions)
 
