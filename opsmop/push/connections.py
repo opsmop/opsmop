@@ -16,6 +16,8 @@ import fnmatch
 import os
 import sys
 import time
+import logging
+import zlib
 
 import mitogen.core
 import mitogen.master
@@ -41,6 +43,9 @@ class ConnectionManager(object):
         """
         Constructor.  Establishes mitogen router/broker.
         """
+        
+        logging.getLogger('mitogen').setLevel(logging.ERROR)
+
         self.policy = policy
         self.broker = mitogen.master.Broker()
         self.router = mitogen.master.Router(self.broker)
@@ -163,8 +168,8 @@ class ConnectionManager(object):
             for f in files:
                 path = os.path.join(root, f)
                 if self.is_allowed_to_serve(path):
-                     self.file_service.register(path)
-                     self.checksums[path] = FileTestFacts().checksum(path)
+                    self.file_service.register(path)
+                    self.checksums[path] = FileTestFacts().checksum(path)
 
     def actual_host(self, role, host):
 
@@ -207,8 +212,8 @@ class ConnectionManager(object):
             tags = self.tags,
             checksums = self.checksums
         )
-
-        call_recv = conn.call_async(remote_fn, self.myself, dill.dumps(params), sender)
+        params = zlib.compress(dill.dumps(params), level=9)
+        call_recv = conn.call_async(remote_fn, self.myself, params, sender)
         self.calls_sel.add(call_recv)
 
         return True
@@ -273,8 +278,8 @@ def remote_fn(caller, params, sender):
     import dill
     from opsmop.core.executor import Executor
 
-    params = dill.loads(params)
-    
+    params = dill.loads(zlib.decompress(params))
+
     host = params['host']
     policy = params['policy']
     role = params['role']
