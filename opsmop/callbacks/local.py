@@ -145,12 +145,7 @@ class LocalCliCallbacks(BaseCallbacks):
 
     def on_complete(self, policy):
         self.i1("")
-        self.banner("complete!")
-        self.summarize()
-
-    def summarize(self):
-        self.i1("")
-        self.i1("%s resource changes (%s actions)" % (self.changed_resources, self.changed_actions))
+        self.i1("complete! changed %s resources (%s actions)" % (self.changed_resources, self.changed_actions))
 
     def on_fatal(self, provider, msg=None):
         self.i1("")
