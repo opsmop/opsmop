@@ -14,8 +14,7 @@ Thanks, Mom!
 How Is OpsMop Different From X?
 -------------------------------
 
-Ok, the one question I don't like.  You'll have to look for yourself.
-
+Ok, the one question I don't like.  I wrote this thing, so  you'll want to look for yourself!
 OpsMop contains the features documentated on this web site. The other tool has features documented on the other tool web site. 
 Some of the features are different or work differently!
 
@@ -44,7 +43,7 @@ OpsMop strongly believes in pragmatism. It is unlikely you will need to signal f
 
 Easy enough.
 
-The "name" parameter might take an array in the near future, but what's wrong with the shell command?  Nothing, really.
+The "name" parameter should take an array in the near future, but what's wrong with the shell command?  Nothing, really.
 
 Are There Going To Be New Language Features?
 --------------------------------------------
@@ -60,14 +59,7 @@ If you have ideas for new language features, stop by the forum. See :ref:`commun
 Push vs Pull vs Local - What Does OpsMop Do?
 --------------------------------------------
 
-Right now, OpsMop is local only - but not for long.
-
-Pull modes will come out next (soon), followed shortly thereafter by a powerful push-mode orchestrator
-capable of multi-tier application in very specific orderings.
-
-Eveything will be super configurable, rigorously engineered, and very fast.
-
-Each will rely on opsmop and other tools in a stackable way and should be extremely pluggable, and also fast.
+Right now, OpsMop is :ref:`local` and :ref:`push` (SSH) only - but highly-pluggable pull modes will be added soon.
 
 I Have A Develoment Question?
 -----------------------------
@@ -81,7 +73,7 @@ How Do You See Modules Growing?
 In order to maintain an extremely high standard of quality, I would hope to see OpsMop stop at around 50 or so modules
 in the core distribution. In some cases, modules may be merged.  Each module can have different provider implementations, and in
 some cases like Package, I would not hold any limits to accepting modules for every language distribution (pip, npm, etc) on
-providers, just types.
+providers, just types.  So effectively this could approach 100 "modules".
 
 What we end up with is a toolbox that contains what is enough for 95% of the use cases out there, and allow the other 5%
 to be performed easily, either by calling a script or using a custom non-tree module.
@@ -119,7 +111,7 @@ Can You Write Modules In Any Language?
 
 Nope! You have to use Python 3.
 
-You could technically write a bridge module though, but it's not something we want for the core program, as we think
+You could technically write a bridge module, but it's not something we want for the core program, as we think
 there is a very strong reason for everybody collaborating around using the same language.
 
 OpsMop modules take advantage of a lot of features for code reuse.  We also minimize forking to
@@ -131,12 +123,12 @@ and return code, which you can still of course do, either.
 How Do I Do (Complicated Thing Without A Module)
 ------------------------------------------------
 
-There really needs to be a Script module feature to make this easier soon, but if you don't feel like writing a type & provider, OpsMop can always
+There really needs to be a Script module feature to make this easier very soon, but if you don't feel like writing a type & provider, OpsMop can always
 push a script::
 
     File(name="/opt/opsmop/", directory=True),
     File(name="/opt/opsmop/setup.sh", from_file="files/setup.sh"),
-    Script("bash /opt/opsmop/setup.sh")
+    Shell("bash /opt/opsmop/setup.sh")
 
 Just return 0 on success and non-zero on failure.
 
@@ -181,18 +173,20 @@ No. We are not experts in this field, but strongly believe tools that do this sh
 network and active monitoring.  This is simply not a good fit for our architecture. OpsMop's policies will describe a local system,
 and then the orchestration features to come may describe a collection of systems and the orders of application across those systems.
 
-Are you going to support Rolling Updates?
+Do you support Rolling Updates?
 -----------------------------------------
 
-Maybe? We would encourage most folks to adopt Immutable Systems for cloud based deployments, and get into a red/green, blue/black, chartreuse/magenta
-type deployment pattern that does not involve rolling updates over a load balancer.  However, this isn't out of question, because some of the
-fine grained control to do this is useful in implementing Canary deployments, which some people are interested in.
+Yes, see :ref:`push_advanced_tricks`.
+
+We would encourage most folks to adopt Immutable Systems for cloud based deployments, and get into a red/green, blue/black, chartreuse/magenta
+type deployment pattern that does not involve rolling updates over a load balancer where you can, but the push mode orchestrator is exceptionally
+flexible and is designed for this sort of thing.
 
 What's The Audience For This Tool?
 ----------------------------------
 
 Basically the audience for OpsMop should be the people that like OpsMop's current direction or where they like where it is going. OpsMop
-should be a good fit for image preparation, management of stateful servers, deploying clouds themselves, and ad-hoc management tasks
+should be a good fit for image preparation, management of stateful servers, deploying clouds on physical hardware, and ad-hoc management tasks
 of all kinds.
 
 Many people want a CM tool to describe image build state, because it is hard to reuse and manage complex bash scripts for describing
@@ -214,9 +208,3 @@ Other Questions or Bug Reports
 ------------------------------
 
 See :ref:`community` for forum and GitHub information.
-
-What's The Roadmap?
--------------------
-
-For some short term ideas, see TODO.md in the main checkout.  This is always subject to change and we don't 
-commit to any specific gameplan - good ideas always get to come first!

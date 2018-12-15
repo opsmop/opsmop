@@ -13,8 +13,8 @@
    Module Index<modules/modules>
    Facts<facts>
    API<api>
-   Pull Mode<pull>
    Push/Orchestration Mode<push>
+   Pull Mode<pull>
    FAQ<faq>
    Development<development>
    Community<community>

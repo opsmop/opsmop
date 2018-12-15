@@ -215,6 +215,10 @@ a resource:
     and you don't have to express the default from within a template.  This tip also works for general templating
     advice.
 
+.. note::
+
+    See :ref:`hooks_should_process_when` for another way to express conditionals on a *Role*.
+
 .. _nested_scopes:
 
 Nested Scopes
@@ -399,15 +403,15 @@ A pre method would be called prior to evaluating a role in either check or apply
 The most trivial use of pre might be to print a quick message when entering a role, without relying on :ref:`module_echo`.
 
 
-.. _hooks_should_execute_when:
+.. _hooks_should_process_when:
 
-should_execute_when()
+should_process_when()
 ~~~~~~~~~~~~~~~~~~~~~
 
 This is powerful. This method is called to decide whether a resource should be executed at all. 
 
 In the example `user_facts.py <https://github.com/opsmop/opsmop-demo/blob/master/content/user_facts.py>`
-we cleverly use should_execute_when() to implement feature flags - a given *Role* skips entirely when a fact is not set.
+we cleverly use should_process_when() to implement feature flags - a given *Role* skips entirely when a fact is not set.
 This is also an easy way to make a role that only runs on a certain platform.  Thus OS specific parts of a multi-OS deployment
 can be split up into different roles, while still retaining common roles in other parts.
 
@@ -415,7 +419,30 @@ can be split up into different roles, while still retaining common roles in othe
 
 .. note:
 
-    While could attach a "when" condition to a role when instantiating it (see :ref:`conditionals`), should_execute_when() is perhaps a more readable way to do it.
+    While could attach a "when" condition to a role when instantiating it (see :ref:`conditionals`), should_process_when() is perhaps a more readable way to do it.
+
+.. _extra_vars:
+
+CLI Extra Variables
+===================
+
+It is possible (both for ref:`local` and :ref:`push`) to specify extra variables on the command line.  These appear in templates as well as conditionals, and override
+any variable value in OpsMop.
+
+Examples::
+
+    python3 deploy.py --apply --push --extra-vars "version=1.2.3.4 package=foo"
+
+    python3 deploy.py --apply --push --extra-vars @vespene.json
+
+Using the "@" symbol allows variables to be loaded from a file.  ".json", ".toml", and ".yaml" files are all readable, assuming they have the appropriate extensions.
+
+This feature is ideally suited for integration with `Vespene <http://docs.vespene.io/>`_ when taking advantage of `Vespene Launch Questions <http://docs.vespene.io/launch_questions.html>`_
+to provide a friendly, accessed controlled web console for all kinds of IT automation tasks. Vespene generates a JSON file called "vespene.json" automatically in each build root, containing all the 
+variables set up in UI and supplied by the user.
+
+If you happen to use another CI/CD server or operations GUI, similar concepts will also work to inject variable values into your scripts. The other way to provide 
+variable data is :ref:`push_inventory`.
 
 Next Steps
 ==========
