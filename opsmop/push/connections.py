@@ -210,10 +210,13 @@ class ConnectionManager(object):
             mode = mode,
             relative_root = self.relative_root,
             tags = self.tags,
-            checksums = self.checksums
+            checksums = self.checksums,
+            sender = sender,
+            myself = self.myself
         )
         params = zlib.compress(dill.dumps(params), level=9)
-        call_recv = conn.call_async(remote_fn, self.myself, params, sender)
+        print("len=%s" % len(params))
+        call_recv = conn.call_async(remote_fn, params)
         self.calls_sel.add(call_recv)
 
         return True
@@ -270,7 +273,7 @@ class ConnectionManager(object):
         self.pool.stop(join=True)
 
 
-def remote_fn(caller, params, sender):
+def remote_fn(caller, params):
     """
     This is the remote function used for mitogen calls
     """
@@ -285,8 +288,9 @@ def remote_fn(caller, params, sender):
     role = params['role']
     mode = params['mode']
     tags = params['tags']
+    sender = params['sender']
+    myself = params['myself']
     checksums = params['checksums']
-
     relative_root = params['relative_root']
 
     Context().set_mode(mode)

@@ -39,8 +39,9 @@ class LocalCliCallbacks(BaseCallbacks):
         super().__init__()
         self.phase = None
         self.count = 0
+        self.changed_resources = 0
+        self.changed_actions = 0
  
-
     def set_phase(self, phase):
         self.phase = phase
 
@@ -87,6 +88,9 @@ class LocalCliCallbacks(BaseCallbacks):
     def on_result(self, provider, result):
         if result.provider.quiet():
             return
+        if result.changed:
+            self.changed_resources = self.changed_resources + 1
+            self.changed_actions = self.changed_actions + len(result.actions)
         self.i3(str(result))
 
     def on_command_result(self, provider, result):
@@ -145,8 +149,8 @@ class LocalCliCallbacks(BaseCallbacks):
         self.summarize()
 
     def summarize(self):
-        # TODO: reimplement the counter and percentages summary
-        pass
+        self.i1("")
+        self.i1("%s resource changes (%s actions)" % (self.changed_resources, self.changed_actions))
 
     def on_fatal(self, provider, msg=None):
         self.i1("")
