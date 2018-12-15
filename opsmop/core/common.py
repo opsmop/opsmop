@@ -18,6 +18,7 @@ import shlex
 
 import toml
 import yaml
+import json
 
 # while we want to keep this miminal, the common class contains some useful functions usable by many providers.
 
@@ -60,8 +61,11 @@ def load_data_file(path):
     if path.endswith(".toml"):
         return toml.load(path)
     elif path.endswith(".json"):
-        return json.load(path)
+        fd = open(path)
+        return json.loads(fd.read())
     elif path.endswith(".yaml"):
-        return yaml.load(path)
+        fd = open(path)
+        data = yaml.safe_load(fd.read())
+        return data
     else:
         raise Exception("unknown extension: %s" % path)
