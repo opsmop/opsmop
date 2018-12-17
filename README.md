@@ -57,7 +57,7 @@ Status
 ======
 
 * Now open for pull requests!
-* Extensive help for new contributors available in December 2019, stop by the forum!
+* Extensive help for new contributors available in December 2018, stop by the forum!
 * Pull and Push features under active development
 * Documentated language features mostly locked in by January 2019
 * Tagged release in Feburary 2019
