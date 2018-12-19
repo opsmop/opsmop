@@ -35,7 +35,7 @@ See :ref:`language` and :ref:`advanced`.
 Run Modes
 =========
 
-* Seperate validate, check ("dry-run"), and apply modes
+* Separate validate, check ("dry-run"), and apply modes
 * :ref:`local`
 * :ref:`pull` pluggable transports (soon)
 * :ref:`push` configuration with multi-tier addressing (soon)
