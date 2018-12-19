@@ -142,7 +142,7 @@ class ConnectionManager(object):
 
         result = conn
         if role.sudo():
-            result = router.sudo(
+            result = self.router.sudo(
                 username=context['sudo_username'], 
                 password=context['sudo_password'], 
                 via=conn
