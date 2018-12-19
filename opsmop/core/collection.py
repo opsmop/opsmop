@@ -1,11 +1,11 @@
 # Copyright 2018 Michael DeHaan LLC, <michael@michaeldehaan.net>
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #    http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
+from opsmop.callbacks.callbacks import Callbacks
 
 
 class Collection(Resource):
@@ -33,7 +34,7 @@ class Collection(Resource):
 
         Collection(*resource_list)
 
-    
+
     key-value arguments are available after the resource declaration, like:
     Collection(*resource_list, when=is_os_x)
     """
@@ -53,7 +54,6 @@ class Collection(Resource):
         else:
             assert issubclass(type(what), Resource)
             self.items.append(what)
-
 
     def attach_child_scope_for(self, resource):
         """
@@ -80,7 +80,7 @@ class Collection(Resource):
         """
         A relatively complex iterator used by Executor() code.
         Walks the entire object tree calling fn() on each element.
-        
+
         items - the kids to start the iteration with
         context - a Context() object for callback tracking
         which - 'resources' or 'handlers'
@@ -89,7 +89,7 @@ class Collection(Resource):
 
         self._on_walk()
         items_type = type(items)
- 
+
         if items is None:
             return
 
@@ -97,8 +97,8 @@ class Collection(Resource):
             # we'll visit every resource but only call the function on items if tags are *not* engaged
             if not tags or v.has_tag(tags):
                 fn(v)
-       
-        if issubclass(items_type, Collection):            
+
+        if issubclass(items_type, Collection):
             self.attach_child_scope_for(items)
             proceed = items.conditions_true()
             if proceed:
@@ -114,7 +114,7 @@ class Collection(Resource):
                 Callbacks().on_skipped(items, is_handler=handlers)
 
         elif items_type == list:
-            for x in items:        
+            for x in items:
                 self.attach_child_scope_for(x)
                 if x.conditions_true():
                     if issubclass(type(x), Collection):
