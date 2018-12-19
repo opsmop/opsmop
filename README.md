@@ -24,7 +24,7 @@ Features
 * A strong API toolkit for both humans and machines
 * Optional imperative capabilities
 * Strong object-oriented  model
-* Formal Type / Provider plugin seperation
+* Formal Type / Provider plugin separation
 * Formal Plan vs Apply evaluation stages
 * Early validation of configuration checks
 * Implicit ordering with notification events
