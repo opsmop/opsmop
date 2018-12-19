@@ -6,12 +6,20 @@
 Push Mode
 ---------
 
-How do you configure multiple hosts at a time, in very specific orderings?
+You should have already read about using OpsMop in local mode (see :ref:`local`) and read over the OpsMop language (see :ref:`language` and :ref:`advanced`).
 
-OpsMop push mode uses policy language files just like :ref:`local`, but operates on multiple hosts using SSH.
-Different tiers of hosts can be contacted and configured in very cleanly ordered, but still paralellized workflows.
+OpsMop's "Push Mode" works like local mode, but targets multiple remote systems simultaneously.
 
-This is best understood while reviewing the `push_demo.py <https://github.com/opsmop/opsmop-demo/blob/master/content/push_demo.py>`_ example.
+Push mode policies in OpsMop are just like Local policies (see :ref:`local`), but require some extra functions to be implemented, though they are very
+small and easy to add.
+
+While OpsMop policy files written just for "local mode" do *NOT* contain enough information to be used
+in push mode, any push-capable policy file *CAN* be used in local mode with *NO* changes. This is a free bonus, as sometimes you may want to develop
+some automation locally as opposed to against remote systems.
+
+What a push mode example looks like is best understood after first understanding the language in local mode, and then reading 
+the `push_demo.py <https://github.com/opsmop/opsmop-demo/blob/master/content/push_demo.py>`_ example.
+
 Please review this in another tab while reading the rest of the documentation.
 
 .. _how_push_works:
@@ -19,47 +27,39 @@ Please review this in another tab while reading the rest of the documentation.
 How Things Work
 ===============
 
-OpsMop was designed from the beginning to be extremely fast in local mode by executing providers in process.
+When in remote mode, it is helpful to think of remote communication, just as in local mode, as happening on a role by role basis.
+For each role, the system will remotely connect to any hosts (or groups of hosts) referenced in that role, and tell them to start evaluating
+that role.
 
-When in remote mode, it is helpful to think of remote communication as happening on a role by role basis.
-For each role, the system will connect to any hosts (or groups of hosts) referenced in that role.
-
-Then, the list of roles will be transferred to the remote host, and executed remotely.  This happens asynchronously,
-so each host is trying to execute through the role as fast as it can, rather than task by task.
-
+This happens asynchronously: each host is trying to execute through the role as fast as it can, rather than task by task.
 Along the way, various events occur and are sent back to the remote client, showing realtime status as configuration
-occurs.
-
-Reporting on what hosts changed for each role is provided before moving on to the next role.
+occurs.  All hosts must finish before moving on to the next role.
 
 If any host hits an error, the whole process stops with that role, and does not proceed to future roles.  
-(Some future controls over this behavior may be provided.)
-
-Before proceeding to the next role, a summary of the changes made to each host is provided.
 
 .. _push_cli:
 
 Command Line Usage
 ==================
 
-Similar to :ref:`local`, the opsmop command line for push mode is very simple::
+Similar to :ref:`local`, the opsmop command line for push mode is short::
 
     cd opsmop-demo/content
-    python3 filename.py --check --push
-    python3 filename.py --apply --push
+    python3 filename.py --check --push [--verbose]
+    python3 filename.py --apply --push [--verbose]
 
-Configuration is largely defined in the policy file.  Additional CLI flags may be added over time.
+Configuration is largely defined in the policy file.  There are other flags, but that's the minimum.
 
 .. _push_role_methods:
 
 Role Methods
-==============
+============
 
-Roles in OpsMop are described in :ref:`roles`, but when executed in push mode, they can make use of
-additional methods.
+Roles in OpsMop are described in :ref:`roles`, but with additional functions added to describe both which
+hosts get contacted, and how, that are exclusively used with the '--push' CLI flag.
 
-The following new methods are useful on each *Role* object in OpsMop when invoked in pull mode. Let's review
-the most important ones:
+There are a few more we'll get to later, but let's review the most important ones. Note that not all of them
+are always required, so don't get overwhelmed at first:
 
 .. code-block: python
 
@@ -68,51 +68,43 @@ the most important ones:
     class DemoRole(Role):
 
         def inventory(self):
-            # required!
+            # required! we'll explain this shortly
             return inventory.filter(groups='webservers*')
 
         def ssh_as(self):
-            # username and optionally a password
+            # optional.
+            # this specifies to login as 'opsmop' and use a SSH key.
+            # the default would be to use your username and SSH key.
+            # if you MUST use a password, read about defaults.toml below.
+            # you CAN put a password here, such a value from a database, but we recommend keys
             return ('opsmop', None)
 
         def sudo(self):
-            # whether to sudo (usually this should be True)
+            # optional. 
+            # whether to sudo after logging in. Defaults to False, almost always should be set True.
             return True
 
         def sudo_as(self):
-            # username and optionally a password for the sudo account
+            # optional. 
+            # username and optionally a password for the sudo account. If not set, consults values in defaults.toml.
+            # if no defaults.toml, this uses root and no password.
             return ('root', None)
 
         def check_host_keys(self):
-            # whether to check host keys, the default is True
+            # whether to check host keys, the default is True - if dealing with frequently changing systems, false may be better.
+            # there is no system to auto-add host keys (yet), so you would have to use ssh-keyscan.
             return False
 
-To review, these are all is is in addition the the usual parts of the role, which are used in both local and push modes:
 
-.. code-block: python
+.. note:
 
-    def set_resources(self):
-        # ...
+    If you need a review of basic language features, see :ref:`language` and :ref:`advanced`.  All the language features you
+    learned in those chapters work together with this new information.
 
-    def set_handlers(self):
-        # ...
+.. note:
 
-    def set_variables(self):
-        # ...
-
-    def should_process_when(self):
-        # ...
-
-    def pre(self):
-        # ...
-
-    def post(self):
-        # ...
-
-If you need a review of basic language features, see :ref:`language` and :ref:`advanced`.
-
-This may seem like a lot of methods to define for each role, but remember that OpsMop is Python, and you can define
-a BaseRole and then subclass from it to keep your roles short and organized!
+    This may seem like a lot of methods to define for each role, but remember that OpsMop is Python, and you can define
+    a BaseRole and then subclass from it to keep your roles short and organized!
 
 .. note::
 
@@ -126,13 +118,19 @@ a BaseRole and then subclass from it to keep your roles short and organized!
 
 .. _sudo_notes:
 
-Sudo Notes
-==========
+Sudo
+====
 
-It is worth noting that the sudo operations that happen above happen only once per role.
+It is worth noting that the sudo operations that happen above happen only once per role.  In fact, existing connections are reused
+between subsequent roles. 
 
-If a role requires sudoing to more than one account, it can usually be broken up into more than one role, or instead if sudo without password
-is allowed for a particular class of user, the sudo command can be embedded directly in any :ref:`module_shell` resources.
+The most common use of sudo is to log in as a normal account and then sudo to root, rather than allowing SSH to the root account.
+From root, it is easy to trivially execute sudo to less priveledged accounts, if needed, but this is not done with the 'sudo_as' 
+methods, you would simply just specify 'sudo' in front of any shell commands.
+
+Or, to put it another way, we expect 'sudo_as' to be used for priveledge escalation about 105% of the time.  This is why you can
+leave the 'sudo_as' undefined if you want, and it will just try root and no-password (or you can set a password in defaults.toml,
+which is explained below).
 
 .. _push_defaults:
 
@@ -140,7 +138,7 @@ Defaults Files
 ==============
 
 For values not specified on the role object, defaults are first looked for in ~/.opsmop/defaults.toml.  If that file does
-not exist, defaults are looked for in /etc/opsmop/defaults.toml.
+not exist, defaults are looked for in /etc/opsmop/defaults.toml.  If there are both files, the second is ignored.
 
 The file has the following format::
 
@@ -475,12 +473,23 @@ number of hosts there may be some lag for the very first time they are contacted
 roles. A future forks flag like "-j4" should allow this to use additional CPUs by dividing the list of hosts up
 between processors.
 
+Logging
+=======
+
+Sometimes it is easier to understand a problem with a configuration policy when viewing the remote log from the perspective of a local
+deploy.
+
+To do this, simply login to the remote system and cat ~/.opsmop/opsmop.log
+
+The output will contain the exact output as if the configuration was run locally, with timestamps.  The file is automatically logrotated
+so you do not need to worry about it growing too large.  The log file path can be changed in defaults.toml.
+
 .. _review:
 
 Review
 ======
 
-All of the features of local mode are usuable in push mode.  Be sure to review useful features documented in :ref:`language`
+All of the features of local mode are usuable in push mode so it helps to master them.  Be sure to review useful features documented in :ref:`language`
 and :ref:`advanced`.
 
 You will find that while configuration management use cases are the ones that most immediately come to mind, many other tricks

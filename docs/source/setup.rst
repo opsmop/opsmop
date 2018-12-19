@@ -58,7 +58,7 @@ Pip Install
 On your platform, python 3 pip may be named 'pip3' or something like 'pip-3.6' or 'pip-3.7'.  
 Please make sure you use Python 3's pip as OpsMop is a Python 3 application/library.
 
-To install OpsMop directly from pip:
+To install OpsMop directly from pip::
 
      pip install git+https://github.com/opsmop/opsmop.git@master
 
@@ -73,7 +73,7 @@ To update to the latest code at any time, simply repeat the above command.
 Alternative: Installing From Source
 -----------------------------------
 
-Checkout both opsmop repo:
+Checkout both opsmop repo::
 
     git clone https://github.com/opsmop/opsmop.git
 

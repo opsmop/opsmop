@@ -1,14 +1,16 @@
 import os
-
 import toml
-
 from opsmop.core.common import memoize
+import getpass
+
+@memoize
+def get_user():
+    return getpass.getuser()
 
 LOCAL_CONFIG = "~/.opsmop/defaults.toml"
 GLOBAL_CONFIG = "/etc/opsmop/defaults.toml"
 
-DEFAULT_SSH_USERNAME = 'opsmop'
-DEFAULT_SSH_PASSWORD = 'opsmop'
+DEFAULT_SSH_PASSWORD = None
 DEFAULT_SUDO_USERNAME = 'root'
 DEFAULT_SUDO_PASSWORD = None
 DEFAULT_SSH_CHECK_HOST_KEYS = 'ignore'
@@ -43,7 +45,7 @@ class UserDefaults(object):
 
     @classmethod
     def ssh_username(cls):
-        return cls._extract('ssh', 'username', DEFAULT_SSH_USERNAME)
+        return cls._extract('ssh', 'username', get_user())
 
     @classmethod
     def ssh_check_host_keys(cls):

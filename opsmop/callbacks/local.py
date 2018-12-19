@@ -154,7 +154,6 @@ class LocalCliCallbacks(BaseCallbacks):
         else:
             self.i1("FAILED")
         self.i1("")
-        self.summarize()
         raise OpsMopStop()
 
     def on_update_variables(self, variables):
