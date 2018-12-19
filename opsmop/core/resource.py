@@ -186,7 +186,6 @@ class Resource(object):
                     raise
                 # this value may need to late bind, we'll catch it later
                 return True
-            return res
         elif issubclass(type(when), Lookup):
             try:
                 return when.evaluate(self)
