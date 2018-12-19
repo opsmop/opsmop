@@ -20,6 +20,7 @@ from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.core.errors import CommandError, OpsMopError, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
+from opsmop.core.context import Context
 
 class CommonCallbacks(BaseCallbacks):
 
