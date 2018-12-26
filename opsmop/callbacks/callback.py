@@ -14,6 +14,7 @@
 
 import logging
 import os
+import textwrap
 
 from opsmop.client.user_defaults import UserDefaults
 
@@ -61,5 +62,5 @@ class BaseCallbacks(object):
     
     def _indent(self, level, msg):
         spc = INDENT * level
-        print("%s%s" % (spc, msg))
+        print(textwrap.indent(str(msg), spc))
         self.logger.info(msg)
