@@ -74,6 +74,8 @@ class File(Provider):
 
     def should_replace_using_url(self):
         """ for from_url, should we write the file? """
+        if not FileTests.exists(self.name):
+            return True
         return self.overwrite
 
     # ---------------------------------------------------------------
