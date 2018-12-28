@@ -14,6 +14,7 @@
 
 import os
 import shutil
+import subprocess
 
 from opsmop.core.template import Template
 from opsmop.providers.provider import Provider
@@ -38,7 +39,7 @@ class Echo(Provider):
 
         if self.cowsay and os.environ.get('MOO'):
             cmd = COWSAY.format(msg=txt)
-            txt = self.run(cmd, echo=False)
+            txt = subprocess.check_output(cmd, shell=True).decode()
         self.echo(txt)
 
         return self.ok()
