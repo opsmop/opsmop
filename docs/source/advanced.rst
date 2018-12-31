@@ -170,7 +170,7 @@ Eval is used to implement :ref:`conditionals`, described below.
 Conditions
 ==========
 
-Any role, policy, or resource can be given a conditional.  If the conditional is true, that object 
+Any role, policy, or resource can be given a conditional.  If the conditional evaluates to False, that object 
 will be skipped during the check or apply phase.
 
 Expressions are specified with "when=", and accept valid `Jinja2 <http://jinja.pocoo.org/docs/>`_ expressions.  This is technically
