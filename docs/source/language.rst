@@ -54,7 +54,7 @@ file into an executable program. Here is a very basic Policy definition:
 See :ref:`local` for how this file would be executed.  
 
 Take special note of 'set_variables' and 'set_roles'. *Roles* are the real units of work in OpsMop. 
-*Polices* say what *Roles* are applied, and optionally set some *variables*, but *Roles* will do all the work.
+*Policies* say what *Roles* are applied, and optionally set some *variables*, but *Roles* will do all the work.
 
 Assigning *variables* in a *Policy* declaration is optional, but *Roles* are not.
 Why? A *Policy* without *Roles* has nothing to do!  We'll get to :ref:`roles` very shortly.
