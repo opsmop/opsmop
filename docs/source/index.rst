@@ -38,7 +38,7 @@ Run Modes
 * Separate validate, check ("dry-run"), and apply modes
 * :ref:`local`
 * :ref:`pull` pluggable transports (soon)
-* :ref:`push` configuration with multi-tier addressing (soon)
+* :ref:`push` configuration with multi-tier addressing
 * All aim for exceptional runtime speed
 
 Project Values
@@ -63,12 +63,10 @@ Supported:
 Status
 ======
 
-Alpha.  Entirely usable for local configuration, with a limited module set.
+Beta. Entirely usable for local configuration, with a limited module set.
 
 Initial plugin versions are now available, and we're providing extensive help to new contributors
-and users this December.
-
-Push and pull modes are also in active development at this time.
+and users.
 
 Share language feedback, thoughts, and experiences on the `forum <https://talk.msphere.io>`_.
 
