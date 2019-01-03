@@ -14,7 +14,7 @@ Setup
 Python 3
 --------
 
-OpsMop requires Python 3.  
+OpsMop requires Python 3.6 or higher.
 
 .. _python3_linux:
 
