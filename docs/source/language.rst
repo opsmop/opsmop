@@ -66,8 +66,8 @@ This means you can dynamically return a list of *Roles* from arbitrary code very
 .. code-block:: python
 
     def set_roles(self):
-        roles = [ HelloRole() ]
-        return Roles(**roles_list)
+        roles_list = [ HelloRole() ]
+        return Roles(*roles_list)
 
 That example is critical to the purpose of OpsMop!  While some configuration management systems mostly
 are for humans writing content for them, any point in OpsMop can be grafted cleverly into software.
