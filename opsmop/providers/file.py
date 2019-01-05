@@ -91,7 +91,7 @@ class File(Provider):
 
         # removal?
         if self.absent:
-            if not exists:
+            if exists:
                 self.needs("rm")
             return
 
