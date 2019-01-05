@@ -73,8 +73,8 @@ class FileTestFacts(Facts):
         with open(fname, "rb") as f:
             block = f.read(blocksize)
             while len(block) > 0:
-                block = f.read(blocksize)
                 m.update(block)
+                block = f.read(blocksize)
         return m.hexdigest()
 
     def string_checksum(self, msg):
