@@ -11,10 +11,10 @@ setup(name='opsmop',
       url='https://opsmop.io/',
       packages=find_packages(exclude=['docs']),
       install_requires=[
-          "PyYAML>=3.13"
-          "toml>=0.10"
-          "jinja2>=2.10"
-          "dill>=0.2.8.2"
+          "PyYAML>=3.13",
+          "toml>=0.10",
+          "jinja2>=2.10",
+          "dill>=0.2.8.2",
           "colorama>=0.4.1"
       ],
       dependency_links = [
