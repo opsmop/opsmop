@@ -190,7 +190,7 @@ Handlers
 ========
 
 *Roles* can also declare *Handlers*. The *Handlers* section is just like the regular *Resources* section, except that *Handlers* run only when the system is
-are changed by OpsMop. When OpsMop evaluates a *Type*, it determines a plan for that *Type* (in check or apply mode), and then
+changed by OpsMop. When OpsMop evaluates a *Type*, it determines a plan for that *Type* (in check or apply mode), and then
 executes that plan (if in apply mode). 
 
 For example, if a *Type* talks about a file needing to have certain modes, and the config file also has incorrect content, the plan would involve creating 
