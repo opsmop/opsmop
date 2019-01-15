@@ -22,6 +22,8 @@ class File(Type):
 
     def __init__(self, name=None, **kwargs):
         self.setup(name=name, **kwargs)
+        if self.auto_dispatch:
+            self.run()
 
     def fields(self):
         return Fields(

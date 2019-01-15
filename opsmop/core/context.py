@@ -13,19 +13,18 @@
 # limitations under the License.
 
 from opsmop.core.common import Singleton
+import inspect
 
-VALIDATE = 'validate'
 CHECK = 'check'
 APPLY = 'apply'
 
 class Context(metaclass=Singleton):
 
-    __slots__ = [ '_host', '_host_failures', '_host_signals', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums', '_globals', '_extra_vars' ]
+    __slots__ = [ '_host', '_host_failures', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums', '_globals', '_extra_vars' ]
 
     def __init__(self):
         self._host = None
         self._host_failures = dict()
-        self._host_signals = dict()
         self._mode = None
         self._caller = None
         self._verbose = False
@@ -41,7 +40,7 @@ class Context(metaclass=Singleton):
         return self._globals
 
     def set_mode(self, mode):
-        assert mode in [ VALIDATE, CHECK, APPLY ]
+        assert mode in [ CHECK, APPLY ]
         self._mode = mode
 
     def mode(self):
@@ -89,15 +88,11 @@ class Context(metaclass=Singleton):
     def set_checksums(self, checksums):
         self._checksums = checksums
 
-
     def record_host_failure(self, host, exc):
         self._host_failures[host] = exc
 
     def host_failures(self):
         return self._host_failures
-
-    def is_validate(self):
-        return self._mode == VALIDATE
 
     def is_check(self):
         return self._mode == CHECK
@@ -105,17 +100,24 @@ class Context(metaclass=Singleton):
     def is_apply(self):
         return self._mode == APPLY
 
-    def add_signal(self, host, signal):
+    def scope_variables(self):
+        
+        from opsmop.types.type import Type
+        from opsmop.providers.provider import Provider
 
-        if not host.name in self._host_signals:
-            self._host_signals[host.name] = []
-        self._host_signals[host.name].append(signal)
+        # all variables in current scope
+        stack = inspect.stack()[1:]
+        found_type_frame=False
+        for item in stack:
+            (frame, filename, lineno, function, code_context, index) = item
+            localz = frame.f_locals
+            if 'self' in localz:
+                z = localz['self']
+                if isinstance(z, Type):
+                    found_type_frame=True
+                elif not isinstance(z, Provider):
+                    return localz
+        return dict()
 
-    def has_seen_any_signal(self, host, signals):
 
-        host_signals = self._host_signals.get(host.name, [])
-
-        for x in host_signals:
-            if x in signals:
-                return True
-        return False
+    

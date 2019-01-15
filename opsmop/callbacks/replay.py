@@ -75,9 +75,6 @@ class ReplayCallbacks(BaseCallbacks):
             return
         self.info(host, evt['data'], sep='|')
 
-    def on_signaled(self, host, evt):
-        self.info(host, self.signaled(evt), sep='>')
-
     # ----
 
     def resource(self, evt):

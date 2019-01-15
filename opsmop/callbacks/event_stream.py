@@ -41,11 +41,8 @@ class EventStreamCallbacks(BaseCallbacks):
     def on_result(self, provider, result):
         self.event('result', provider=provider, data=result)
 
-    def on_resource(self, resource, is_handler):
-        self.event('resource', resource=resource, is_handler=is_handler)
-
-    def on_signaled(self, resource, event_name):
-        self.event('signaled', resource=resource, data=event_name)
+    def on_resource(self, resource):
+        self.event('resource', resource=resource)
 
     def on_fatal(self, provider, msg=None):
         self.event('fatal', provider=provider, data=msg)
@@ -78,8 +75,4 @@ class EventStreamCallbacks(BaseCallbacks):
                 if hasattr(v, 'to_dict'):
                     v = v.to_dict()
             data[k] = v
-        #if self.sender:
-        #    # print(json.dumps(data))
-        #    pass
-        #else:
         self.sender.send(data)

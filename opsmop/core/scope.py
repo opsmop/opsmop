@@ -108,6 +108,5 @@ class Scope(object):
         root = self.root_scope()
         root.update_variables(variables)
 
-
     def __str__(self):
         return "<Scope resource=%s, level=%s, parent=%s, variables=%s>" % (self._resource, self._level, self.parent(), self._variables)

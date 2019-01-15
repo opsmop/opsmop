@@ -6,12 +6,11 @@
 Push Mode
 ---------
 
-You should have already read about using OpsMop in local mode (see :ref:`local`) and read over the OpsMop language (see :ref:`language` and :ref:`advanced`).
 
 OpsMop's "Push Mode" works like local mode, but targets multiple remote systems simultaneously.
 
-Push mode policies in OpsMop are just like Local policies (see :ref:`local`), but require some extra functions to be implemented, though they are very
-small and easy to add.
+Push mode policies in OpsMop are just like Local policies (see :ref:`local`), and only require some very small extra 
+functions to be implemented.
 
 While OpsMop policy files written just for "local mode" do *NOT* contain enough information to be used
 in push mode, any push-capable policy file *CAN* be used in local mode with *NO* changes. This is a free bonus, as sometimes you may want to develop
@@ -95,6 +94,10 @@ are always required, so don't get overwhelmed at first:
             # there is no system to auto-add host keys (yet), so you would have to use ssh-keyscan.
             return False
 
+        def main(self):
+            # this isn't new
+            File("/tmp/test.txt", from_content="I'm making a note here, huge success.")
+
 
 .. note:
 
@@ -170,7 +173,7 @@ These values are ignored if specified in the "sudo_as" or "connect_as" methods o
 Inventory
 =========
 
-Pull mode requires an inventory to decide what hosts to target.  Inventory can also attach variables
+Push mode requires an inventory to decide what hosts to target.  Inventory can also attach variables
 to each host (for use in :ref:`templates` or :ref:`conditionals`), and there are certain special
 variables that can influence how the push mode operates.
 
@@ -333,10 +336,8 @@ To access other paths, a method can be added to the change what paths are served
         def allow_fileserving_paths(self):
             return [ '.', '/opt/files' ]
 
-        def set_resources(self):
-            return Resources(
-                File("/opt/destination/large.file", from_file="/opt/files/large.file")
-            )
+        def main(self):
+            File("/opt/destination/large.file", from_file="/opt/files/large.file")
 
 "." in this case, always means the path of the policy file being executed on the command line.  If any other paths are given,
 they should be referenced as absolute paths by any resources that use them, as shown above.  If an 'allow_fileserving_paths'
@@ -416,16 +417,13 @@ The OpsMop role might look like this:
             # this runs on the control machine
             subprocess.check_rc("unbalance.sh %s" % host.hostname())
 
-        def pre(self):
-            # this runs on the remote machine
-            pass
+        def main(self):
+            # do meaningful work here
 
         def after_connect(self, host):
             # this runs on the control machine
             subprocess.check_rc("balance.sh %s" % host.hostname())
 
-        def post(self):
-            # this runs on the remote machine
 
 As you can see, there are a lot of details to this example, but full control is provided.  Interaction with any piece of hardware, database, or system - including
 waiting on external locks, is completely possible *without* needing to rely on extra modules.
@@ -447,7 +445,7 @@ Tuning
 
 The SSH implementation is already very fast, but there are a few things you can do to boost performance.
 
-Your ansible providers likely have many dependencies.  While opsmop does not require
+Your opsmop providers likely have python library dependencies.  While opsmop does not require
 that you install these dependencies on managed nodes, if you install them, this will
 greatly speed up execution time.
 
@@ -460,7 +458,7 @@ If not installed, the module code for these are copied over once per each push e
 Current Status
 ==============
 
-Push mode is still new, and can use help testing in all manner of configurations, including in high-
+Push mode is still a little new, and can use help testing in all manner of configurations, including in high-
 performance, high-host-count, and high-latency scenarios.  However, most features are already implemented
 and this is completely usable today.
 
@@ -468,10 +466,9 @@ and this is completely usable today.
 be able to switch selinux to permissive mode.  Non-SELinux distributions (Debian, Ubuntu, Arch, etc) 
 are of course not effected.
 
-2. Connections to hosts are conducted in a threadpool with a default of 16 threaded workers (see :ref:`push_defaults`). If you have a large
-number of hosts there may be some lag for the very first time they are contacted that will not occur in subsequent
-roles. A future forks flag like "-j4" should allow this to use additional CPUs by dividing the list of hosts up
-between processors.
+2. Connecting to new hosts (but not the actual management operations) are conducted in a threadpool with a default of 16 threaded workers (see :ref:`push_defaults`). If you have a large
+number of hosts there may be some lag for the very first time they are contacted that will not occur in subsequent roles. 
+A future forks flag like "-j4" should allow this to use additional CPUs by dividing the list of hosts up between processors.
 
 Logging
 =======
@@ -483,25 +480,6 @@ To do this, simply login to the remote system and cat ~/.opsmop/opsmop.log
 
 The output will contain the exact output as if the configuration was run locally, with timestamps.  The file is automatically logrotated
 so you do not need to worry about it growing too large.  The log file path can be changed in defaults.toml.
-
-.. _review:
-
-Review
-======
-
-All of the features of local mode are usuable in push mode so it helps to master them.  Be sure to review useful features documented in :ref:`language`
-and :ref:`advanced`.
-
-You will find that while configuration management use cases are the ones that most immediately come to mind, many other tricks
-and useful admin utilities can be implemented in OpsMop.
-
-For instance, it is possible to combine :ref:`hooks_should_process_when` with :ref:`file_tests` to write a push mode script that does
-something to systems only if they have a particular package installed.
-
-Another example is you could use the "def serial()" method, set to 1 coupled with :ref:`extra_vars`, to make a very basic distributed "cat" that made
-use of OpsMop inventory.
-
-What other combinations can you think of?
 
 Credits
 =======

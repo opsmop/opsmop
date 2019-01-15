@@ -20,7 +20,9 @@ class DebugFacts(Type):
 
     def __init__(self, *args, **kwargs):
         self.setup(**kwargs)
-
+        if self.auto_dispatch:
+            self.run()
+            
     def quiet(self):
         return True
 

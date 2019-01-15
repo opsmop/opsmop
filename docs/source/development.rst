@@ -54,80 +54,17 @@ Once again, if you're wishing to contribute a new provider, and it requires a ne
 Adding Custom Facts
 ===================
 
-The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/opsmop/opsmop/blob/master/opsmop/facts/facts.py>`_
-
-If you write your own fact classes, you should make it available to template namespace by calling set:
-
-.. code-block:: python
-
-    def set_resources(self):
-        return Resources(
-             # ...
-             Set(site_facts=AcmeLabsCustomFacts())
-             # ...
-        )
-
-
-
-A future feature for custom facts in /etc/opsmop/facts.d is also pending development, which will allow string, JSON, or YAML facts as well as executable
-facts to be written in any language. See :ref:`facts`
-
-.. _lookups:
-
-Adding Custom Lookups
-=====================
-
-Lookup Values are subclasses of `opsmop.lookups.Lookup <https://github.com/opsmop/opsmop/blob/master/opsmop/lookups/lookup.py>`_, and are functions 
-that are lazy-evaluated at check or apply stage.  Ok, it's not exactly true they are functions. They are black-magic metaclass stuff. But eventually
-they are functions!
-
-They are also easy to write, and you don't need to know anything about Python metaclasses to do it.
-
-Take a look at any of the subclasses in the 'opsmop.lookups' directory.
-
-Examples of core Lookups include Eval() for string evaluation and T() for :ref:`templates`.
-
-An example of a future custom type might be a 'Etcd' or 'Consul' or even DNS record lookup plugin - and something like this would be something we'd gladly include in
-the core distribution (probably then creating an opsmop.lookups package).
-
-Such a plugin could (and probably should) also memoize the value to prevent repeated computations.
-
-A quick reminder, lookups aren't automatically available inside Jinja2, and to do that, use set:
-
-.. code-block:: python
-    
-    def set_resources(self):
-        return Resources(
-             # ...
-             set(ff01=CustomFeatureFlagLookup('ff01'))
-             # ..
-        )
-
+The code for facts (see :ref:`facts`) is in `opsmop.facts.facts.Fact <https://github.com/opsmop/opsmop/blob/master/opsmop/facts/>`_ and they are just
+simple classes that are made available to templates and regular python conditionals.
 
 .. _callbacks:
 
 Custom Callbacks
 ================
 
-CLI output is driven by a callback plugin, as shown in `opsmop.client.callbacks <https://github.com/opsmop/opsmop/blob/master/opsmop/client/callbacks.py>`_.
+CLI output is driven by callback plugins, as shown in `opsmop.client.callbacks <https://github.com/opsmop/opsmop/blob/master/opsmop/callbacks/>`_.
 
-You can easily customize OpsMop by replacing it with another plugin, potentially a subclass.
-
-Using a new callback would require subclassing cli.py and a new bin/opsmop, which is just a thin layer over cli.py
-We can easily consider reading the callback name from an environment variable or a CLI parameter as a feature upgrade.
-
-Future plans for :ref:`pull` and :ref:`push` will also feature different types of callback classes or additional callbacks.
-
-.. _roadmap:
-
-Roadmap
-=======
-
-While OpsMop has a fluid roadmap, at this stage of development TODO.md is illustrative of some near-term features.
-We want the best ideas at the moment to win, and a lot of our development time will also be devoted to shepherding
-incoming pull requests and ideas from folks like yourself.
-
-If you have questions (or would like to help with something specific, stop by the :ref:`forum`.
+You can easily customize OpsMop by replacing or augmenting callback plugins.
 
 See Also
 ========

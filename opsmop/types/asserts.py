@@ -22,6 +22,8 @@ class Asserts(Type):
     def __init__(self, *args, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(evals=args, variable_checks=original, **common)
+        if self.auto_dispatch:
+            self.run()
 
     def fields(self):
         return Fields(

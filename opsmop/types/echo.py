@@ -21,6 +21,8 @@ class Echo(Type):
 
     def __init__(self, msg, *args, **kwargs):
         self.setup(msg=msg, **kwargs)
+        if self.auto_dispatch:
+            self.run()
 
     def quiet(self):
         return True

@@ -21,8 +21,16 @@ class Resource(object):
 
     def __init__(self,  *args, **kwargs):
         self.setup(*args, **kwargs)
+        self.run()
+
+    def run(self):
+        pass
 
     def setup(self, **kwargs):
+        self.changed = False
+        self.data = None
+        self.rc = None
+
         self.kwargs = kwargs
         self.facts = None
         self.condition_stack = []
@@ -31,6 +39,10 @@ class Resource(object):
         self._field_spec = self.fields()
         self._field_spec.find_unexpected_keys(self)
         self._field_spec.load_parameters(self)
+
+        # FIXME: load these up
+        self.changed = False
+        self.data = None
 
     def quiet(self):
         """ If true, surpresses some callbacks """
@@ -66,6 +78,9 @@ class Resource(object):
         Without a scope object, it is impossible to compute variables for use in template
         and conditional evaluation, hence the assert.
         """
+        if self._scope is None:
+            role = Context().role()
+            role.attach_child_scope_for(self)
         return self._scope
 
     def top_level_resource(self):
@@ -97,6 +112,7 @@ class Resource(object):
         results = self.get_variables()
         results.update(context.globals())
         results.update(self.fact_context())
+        results.update(context.scope_variables())
         results.update(context.extra_vars())
         return results
 
@@ -120,13 +136,6 @@ class Resource(object):
         make sure the arguments of a resource are sensical with each other.
         """
         pass
-
-    def should_process_when(self):
-        """
-        A subclassable hook to conditionally skip a resource. Useful for lazy
-        evaluation of runtime conditions that may change between resources
-        """
-        return True
 
     def update_variables(self, variables):
         """
@@ -164,38 +173,36 @@ class Resource(object):
                 return True
         return False
 
-    def conditions_true(self, validate=False):
-        """
-        Called by Executor code to decide if a resource is processable.
-        """
+    # OLD:
+    #def conditions_true(self, validate=False):
+    #    """
+    #    Called by Executor code to decide if a resource is processable.
+    #    """
 
-        from opsmop.lookups.eval import Eval 
-        from opsmop.lookups.lookup import Lookup
+    #    from opsmop.lookups.eval import Eval 
+    #    from opsmop.lookups.lookup import Lookup
 
-        if not self.should_process_when():
-            return False
-
-        when = self.when
-        if when is None:
-            return True
-        if type(when) == str:
-            try:
-                return Eval(self.when).evaluate(self)
-            except jinja2.exceptions.UndefinedError:
-                if not validate:
-                    raise
-                # this value may need to late bind, we'll catch it later
-                return True
-        elif issubclass(type(when), Lookup):
-            try:
-                return when.evaluate(self)
-            except jinja2.exceptions.UndefinedError:
-                if not validate:
-                    raise
-                # this value may need to late bind, we'll catch it later
-                return True
-        else:
-            return when
+    #    when = self.when
+    #    if when is None:
+    #        return True
+    #    if type(when) == str:
+    #        try:
+    #            return Eval(self.when).evaluate(self)
+    #        except jinja2.exceptions.UndefinedError:
+    #            if not validate:
+    #                raise
+    #            # this value may need to late bind, we'll catch it later
+    #            return True
+    #    elif issubclass(type(when), Lookup):
+    #        try:
+    #            return when.evaluate(self)
+    #        except jinja2.exceptions.UndefinedError:
+    #            if not validate:
+    #                raise
+    #            # this value may need to late bind, we'll catch it later
+    #            return True
+    #    else:
+    #        return when
 
     def parent(self):
         parent_scope = self.scope().parent()
@@ -223,18 +230,6 @@ class Resource(object):
                 result.extend(ptr.tags)
             ptr = ptr.parent()
         return result
-
-    def pre(self):
-        """
-        user hook. called before executing a resource in Executor code
-        """
-        pass
-
-    def post(self):
-        """
-        user hook. called after executing a resource in Executor code
-        """
-        pass
 
     def to_dict(self):
         result = dict()

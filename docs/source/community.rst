@@ -6,10 +6,12 @@
 Community
 ---------
 
-The purpose of the OpsMop community is to come together to build the ultimate configuration system we all want to use.
+The purpose of the OpsMop community is to come together to build the system we all want to use.
 We love to hear use cases, stories, challenges, and ideas and learn from everyone's experiences.
 
+Participation in discussions is vital and strongly encouraged.
 Code contributions are always welcome, but never required.
+
 
 .. _forum:
 
@@ -20,7 +22,7 @@ The official Opsmop discussion form is hosted at `talk.msphere.io <https://talk.
 is to get help, ask questions, post ideas, coordinate development, and brainstorm features.
 
 In respect of worldwide time zones and the nature of software development, there is no official realtime chat channel.
-While we welcome sharing on site like StackOverflow or Reddit, we are unlikely to see your posts. The official forum
+If you post on StackOverflow or Reddit, we are unlikely to see your posts. The official forum 
 will always be the best place to get help.
 
 .. _github:
@@ -31,11 +33,11 @@ GitHub
 OpsMop lives on GitHub `here <https://github.com/opsmop/opsmop>`_.
 
 Code contributions are very welcome! To submit a pull request to the master branch after reading :ref:`development`.
-Often it may be best to discuss a development idea on the forum before contributing to avoid duplicate efforts.
+Often it is almost always best to discuss a development idea on the forum to discuss suitability and to avoid duplicate efforts.
 
-Of course not all contributions are code.  We're also quite welcome to have documentation improvements.  The documentation
+We're also quite welcome to have documentation fixes submitted.  The documentation
 source lives in the 'docs/source' folder of the main repo, except for module docs, which are auto-generated from content
-in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo. We're also of course very appreciative of bug reports and helping other users with questions.
+in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo.
 
 Bugs should also be filed directly in GitHub, but if you would like some help or want to discuss a bug more widely, the
 forum is fine for that too. If you have a question such as 'how do I do X?' that's a better topic for the forum

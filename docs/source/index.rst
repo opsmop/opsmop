@@ -1,60 +1,35 @@
 .. image:: opsmop.png
    :alt: OpsMop Logo
 
-It's OpsMop!
+About OpsMop
 ------------
 
-Cleanup on Datacenter Aisle 3!
+OpsMop is a agentless distributed SSH control plane for all manner of computing tasks, created and led by 
+`Michael DeHaan <http://michaeldehaan.net>`_.
 
-OpsMop is a next-generation, no-compromise automation system from `Michael DeHaan <http://michaeldehaan.net>`_.
+OpsMop works off a static or dynamic inventory of systems, and then allows running
+arbitrary tasks, represented by Python functions, against those systems. Any library 
+dependencies are transferred automatically, and reports are provided on a host by host basis of successes and failures. 
+Callbacks are pluggable, allowing for easy injection of results into external software systems. 
 
-Uses
-====
+OpsMop allows for addressing different tiers of machines at different orders, including controls 
+over how many instances to address at once.  Modelling of complex orchestration behaviors, including rolling updates involving 
+load balancers, is also trivial.  Further, multiple-levels of bastion hosts are supported, allowing for highly-efficient fanout topologies.
 
-* Web-scale configuration management of all Linux/Unix systems
-* Application deployment
-* Immutable systems build definition
-* Maintaining stateful services such as database and messaging platforms
-* Automating one-off tasks & processes
-* Deployment and management of the undercloud
+While not limited to declarative host configuration, OpsMop also includes a strong model-based class library, that can be easily
+mixed in with standard Python functions.  Common industry features such as installing packages, file transfer, templates, and starting
+OS services are supported without requiring installation of any permament management agents.
 
-Features
-========
-
-* Python 3 DSL
-* Declarative resource model with imperative capabilities
-* Type / Provider plugin seperation
-* Implicit ordering (with handler notification)
-* Formalized "Plan" vs "Apply" evaluation stages
-* Early validation prior to runtime
-* Programatically scoped variables
-* Strong object-orientation
-
-See :ref:`language` and :ref:`advanced`.
-
-Run Modes
-=========
-
-* Separate validate, check ("dry-run"), and apply modes
-* :ref:`local`
-* :ref:`pull` pluggable transports (soon)
-* :ref:`push` configuration with multi-tier addressing
-* All aim for exceptional runtime speed
-
-Project Values
-==============
-
-* Minimalism
-* Flexibility
-* Language design
-* Code quality
-* Speed
-* Applied Experience
+Most tools in this space are built around particular use cases related to systems configuration.  Instead, OpsMop allows for full programmability, 
+so it can easily interact with arbitrary software systems at any point in time, rather than constraining the user along particular language
+and use-case guiderails. Use cases are not limited to configuration or application deployment, but can be completely open ended.  While not designed
+for a particular audience, OpsMop is especiallly appropriate within large and distributed datacenter environments, particularly in verticals such as 
+finance, renderfarm, IOT, or edge computing.
 
 Operating Systems
 =================
 
-Supported:
+Supported control platforms and targets:
 
 * Linux
 * BSD
@@ -63,27 +38,11 @@ Supported:
 Status
 ======
 
-Beta. Entirely usable for local configuration, with a limited module set.
-
-Initial plugin versions are now available, and we're providing extensive help to new contributors
-and users.
+Beta. 
 
 Share language feedback, thoughts, and experiences on the `forum <https://talk.msphere.io>`_.
 
 See also: :ref:`development` and :ref:`community`
-
-Schedule
-========
-
-* Open for pull requests and bug reports starting December 1.
-* December will be devoted almost exclusively to plugin development, helping new contributors, and small language tweaks
-* Pull mode likely debuts in December 2018.
-* Documentated language features will be locked in and largely stable by January 2019
-* First 'tagged' stable release in early Feburary 2019, but master branch usage is always encouraged
-
-If you like where this is going, now is the time to join up with thoughts
-and potentially code. Read over :ref:`community` and :ref:`development` for details 
-and we would be glad to have you!
 
 License
 =======
@@ -106,3 +65,7 @@ Twitter
 
 * `@opsmop <https://twitter.com/opsmop>`_
 
+Support and Engineering Contracts Available
+===========================================
+
+Please contact <mailto:michael@michaeldehaan.net>Michael DeHaan</A> for details.

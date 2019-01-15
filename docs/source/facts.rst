@@ -22,24 +22,10 @@ Here's a basic example from :ref:`platform`:
 
 .. code-block:: python
 
-    def set_resources(self):
-        darwin = (Platform.system() == "Darwin")
-        return Resources(
-            Echo("My platform is {{ Plaform.system() }}"),
-            Echo("This is OS X.", when=darwin)
-        )
+    def main(self):
+        system = Platform.system()
+        Echo("My platform is {{ system }}")
 
-Or as we showcased in :ref:`hooks`, it's also easy to attach a conditional to a whole *Role*, or even a *Policy*.  For most
-use cases, we definitely prefer this format:
-
-.. code-block: python
-
-    class FooRole(Role):
-
-        def should_process_when(self):
-            return Platform.system() != "Darwin"
-
-        # ...
 
 .. _platform:
 
@@ -73,32 +59,16 @@ See :ref:`development` if you are interested in adding something.
    * - os_version_string()
      - ex: "7.2.1234"
 
-Example:
-
-.. code-block:: python
-
-    class LinuxSetup(Role):
-
-        def should_process_when(self):
-            return (Platform.system() != "Darwin")
-
-        def set_resources(self):
-            # ...
-
-Example:
 
 .. code-block:: python
 
     class Foo(Role):
 
-
-        def set_resources(self):
+        def main(self):
             darwin = (Platform.system() == "Darwin")
-            return Resources(
-                # ...
-                Echo("this only runs on OS X", when=darwin)
-                #..
-            )
+            if darwin:
+                Echo("this only runs on OS X")
+             
 
 Example (Jinja2 template):
 
@@ -106,10 +76,8 @@ Example (Jinja2 template):
 
     class Foo(Role):
 
-        def set_resources(self):
-            return Resources(
-                File("/etc/foo.cfg", from_template="templates/foo.cfg.j2"),
-            )
+        def main(self):
+            File("/etc/foo.cfg", from_template="templates/foo.cfg.j2")
 
 Here is a Jinja2 template example::
 
@@ -154,11 +122,9 @@ Example:
 
     class FooRole(Role):
 
-        def should_process_when(self):
-            return (Chaos.random() < 0.25)
-
-        def set_resources(self):
-            # ...
+        def main(self):
+            if Chaos.random() < 0.25:
+                # ...
 
 Or in a Jinja2 template::
 
@@ -208,20 +174,9 @@ which might be wrong:
 
 .. code-block:: python
 
-    def set_resources(self):
-        return Resources(
-            Shell("/bin/foo", when=(not FileTests.exists("/blarg/foo")))
-        )
-
-Here is an improved late binding example:
-
-.. code-block:: python
-
-    def set_resources(self):
-        exists = Eval('not FileTests.exists("/blarg/foo")')
-        resources = Resources(
-            Shell("/bin/foo", when=not_exists),
-        )
+    def main(self):
+        if not FileTests.exists("/blarg/foo"):
+            Shell("/bin/foo")
 
 And of course technically you can still do these checks within Jinja2, but it's a little
 hard to think of a use case for that::
@@ -230,11 +185,6 @@ hard to think of a use case for that::
     flag=True
     {% endif %}
   
-.. note::
-    Many older configuration management systems have implemented existance tests specifically
-    on a command or exec resource.  In OpsMop, file existance (or absence, or status, or ... anything)
-    can gate the evaluation of any resource.
-
 .. note::
     Pretty much all of the FileTest facts take parameters, which means they
     can't be debugged by :ref:`module_debug_facts`. Using them in a template

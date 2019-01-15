@@ -22,7 +22,8 @@ class Directory(Type):
 
     def __init__(self, name=None, **kwargs):
         self.setup(name=name, **kwargs)
-        self.directory = True
+        if self.auto_dispatch:
+            self.run()
 
     def fields(self):
         return Fields(

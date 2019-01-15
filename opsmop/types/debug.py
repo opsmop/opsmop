@@ -23,6 +23,8 @@ class Debug(Type):
     def __init__(self, *args, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(variable_names=args, evals=original, **common)
+        if self.auto_dispatch:
+            self.run()
 
     def quiet(self):
         return True

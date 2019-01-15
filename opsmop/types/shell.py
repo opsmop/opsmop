@@ -25,7 +25,9 @@ class Shell(Type):
 
     def __init__(self, cmd=None, **kwargs):
         self.setup(cmd=cmd, **kwargs)
-
+        if self.auto_dispatch:
+            self.run()
+            
     def fields(self):
         return Fields(
             self,

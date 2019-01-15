@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-COMMON_FIELDS = [ 'when', 'signals', 'handles', 'method', 'register', 'ignore_errors', 'tags' ]
+COMMON_FIELDS = [ 'when', 'handles', 'method', 'ignore_errors', 'tags' ]
 
 # TODO: refactor
 
@@ -37,15 +37,8 @@ class Fields(object):
         when - a conditional to decide if the resource is to be executed.  For collections, this condition
         is applied to the whole collection (FIXME) before traversing any element in the collection.
 
-        handles - the name of a signal that handlers can use when triggered by 'notify'.  Assigning
-        'handles' to something that is not a handler has no effect.
-
-        notify - the name of a signal that triggers a handler
-
         method - used on any resource to explicitly select a provider class rather than using
         the default provider figured out by the resource.  For an example see opsmop.types.package.Package
-
-        register - saves the result to a variable, regardless of type
 
         ignore_errors - if the return is a fatal result object, ignore it anyway
         """
@@ -63,17 +56,14 @@ class Fields(object):
 
         return dict(
             when            = Field(default=None, lazy=True, help="attaches a condition to this resource"),
-            signals         = Field(kind=list, of=Resource, default=None, help="signals a handler event by name"),
-            handles         = Field(kind=str, default=None, help=None),
             method          = Field(kind=str, default=None, help="selects a non-default provider by name"),
-            register        = Field(kind=str, default=None, help="saves the resource result into a named variable"),
             ignore_errors   = Field(kind=bool, default=False, help="proceeds in the event of most error conditions"),
+            changed_when    = Field(kind=bool, default=False, help="accepts a lambda to determine if a state change should be recorded, whose parameter is the provider result"),
+            failed_when     = Field(default=None, help="similar to ignore_errors but accepts a lambda function whose parameter is the provider result"),
             variables       = Field(kind=dict, loader=resource.set_variables, help=None),
             extra_variables = Field(kind=dict, empty=True, help=None),
             tags            = Field(kind=list, of=str, default=None, help="allows applying part of the policy"),
-            failed_when     = Field(default=None, lazy=True, help="if set, specify terms of resource application failure"),
-            changed_when    = Field(default=None, lazy=True, help="if set, only signal handlers if this is true")
-
+            auto_dispatch   = Field(kind=bool, default=True, help=None)
         )
 
     def find_unexpected_keys(self, obj):

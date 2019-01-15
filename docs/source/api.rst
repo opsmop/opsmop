@@ -11,9 +11,7 @@ the various classes could also be thought of as 'API', and for more information 
 development on those, see :ref:`development`.
 
 OpsMop is decidely API driven.  The CLI itself is a fully pluggable instantiation of the local API,
-using a custom callback class.
-
-As OpsMop grows, :ref:`pull` and :ref:`push` features will also have strong API support.
+using custom callback classes.
 
 It is probably easiest to simply refer to GitHub to start:
 

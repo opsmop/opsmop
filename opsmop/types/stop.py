@@ -21,7 +21,9 @@ class Stop(Type):
 
     def __init__(self, msg, *args, **kwargs):
         self.setup(msg=msg, **kwargs)
-
+        if self.auto_dispatch:
+            self.run()
+            
     def fields(self):
         return Fields(
             self,

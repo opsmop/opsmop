@@ -110,7 +110,7 @@ class LocalCliCallbacks(BaseCallbacks):
     def on_begin_handlers(self):
         self.phase = 'handlers'
 
-    def on_resource(self, resource, is_handler):
+    def on_resource(self, resource):
         if self.phase == 'validate':
             return
 
@@ -136,12 +136,6 @@ class LocalCliCallbacks(BaseCallbacks):
                         v = "0o{0:o}".format(v)
                     self.i5("| %s: %s" % (k,v))
 
-        # show if this resource is a handler
-        if is_handler:
-            self.i3("(handler)")
-
-    def on_signaled(self, resource, event_name):
-        self.i3("signaled: %s" % event_name)
 
     def on_complete(self, policy):
         self.i1("")
@@ -156,10 +150,11 @@ class LocalCliCallbacks(BaseCallbacks):
         self.i1("")
         raise OpsMopStop()
 
-    def on_update_variables(self, variables):
-        self.i3("registered:")
-        for (k,v) in variables.items():
-            self.on_echo(None, "%s => %s" % (k,v))
+    # OLD
+    #def on_update_variables(self, variables):
+    #    self.i3("registered:")
+    #    for (k,v) in variables.items():
+    #        self.on_echo(None, "%s => %s" % (k,v))
 
     def on_host_exception(self, host, exc):
         pass

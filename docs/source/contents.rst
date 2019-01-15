@@ -14,7 +14,6 @@
    Facts<facts>
    API<api>
    Push/Orchestration Mode<push>
-   Pull Mode<pull>
    FAQ<faq>
    Development<development>
    Community<community>

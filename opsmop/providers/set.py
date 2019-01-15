@@ -37,6 +37,7 @@ class Set(Provider):
 
     def apply(self):
         self.do('set')
+        # TODO: I'm not sure this applies in the new system but should make sure
         # we run this again so that any registered variables can be erased if so desired
         self.copy_variables()
         return self.ok()

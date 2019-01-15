@@ -22,7 +22,9 @@ class Set(Type):
     def __init__(self, *args, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
-
+        if self.auto_dispatch:
+            self.run()
+            
     def fields(self):
         return Fields(
             self,

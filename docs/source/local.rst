@@ -6,11 +6,9 @@
 Local
 -----
 
-The simplest way to use OpsMop to use is with the local command line.  Soon there 
-will also be :ref:`pull` and :ref:`push` modes. 
+While most interest of ospmop will be around remote configuration (see :ref:`push`), the simplest way to use OpsMop to use is with the local command line. 
 
-Opsmop uses policy files written in a pure-Python DSL.  The command line simply
-loads a policy file and runs it.
+Opsmop uses policy files written in python.  The command line simply runs particular classes, called *Roles*, and runs them.
 
 See :ref:`language` for more about the contents of those files.
 

@@ -55,8 +55,8 @@ class Callbacks(metaclass=Singleton):
     def on_execute_command(self, provider, value):
         self._run_callbacks('on_execute_command', provider, value)
 
-    def on_resource(self, resource, is_handler):
-        self._run_callbacks('on_resource', resource, is_handler)
+    def on_resource(self, resource):
+        self._run_callbacks('on_resource', resource)
 
     def on_command_result(self, provider, value):
         self._run_callbacks('on_command_result', provider, value)
@@ -77,9 +77,6 @@ class Callbacks(metaclass=Singleton):
 
     def on_skipped(self, value, is_handler=False):
         self._run_callbacks('on_skipped', value, is_handler)
-
-    def on_signaled(self, resource, event_name):
-        self._run_callbacks('on_signaled', resource, event_name)
 
     def on_complete(self, policy):
         self._run_callbacks('on_complete', policy)

@@ -192,14 +192,6 @@ class Provider(object):
         """
         return len(self.actions_planned)
 
-    def handle_registration(self, result):
-        assert result is not None
-        va = dict()
-        va[self.register] = result
-        Callbacks().on_update_variables(va)
-        self.resource.update_variables(va)
-        self.resource.update_parent_variables(va)
-
     def commit_to_plan(self):
         """ used in executor code to move the list of planned actions in to the list that self.should() will check """
         self.actions = self.actions_planned
@@ -207,6 +199,10 @@ class Provider(object):
     def apply_simulated_actions(self):
         """ used in executor code (check mode only) to imply all commands were run when they were only simulated """
         self.actions_taken = self.actions_planned
+        changed = False
+        if len(self.actions_taken) > 0:
+            changed = True
+        return Result(provider=self, changed=changed)
 
     def echo(self, msg):
         Callbacks().on_echo(self, msg)
