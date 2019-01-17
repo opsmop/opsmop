@@ -164,46 +164,6 @@ class Resource(object):
         """
         return self.scope().variables()
 
-    def has_tag(self, tags):
-        my_tags = self.all_tags()
-        if 'any' in my_tags:
-            return True
-        for t in tags:
-            if t in my_tags:
-                return True
-        return False
-
-    # OLD:
-    #def conditions_true(self, validate=False):
-    #    """
-    #    Called by Executor code to decide if a resource is processable.
-    #    """
-
-    #    from opsmop.lookups.eval import Eval 
-    #    from opsmop.lookups.lookup import Lookup
-
-    #    when = self.when
-    #    if when is None:
-    #        return True
-    #    if type(when) == str:
-    #        try:
-    #            return Eval(self.when).evaluate(self)
-    #        except jinja2.exceptions.UndefinedError:
-    #            if not validate:
-    #                raise
-    #            # this value may need to late bind, we'll catch it later
-    #            return True
-    #    elif issubclass(type(when), Lookup):
-    #        try:
-    #            return when.evaluate(self)
-    #        except jinja2.exceptions.UndefinedError:
-    #            if not validate:
-    #                raise
-    #            # this value may need to late bind, we'll catch it later
-    #            return True
-    #    else:
-    #        return when
-
     def parent(self):
         parent_scope = self.scope().parent()
         if parent_scope is None:
@@ -219,15 +179,6 @@ class Resource(object):
         while ptr is not None:
             if ptr.handles:
                 result.append(ptr.handles)
-            ptr = ptr.parent()
-        return result
-
-    def all_tags(self):
-        result = []
-        ptr = self
-        while ptr is not None:
-            if ptr.tags:
-                result.extend(ptr.tags)
             ptr = ptr.parent()
         return result
 

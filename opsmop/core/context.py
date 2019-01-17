@@ -20,7 +20,8 @@ APPLY = 'apply'
 
 class Context(metaclass=Singleton):
 
-    __slots__ = [ '_host', '_host_failures', '_relative_root', '_mode', '_caller', '_verbose', '_role', '_checksums', '_globals', '_extra_vars' ]
+    __slots__ = [ '_host', '_host_failures', '_relative_root', 
+    '_mode', '_caller', '_verbose', '_role', '_checksums', '_globals', '_extra_vars' ]
 
     def __init__(self):
         self._host = None

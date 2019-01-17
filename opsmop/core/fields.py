@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-COMMON_FIELDS = [ 'when', 'handles', 'method', 'ignore_errors', 'tags' ]
+COMMON_FIELDS = [ 'when', 'handles', 'method', 'ignore_errors']
 
 # TODO: refactor
 
@@ -62,7 +62,6 @@ class Fields(object):
             failed_when     = Field(default=None, help="similar to ignore_errors but accepts a lambda function whose parameter is the provider result"),
             variables       = Field(kind=dict, loader=resource.set_variables, help=None),
             extra_variables = Field(kind=dict, empty=True, help=None),
-            tags            = Field(kind=list, of=str, default=None, help="allows applying part of the policy"),
             auto_dispatch   = Field(kind=bool, default=True, help=None)
         )
 

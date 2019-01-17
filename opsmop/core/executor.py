@@ -34,19 +34,19 @@ from opsmop.push.connections import ConnectionManager
 
 class Executor(object):
 
-    __slots__ = [ '_policies', '_tags', '_push', '_local_host', 'connection_manager', '_limit_groups', '_limit_hosts' ]
+    __slots__ = [ '_policies', '_push', '_local_host', 'connection_manager', '_limit_groups', '_limit_hosts' ]
 
     # ---------------------------------------------------------------
 
-    def __init__(self, policies, local_host=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
+    def __init__(self, policies, local_host=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
 
         """
         The Executor runs a list of policies in either CHECK or APPLY modes
         """
   
+
         assert type(policies) == list
         self._policies = policies
-        self._tags = tags
         self._push = push
         self._limit_groups = limit_groups
         self._limit_hosts = limit_hosts
@@ -84,7 +84,7 @@ class Executor(object):
         Context().set_mode(mode)
         for policy in self._policies:     
             if self._push:
-                self.connection_manager = ConnectionManager(policy, self._tags, limit_groups=self._limit_groups, limit_hosts=self._limit_hosts)
+                self.connection_manager = ConnectionManager(policy, limit_groups=self._limit_groups, limit_hosts=self._limit_hosts)
             self.run_policy(policy=policy)
 
 

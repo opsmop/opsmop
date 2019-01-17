@@ -29,7 +29,9 @@ class Type(Resource):
         pass
 
     def run(self):
+
         Callbacks().on_resource(self)
+
         provider = self.do_plan()
         if Context().is_apply():
             result = self.do_apply(provider)

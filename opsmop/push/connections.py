@@ -39,7 +39,7 @@ from opsmop.facts.filetests import FileTestFacts
 
 class ConnectionManager(object):
 
-    def __init__(self, policy, tags, limit_groups=None, limit_hosts=None):
+    def __init__(self, policy, limit_groups=None, limit_hosts=None):
         """
         Constructor.  Establishes mitogen router/broker.
         """
@@ -53,7 +53,6 @@ class ConnectionManager(object):
         self.connections = dict()
         self.hosts = dict()
         self.context = dict()
-        self.tags = tags
         self.allow_patterns = policy.allow_fileserving_patterns()
         self.deny_patterns  = policy.deny_fileserving_patterns()
         self.checksums = dict()
@@ -233,7 +232,6 @@ class ConnectionManager(object):
             role = role, 
             mode = mode,
             relative_root = Context().relative_root(),
-            tags = self.tags,
             checksums = self.checksums,
             hostvars = host.all_variables(),
             extra_vars = Context().extra_vars()
@@ -314,7 +312,6 @@ def remote_fn(caller, params, sender):
     policy = params['policy']
     role = params['role']
     mode = params['mode']
-    tags = params['tags']
     checksums = params['checksums']
     relative_root = params['relative_root']
     hostvars = params['hostvars']
@@ -329,8 +326,7 @@ def remote_fn(caller, params, sender):
 
     policy.roles = Roles(role)
 
-    print("HERE")
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
-    executor = Executor([ policy ], local_host=host, push=False, tags=params['tags'], extra_vars=extra_vars, relative_root=relative_root) # remove single_role
+    executor = Executor([ policy ], local_host=host, push=False, extra_vars=extra_vars, relative_root=relative_root) # remove single_role
     # FIXME: care about mode
     executor.apply()

@@ -22,13 +22,12 @@ from opsmop.core.executor import Executor
 class Api(object):
 
 
-    __slots__ = [ '_policies', '_tags', '_push', '_extra_vars', '_limit_groups', '_limit_hosts', '_relative_root' ]
+    __slots__ = [ '_policies', '_push', '_extra_vars', '_limit_groups', '_limit_hosts', '_relative_root' ]
 
-    def __init__(self, policies=None, tags=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
+    def __init__(self, policies=None, push=False, extra_vars=None, limit_groups=None, limit_hosts=None, relative_root=None):
 
         assert type(policies) == list
         self._policies = policies
-        self._tags = tags
         self._push = push
         self._limit_groups = limit_groups
         self._limit_hosts = limit_hosts
@@ -38,7 +37,6 @@ class Api(object):
     def get_executor(self):
         return Executor(
             self._policies, 
-            tags=self._tags, 
             push=self._push, 
             extra_vars=self._extra_vars, 
             limit_groups=self._limit_groups, 

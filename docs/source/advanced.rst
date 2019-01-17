@@ -168,32 +168,6 @@ accesssed in Python as follows:
     Registration is most commonly used with shell commands. Most resources will probably not have very interesting 
     return data other than the 'changed' attribute mentioned in :ref:`handlers`.
 
-.. _tags:
-
-Tags
-====
-
-OpsMop Tags are a feature where any certain resources in OpsMop can be selectively triggered without running all
-of the other resources in the policy file.  Tags may be applied only to roles.
-
-.. code-block:: python
-
-    class DemoPolicy(Policy):
-    
-        def set_roles(self):
-
-            return Roles(
-                Security(tags=['security']),
-                WebServer(tags=['webserver'])
-            )
-
-In the above example, if the opsmop binary was invoked with "-\\-tags=security", only the security role
-would be processed.
-
-The special tag name 'any' triggers regardless of what is specified with '-\\-tags'.  
-
-This is best demonstrated by the `tags.py <https://github.com/opsmop/opsmop-demo/blob/master/content/tags.py>`_ demo in the `opsmop-demo <https://github.com/opsmop/opsmop-demo>`_ repo.
-
 .. _ignore_errors:
 
 Ignore Errors

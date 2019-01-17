@@ -77,7 +77,6 @@ class Cli(object):
         parser.add_argument('--validate', action='store_true', help='policy file to validate')
         parser.add_argument('--apply', action='store_true', help="policy file to apply")
         parser.add_argument('--check', action='store_true', help="policy file to check")
-        parser.add_argument('--tags', help='optional comma seperated list of tags')
         parser.add_argument('--push', action='store_true', help='run in push mode')
         parser.add_argument('--local', action='store_true', help='run in local mode')
         parser.add_argument('--verbose', action='store_true', help='(with --push) increase verbosity')
@@ -108,13 +107,8 @@ class Cli(object):
         relative_root = os.path.dirname(abspath)
         os.chdir(os.path.dirname(abspath))
 
-        tags = None
-        if args.tags is not None:
-            tags = args.tags.strip().split(",")
-
         api = Api(
             policies=[self.policy], 
-            tags=tags, 
             push=args.push, 
             extra_vars=extra_vars, 
             limit_groups=args.limit_groups, 
