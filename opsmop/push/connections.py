@@ -329,6 +329,7 @@ def remote_fn(caller, params, sender):
 
     policy.roles = Roles(role)
 
+    print("HERE")
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
     executor = Executor([ policy ], local_host=host, push=False, tags=params['tags'], extra_vars=extra_vars, relative_root=relative_root) # remove single_role
     # FIXME: care about mode

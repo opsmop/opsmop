@@ -32,6 +32,10 @@ class Callbacks(metaclass=Singleton):
         """ 
         Run a named callback method against all attached callback classes, in order.
         """
+        if getattr(self, '_callbacks', None) is None:
+            # callbacks not ready yet
+            return
+
         for c in self._callbacks:
             attr = getattr(c, cb_method, None)
             if attr:

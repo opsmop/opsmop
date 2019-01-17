@@ -44,6 +44,7 @@ class Cli(object):
         """
         The CLI is constructed with the sys.argv command line, see bin/opsmop
         """
+
         self.policy = policy
         self.args = sys.argv
         self.go()
@@ -61,6 +62,7 @@ class Cli(object):
     def go(self):
 
         colorama_init()
+        Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
        
         if len(self.args) < 3 or sys.argv[1] == "--help":
             print(USAGE)
@@ -100,7 +102,6 @@ class Cli(object):
         if args.extra_vars is not None:
             extra_vars = self.handle_extra_vars(args.extra_vars)
 
-        Callbacks().set_callbacks([ LocalCliCallbacks(), CommonCallbacks() ])
         Context().set_verbose(args.verbose)
 
         abspath = os.path.abspath(sys.modules[self.policy.__module__].__file__)
