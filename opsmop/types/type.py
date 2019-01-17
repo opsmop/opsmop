@@ -156,8 +156,9 @@ class Type(Resource):
         # some simple providers - like Echo, do not have a planning step
         # we will always run the apply step for them. For others, we will only
         # run the apply step if we have computed a plan
-        if (not provider.skip_plan_stage()) and (not provider.has_planned_actions()):
-            return Result(provider=provider, changed=False, data=None)
+        if not provider.has_planned_actions():
+            if not provider.skip_plan_stage():
+                return Result(provider=provider, changed=False, data=None)
                 
         # indicate we are about take some actions
         Callbacks().on_apply(provider)

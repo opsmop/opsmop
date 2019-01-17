@@ -58,7 +58,7 @@ class Fields(object):
             when            = Field(default=None, lazy=True, help="attaches a condition to this resource"),
             method          = Field(kind=str, default=None, help="selects a non-default provider by name"),
             ignore_errors   = Field(kind=bool, default=False, help="proceeds in the event of most error conditions"),
-            changed_when    = Field(kind=bool, default=False, help="accepts a lambda to determine if a state change should be recorded, whose parameter is the provider result"),
+            changed_when    = Field(default=None, help="accepts a lambda to determine if a state change should be recorded, whose parameter is the provider result"),
             failed_when     = Field(default=None, help="similar to ignore_errors but accepts a lambda function whose parameter is the provider result"),
             variables       = Field(kind=dict, loader=resource.set_variables, help=None),
             extra_variables = Field(kind=dict, empty=True, help=None),
