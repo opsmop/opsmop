@@ -71,6 +71,9 @@ class UserFactsGenerator(Facts):
         See the 'opsmop-demo' repo in 'content/fact_demo.py' for an example or execute
         # python -m opsmop.core.facts.local to see values
         """
+        global FACTS_CACHE
+        if FACTS_CACHE is None:
+            self.reload()
         return FACTS_CACHE
 
     def __getattr__(self, attr):
