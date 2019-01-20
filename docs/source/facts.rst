@@ -15,7 +15,7 @@ Users can write their own 'Facts' classes, or use one of the many included ones:
 * UserFacts
 * FileTests
 
-All facts can be used in :ref:`conditionals`, :ref:`hooks` as well as :ref:`templates` - in fact, they are just Python
+All facts can be used in functions, as well as :ref:`templates` - they are just Python
 instances with functions, so you can use them anywhere.  
 
 Here's a basic example from :ref:`platform`:

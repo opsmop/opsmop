@@ -14,13 +14,15 @@ Thanks, Mom!
 How Is OpsMop Different From X?
 -------------------------------
 
-Ok, the one question I don't like.  I wrote this thing, so  you'll want to look for yourself!
-OpsMop contains the features documentated on this web site. The other tool has features documented on the other tool web site. 
-Some of the features are different or work differently!
+This is a long question, best answered by reading through the documentation and trying things for yourself.
 
-You might like the language of one thing more than the other. Pick that thing.
+If X is a configuration management system, the quickest answer is that OpsMop is completely open ended, and supports
+arbitrary code.  There is no "DSL" anywhere, just an RPC system with an integrated library.
 
-If you like where we are going and want to hop on board, we'd love to have you.
+It is designed around runtime performance, developer efficiency (both in modules and language) and ultimate flexibility.
+
+We believe you shouldn't need to keep a lot of things floating around in your head when using an automation tool, so OpsMop
+exposes Python wherever it can.
 
 Multiple Package Installs
 -------------------------
@@ -45,21 +47,10 @@ Easy enough.
 
 The "name" parameter should take an array in the near future, but what's wrong with the shell command?  Nothing, really.
 
-Are There Going To Be New Language Features?
---------------------------------------------
-
-Yes, definitely!  Lots! However OpsMop strongly values backward compatibility, and will never let you down or hurt you.
-
-If you have new ideas, see :ref:`community` and share your ideas on the forum. We would be glad to have them, and you
-would like to maybe add them, that would also be great! OpsMop is designed to be a relatively easy to understand
-codebase and we would love that.
-
-If you have ideas for new language features, stop by the forum. See :ref:`community` for details.
-
 Push vs Pull vs Local - What Does OpsMop Do?
 --------------------------------------------
 
-Right now, OpsMop is :ref:`local` and :ref:`push` (SSH) only - but highly-pluggable pull modes will be added soon.
+Right now, OpsMop is :ref:`local` and :ref:`push` (SSH) only - but highly-pluggable pull modes will likely be added in the future.
 
 I Have A Develoment Question?
 -----------------------------
@@ -67,34 +58,6 @@ I Have A Develoment Question?
 Great! Thanks for the interest! Please check out :ref:`development`!  We would be glad to help you with pull requests, and also feel
 free to stop by the forum listed on :ref:`community` with development questions.
 
-How Do You See Modules Growing?
--------------------------------
-
-In order to maintain an extremely high standard of quality, I would hope to see OpsMop stop at around 50 or so modules
-in the core distribution. In some cases, modules may be merged.  Each module can have different provider implementations, and in
-some cases like Package, I would not hold any limits to accepting modules for every language distribution (pip, npm, etc) on
-providers, just types.  So effectively this could approach 100 "modules".
-
-What we end up with is a toolbox that contains what is enough for 95% of the use cases out there, and allow the other 5%
-to be performed easily, either by calling a script or using a custom non-tree module.
-
-Just to ensure strong upkeep, we are unlikely to include modules that are difficult to test, including modules for paid services
-that we do not use. However, the API remains fully extensible and does not block such efforts.
-
-Where a command line tool exists and is already clear, sometimes we don't want a module. If something can be handled
-by the :ref:`module_file`, that's the best way to configure something rather than maintaining custom code
-designed to do in-place error-prone rearrangement on a configuration file.
-
-An example of this is we don't need a "/sbin/reboot" module because there already is "/sbin/reboot".  Configuration tools
-do serve to reduce our need to memorize a wide variety of Linux/Unix tools, but there is a balance to be struck. Often
-CLI versions will be faster and have more stable APIs.
-
-Another important aspect of OpsMop is we prefer to see some modules become robust and comprehensive versus splitting them into
-too many sub-modules. For instance the file module contains the logic to template files, rather than having a seperate module
-to do this.
-
-Thus, with even 50 or so modules (not counting provider implementations) the feature set of OpsMop will still be incredibly
-large.
 
 Will You Integrate With (Other Config Tool)?
 --------------------------------------------
@@ -131,8 +94,6 @@ push a script::
     Shell("bash /opt/opsmop/setup.sh")
 
 Just return 0 on success and non-zero on failure.
-
-We should have that script module shortly!
   
 Is There Going to be a community module or policy site?
 -------------------------------------------------------
@@ -166,43 +127,14 @@ Are you going to do Cloud Management?
 No. Talking to cloud APIs is technically something you could do in plugins, but we suggest using a purpose-designed tool for this,
 such as CloudFormation on AWS, or Terraform.
 
-Are you going to manage Network Devices?
-----------------------------------------
-
-No. We are not experts in this field, but strongly believe tools that do this should have a graph-based representation of a discovered
-network and active monitoring.  This is simply not a good fit for our architecture. OpsMop's policies will describe a local system,
-and then the orchestration features to come may describe a collection of systems and the orders of application across those systems.
-
 Do you support Rolling Updates?
------------------------------------------
+-------------------------------
 
 Yes, see :ref:`push_advanced_tricks`.
 
 We would encourage most folks to adopt Immutable Systems for cloud based deployments, and get into a red/green, blue/black, chartreuse/magenta
 type deployment pattern that does not involve rolling updates over a load balancer where you can, but the push mode orchestrator is exceptionally
 flexible and is designed for this sort of thing.
-
-What's The Audience For This Tool?
-----------------------------------
-
-Basically the audience for OpsMop should be the people that like OpsMop's current direction or where they like where it is going. OpsMop
-should be a good fit for image preparation, management of stateful servers, deploying clouds on physical hardware, and ad-hoc management tasks
-of all kinds.
-
-Many people want a CM tool to describe image build state, because it is hard to reuse and manage complex bash scripts for describing
-image configurations.  Many people wish to apply configuration change to update their images on boot, and in this case, a pull-based
-solution using git or the future opsmop pull support would be highly useful.  And of course lots of folks still need classic configuration 
-and deployment tools.
-
-We fully embrace Python3 and value exceptionally clean code and near-constant refactoring, which should keep the codebase both appealing
-to new operations folks and new python developers but also very attractive to experienced Python developers.
-
-It will not be appealing to those who do not wish to learn Python, but we strongly believe there is tremendous value in Python.
-
-If you like Michael's past work you will probably like this tool a lot.
-
-If you have a good idea, we can probably add it. See :ref:`community` and :ref:`development` for how to get involved with ideas,
-discussion, code, and docs.
 
 Other Questions or Bug Reports
 ------------------------------
