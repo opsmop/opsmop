@@ -30,7 +30,6 @@ from opsmop.facts.user_facts import UserFacts
 from opsmop.inventory.toml import TomlInventory
 from opsmop.lookups.eval import Eval
 from opsmop.lookups.template import T
-from opsmop.types.debug import Debug
 from opsmop.types.debug_facts import DebugFacts
 from opsmop.types.directory import Directory
 from opsmop.types.echo import Echo
@@ -38,7 +37,6 @@ from opsmop.types.file import File
 from opsmop.types.group import Group
 from opsmop.types.package import Package
 from opsmop.types.service import Service
-from opsmop.types.set import Set
 from opsmop.types.shell import Shell
 from opsmop.types.stop import Stop
 from opsmop.types.user import User
@@ -55,7 +53,7 @@ __all__ = [
 
     # common types
     'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 
-    'Set', 'Stop', 'Debug', 'DebugFacts', 'User',
+    'Stop', 'DebugFacts', 'User',
     'Group',
 
     # inventory
