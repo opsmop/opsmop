@@ -30,7 +30,6 @@ from opsmop.facts.user_facts import UserFacts
 from opsmop.inventory.toml import TomlInventory
 from opsmop.lookups.eval import Eval
 from opsmop.lookups.template import T
-from opsmop.types.asserts import Asserts
 from opsmop.types.debug import Debug
 from opsmop.types.debug_facts import DebugFacts
 from opsmop.types.directory import Directory
@@ -56,7 +55,7 @@ __all__ = [
 
     # common types
     'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 
-    'Set', 'Stop', 'Asserts', 'Debug', 'DebugFacts', 'User',
+    'Set', 'Stop', 'Debug', 'DebugFacts', 'User',
     'Group',
 
     # inventory
