@@ -129,7 +129,7 @@ class File(Provider):
 
         if self.should('rm'):
             self.do('rm')
-            self.path.unlink()
+            Path(self.name).unlink()
             return self.ok()
         
         # fetch from url ...
