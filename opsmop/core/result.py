@@ -58,11 +58,9 @@ class Result(object):
         if self.reason is not None:
             msg = ", reason: %s" % self.reason
         if self.rc is not None:
-            rc_msg = ", rc=%s" % self.rc
-        if self.is_ok():
-            return "ok%s%s" % (rc_msg, msg)
-        else:
-            return "fatal%s%s" % (rc_msg, msg)
+            rc_msg = "rc=%s" % self.rc
+        return "result: %s%s" % (rc_msg, msg)
+
 
     def to_dict(self):
         reason = self.reason

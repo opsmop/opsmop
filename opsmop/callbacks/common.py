@@ -17,7 +17,7 @@ import json
 import sys
 
 from opsmop.callbacks.callback import BaseCallbacks
-from opsmop.core.errors import CommandError, OpsMopError, ProviderError
+from opsmop.core.errors import FailedResult, OpsMopError, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 from opsmop.core.context import Context
@@ -45,13 +45,7 @@ class CommonCallbacks(BaseCallbacks):
             raise err
 
     def on_command_result(self, provider, result):
-        if not result.primary and result.fatal:
-            # only process intermediate command results here, if the command result is to be the final
-            # return of a module, let the Executor code handle this so failed_when/ignore_errors can take
-            # effect
-            err = CommandError(provider, "command failed", result)
-            self.record_host_failure(Context().host(), err)
-            raise err
+        pass
 
     def on_fatal(self, provider, msg=None):
         #raise OpsMopError("failed")

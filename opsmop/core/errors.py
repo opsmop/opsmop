@@ -75,7 +75,7 @@ class ProviderError(OpsMopError):
     def __str__(self):
         return "<ProviderError (%s)>" % (self.msg)
 
-class CommandError(ProviderError):
+class FailedResult(ProviderError):
 
     __slots__ = [ 'provider', 'resource', 'msg', 'result' ]
 
@@ -87,4 +87,6 @@ class CommandError(ProviderError):
         self.result = result
 
     def __str__(self):
-        return "<CommandError (%s) (%s)>" % (self.msg, self.result)
+        return "<FailedResult (%s)>" % (self.result)
+
+

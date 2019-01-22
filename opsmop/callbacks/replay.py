@@ -100,7 +100,7 @@ class ReplayCallbacks(BaseCallbacks):
         actions = len(data['actions'])
         rc = data['rc']
         if fatal:
-            caption = "fatal"
+            caption = "failed"
         elif changed:
             caption = "modified (%s actions)" % actions
         else:

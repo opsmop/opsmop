@@ -23,7 +23,7 @@ from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.action import Action
 from opsmop.core.command import Command
 from opsmop.core.context import Context
-from opsmop.core.errors import ProviderError
+from opsmop.core.errors import ProviderError, FailedResult
 from opsmop.core.result import Result
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup
@@ -169,7 +169,29 @@ class Provider(object):
         Similar to test, this will call failed command callbacks when the commands fail, which MAY be intercepted
         by properly-programmed callbacks to fail the entire execution process.
         """
-        return self._handle_cmd(cmd, input_text=input_text, timeout=timeout, echo=echo, fatal=True, loud=loud, ignore_lines=ignore_lines, primary=primary)
+        try:
+            return self._handle_cmd(cmd, 
+                input_text=input_text, 
+                timeout=timeout, 
+                echo=echo, fatal=True, 
+                loud=loud, 
+                ignore_lines=ignore_lines, 
+                primary=primary
+            )
+        except FailedResult as re:
+            if self.ignore_errors:
+                return re.result
+            if not self.failed_when:
+                raise re
+            failed = True
+            if callable(self.failed_when) and not self.failed_when(re.result):
+                failed = False
+            elif not self.failed_when:
+                failed = False
+            if failed:
+                raise re
+            return re.result
+                
 
     def get_default_timeout(self): 
         """

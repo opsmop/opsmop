@@ -22,7 +22,7 @@ import sys
 from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.context import Context
-from opsmop.core.errors import CommandError, OpsMopStop
+from opsmop.core.errors import FailedResult, OpsMopStop
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
@@ -141,10 +141,10 @@ class LocalCliCallbacks(BaseCallbacks):
         self.i1("")
         self.i1("complete! changed %s resources (%s actions)" % (self.changed_resources, self.changed_actions))
 
-    def on_fatal(self, provider, msg=None):
+    def on_fatal(self, exception=None):
         self.i1("")
-        if msg:
-            self.i1("FAILED: %s" % msg)
+        if exception:
+            self.i1("FAILED: %s" % str(exception))
         else:
             self.i1("FAILED")
         self.i1("")

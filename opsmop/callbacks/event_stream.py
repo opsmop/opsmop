@@ -17,7 +17,7 @@ import json
 import sys
 
 from opsmop.callbacks.callback import BaseCallbacks
-from opsmop.core.errors import CommandError
+from opsmop.core.errors import FailedResult
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
@@ -44,8 +44,8 @@ class EventStreamCallbacks(BaseCallbacks):
     def on_resource(self, resource):
         self.event('resource', resource=resource)
 
-    def on_fatal(self, provider, msg=None):
-        self.event('fatal', provider=provider, data=msg)
+    def on_fatal(self, exception=None):
+        self.event('fatal', exception=exception)
 
     def on_command_result(self, provider, result):
         self.event('command_result', provider=provider, data=result)

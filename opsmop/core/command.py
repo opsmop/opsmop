@@ -20,6 +20,7 @@ import subprocess
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.common import memoize
 from opsmop.core.result import Result
+from opsmop.core.errors import FailedResult
 
 
 class Command(object):
@@ -139,8 +140,9 @@ class Command(object):
             res = Result(self.provider, rc=rc, data=output, fatal=self.fatal, primary=self.primary)
         else:
             res = Result(self.provider, rc=rc, data=output, fatal=False, primary=self.primary)
-        # this callback will, depending on implementation, usually note fatal result objects and raise an exception
         Callbacks().on_command_result(self.provider, res)
+        if res.fatal:
+            raise FailedResult(provider=self.provider, result=res)
         return res
 
     def should_ignore(self, line):

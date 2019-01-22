@@ -176,6 +176,9 @@ class Executor(object):
         host = self._local_host
         Context().set_host(host)
         policy.attach_child_scope_for(role)
-        role.main()
-
+        
+        try:
+            role.main()
+        except Exception as e:
+            Callbacks().on_fatal(e)
  
