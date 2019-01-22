@@ -118,6 +118,7 @@ class ConnectionManager(object):
 
         context = host.connection_context(role)
         if host.hostname() != "127.0.0.1":
+            # print("PYTHON=%s" % host.python_path())
             remote = self.router.ssh(
                 python_path=host.python_path(), 
                 hostname=context['hostname'], 
@@ -273,17 +274,17 @@ class ConnectionManager(object):
 
                 elif msg.receiver is self.calls_sel:  
                     # handle a function call result.
-                    try:
-                        msg.unpickle()
+                    #try:
+                    msg.unpickle()
                         # all done for host
-                    except mitogen.core.CallError as e:
-                        Context().record_host_failure(host, e)
+                    #except mitogen.core.CallError as e:
+                    #    Context().record_host_failure(host, e)
 
-                        if 'opsmop.core.errors' in str(e):
-                            # callbacks should have already eaten it
-                            pass
-                        else:                          
-                            raise e
+                        #if 'opsmop.core.errors' in str(e):
+                        #    # callbacks should have already eaten it
+                        #    pass
+                        #else:                          
+                        #    raise e
 
             
         finally:
@@ -306,6 +307,7 @@ def remote_fn(caller, params, sender):
     import dill
     from opsmop.core.executor import Executor
 
+    print("HI!")
     params = dill.loads(zlib.decompress(params))
 
     host = params['host']
@@ -319,7 +321,7 @@ def remote_fn(caller, params, sender):
 
     Context().set_mode(mode)
     Context().set_caller(caller)
-    assert relative_root is not None
+    #assert relative_root is not None
     Context().set_checksums(checksums)
 
     Context().update_globals(hostvars)
@@ -327,6 +329,7 @@ def remote_fn(caller, params, sender):
     policy.roles = Roles(role)
 
     Callbacks().set_callbacks([ EventStreamCallbacks(sender=sender), LocalCliCallbacks(), CommonCallbacks() ])
-    executor = Executor([ policy ], local_host=host, push=False, extra_vars=extra_vars, relative_root=relative_root) # remove single_role
-    # FIXME: care about mode
-    executor.apply()
+    executor = Executor([ policy ], local_host=host, push=False, extra_vars=extra_vars, relative_root=relative_root) 
+    # remove single_role
+    # FIXME: needs to send mode over (check/apply)
+    return executor.apply()

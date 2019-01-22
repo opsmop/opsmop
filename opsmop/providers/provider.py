@@ -181,7 +181,7 @@ class Provider(object):
         except FailedResult as re:
             if self.ignore_errors:
                 return re.result
-            if not self.failed_when:
+            if self.failed_when is None:
                 raise re
             failed = True
             if callable(self.failed_when) and not self.failed_when(re.result):

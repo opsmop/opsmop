@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import time
+import traceback
 
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.callbacks.common import CommonCallbacks
@@ -180,5 +181,10 @@ class Executor(object):
         try:
             role.main()
         except Exception as e:
-            Callbacks().on_fatal(e)
+            tb = traceback.format_exc()
+            # process *any* uncaught exceptions through the configured exception handlers
+            # this includes any resources where failed_when / ignore_errors was not used
+            # but also any random python exceptions
+            Callbacks().on_fatal(e, tb)
+            
  

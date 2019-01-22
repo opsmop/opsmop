@@ -44,8 +44,8 @@ class EventStreamCallbacks(BaseCallbacks):
     def on_resource(self, resource):
         self.event('resource', resource=resource)
 
-    def on_fatal(self, exception=None):
-        self.event('fatal', exception=exception)
+    def on_fatal(self, exc, tb):
+        self.event('fatal', str(exc), str(tb))
 
     def on_command_result(self, provider, result):
         self.event('command_result', provider=provider, data=result)

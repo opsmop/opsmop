@@ -196,13 +196,7 @@ class Type(Resource):
         else:
             result.actions = []
 
-        # tell the callbacks about the result
         Callbacks().on_result(provider, result)
-
-        # if there was a failure, handle it
-        # (common callbacks should abort execution)
-        #if fatal:
-        #    Callbacks().on_fatal(provider, result)
 
         return result
 

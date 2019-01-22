@@ -47,8 +47,7 @@ class CommonCallbacks(BaseCallbacks):
     def on_command_result(self, provider, result):
         pass
 
-    def on_fatal(self, provider, msg=None):
-        #raise OpsMopError("failed")
+    def on_fatal(self, exc, tb):
         pass
 
     def on_host_exception(self, host, exc):

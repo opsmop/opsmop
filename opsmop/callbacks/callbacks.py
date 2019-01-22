@@ -77,8 +77,8 @@ class Callbacks(metaclass=Singleton):
     def on_result(self, provider, result):
         self._run_callbacks('on_result', provider, result)
 
-    def on_fatal(self, exception):
-        self._run_callbacks('on_fatal', exception)
+    def on_fatal(self, exc, tb):
+        self._run_callbacks('on_fatal', exc, tb)
 
     def on_skipped(self, value, is_handler=False):
         self._run_callbacks('on_skipped', value, is_handler)

@@ -18,11 +18,12 @@ import logging
 import logging.handlers
 import os
 import sys
+import traceback
 
 from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.client.user_defaults import UserDefaults
 from opsmop.core.context import Context
-from opsmop.core.errors import FailedResult, OpsMopStop
+from opsmop.core.errors import FailedResult, OpsMopStop, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
@@ -141,20 +142,15 @@ class LocalCliCallbacks(BaseCallbacks):
         self.i1("")
         self.i1("complete! changed %s resources (%s actions)" % (self.changed_resources, self.changed_actions))
 
-    def on_fatal(self, exception=None):
+    def on_fatal(self, exc, tb):
         self.i1("")
-        if exception:
-            self.i1("FAILED: %s" % str(exception))
-        else:
+        if isinstance(exc, ProviderError):
             self.i1("FAILED")
-        self.i1("")
+            self.i1(str(exc))
+        else:
+            self.i1("EXCEPTION")
+            self.i1(str(tb))
         raise OpsMopStop()
-
-    # OLD
-    #def on_update_variables(self, variables):
-    #    self.i3("registered:")
-    #    for (k,v) in variables.items():
-    #        self.on_echo(None, "%s => %s" % (k,v))
 
     def on_host_exception(self, host, exc):
         pass
