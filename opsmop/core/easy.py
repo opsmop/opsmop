@@ -38,7 +38,6 @@ from opsmop.types.group import Group
 from opsmop.types.package import Package
 from opsmop.types.service import Service
 from opsmop.types.shell import Shell
-from opsmop.types.stop import Stop
 from opsmop.types.user import User
 
 __all__ = [
@@ -53,8 +52,7 @@ __all__ = [
 
     # common types
     'File', 'Directory', 'Echo', 'Service', 'Package', 'Shell', 
-    'Stop', 'DebugFacts', 'User',
-    'Group',
+    'DebugFacts', 'User', 'Group',
 
     # inventory
     'TomlInventory',
