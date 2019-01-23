@@ -111,24 +111,32 @@ to improve readability.
 Variable Scoping
 ================
 
-OpsMop uses variables in both templates and conditionals.
+This section talks about how variables win out over one another, when variables are defined at multiple levels.
 
-We've already talked a little bit about variables, and knowledge of variables weighs in on
-future sections and nearly everything in OpsMop.  
-
-It is important to not confuse Python variables with OpsMop variables.  To transfer a Python class variable
-or global variable into OpsMop template space, use :ref:`module_set`.
-
-OpsMop has a very simple to understand variable system based on the
-concept of scope.  Variables defined at outer scopes are always available further
-down, but changing a variable inside a scope does not effect the value at the outer scope.
-These variables are 'scope-local'.
+OpsMop uses variables in both templates (like :ref:`module_file` or :ref:`module_echo`) and conditionals.
 
 In the opsmop-demo repository, `var_scoping.py <https://github.com/opsmop/opsmop-demo/blob/master/content/var_scoping.py>`_ demonstrates
 the various variable scopes in OpsMop. 
 
-Because this is a long example, we'll refer you to GitHub and ask you to read and perhaps run the example. In browsing
-the source, you will understand more about what is possible with variable scopes.
+In the following list, the LAST variable listed wins out.
+
+1. Any variables defined in inventory on a group (:ref:`push` only)
+2. Any variables defined in inventory on a host (:ref:`push` only)
+3. Any variables defined on the resource itself, such as a parameter passed into a role or policy object, including those defined
+   inside the 'set_variables' function.
+4. Any variables in local python scope inside the main function
+5. Any variables sent to --extra-vars (see :ref:`extra_vars`)
+
+If you ever need to access a variable inside a function (not a template), you can do this, *regardless* of the scope in which it is defined,
+and you are guaranteed to always get the right value:
+
+.. _code-block: python
+
+    def main(self):
+        if self.vars.x > 2:
+           print(self.vars.x)
+           
+The GitHub example demo linked above is the best way to see these concepts linked together in practice.
 
 .. _eval:
 
@@ -144,6 +152,9 @@ which are pieces of information OpsMop can return about the target system.
         if Platform.system() != "Darwin":
             return
         Shell("reboot")
+
+As listed above in :ref:`var_scoping`, usage of "self.vars.x" can be used to access a variable, even if it is not defined in local
+scope.
 
 .. _registration:
 
