@@ -27,6 +27,8 @@ pyflakes:
 	pyflakes opsmop/
 
 clean:
+	rm -rf docs/build/*
+	rm -rf build/*
 	find . -name '*.pyc' | xargs rm -r
 	find . -name '__pycache__' | xargs rm -rf
 

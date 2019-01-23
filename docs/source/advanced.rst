@@ -216,15 +216,15 @@ should possibly depend on specific return codes or output. The state can be over
 
     def main(self):
         cmd = Shell("/bin/foo --args", changed_when=lambda x: 'changed' in x.data)
-        if cmd.changed():
+        if cmd.changed:
             Service("blippy", restarted=True)
 
-Changed reporting control isn't really required, because you could also write things like this::
+Changed reporting control isn't really required, because you could also write things like this:
 
 .. code-block:: python
 
     def main(self):
-        cmd = Shell("/bin/foo --args", register="x", changed_when=changed_test)
+        cmd = Shell("/bin/foo --args", changed_when=changed_test)
         if "changed" in cmd.data:
             Service("blippy", restarted=True)
 
