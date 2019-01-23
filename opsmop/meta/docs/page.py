@@ -63,10 +63,10 @@ class Page(object):
         class_name = self.fix_class_name(self.record.name.title())
         cls  = getattr(module, class_name)
         try:
-            inst = cls()
+            inst = cls(auto_dispatch=False)
         except TypeError:
             # for shortcut Types that take a first argument
-            inst = cls('')
+            inst = cls('', auto_dispatch=False)
         fields = inst.fields().fields
         common_fields = Fields.common_field_spec(self, inst)
         if common:
