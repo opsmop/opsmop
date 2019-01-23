@@ -119,6 +119,7 @@ class ConnectionManager(object):
         context = host.connection_context(role)
         if host.hostname() != "127.0.0.1":
             # print("PYTHON=%s" % host.python_path())
+            print("PASS=%s" % context['password'])
             remote = self.router.ssh(
                 python_path=host.python_path(), 
                 hostname=context['hostname'], 

@@ -72,26 +72,23 @@ are always required, so don't get overwhelmed at first:
 
         def ssh_as(self):
             # optional.
-            # this specifies to login as 'opsmop' and use a SSH key.
-            # the default would be to use your username and SSH key.
-            # if you MUST use a password, read about defaults.toml below.
-            # you CAN put a password here, such a value from a database, but we recommend keys
+            # specifies SSH username and password.  If no password, will try an SSH key.
+            # if you MUST use a password, maybe load it from a file.
             return ('opsmop', None)
 
         def sudo(self):
             # optional. 
-            # whether to sudo after logging in. Defaults to False, almost always should be set True.
+            # whether to sudo after logging in. Defaults to False.
             return True
 
         def sudo_as(self):
             # optional. 
-            # username and optionally a password for the sudo account. If not set, consults values in defaults.toml.
-            # if no defaults.toml, this uses root and no password.
+            # username and optionally a password for the sudo account. If not set, tries root / no-password.
             return ('root', None)
 
         def check_host_keys(self):
-            # whether to check host keys, the default is True - if dealing with frequently changing systems, false may be better.
-            # there is no system to auto-add host keys (yet), so you would have to use ssh-keyscan.
+            # whether to check host keys, the default is True - if dealing with frequently changing systems, False may be better.
+            # there is no system to auto-add host keys (yet), so you would have to use ssh-keyscan and add them.
             return False
 
         def main(self):
@@ -124,49 +121,15 @@ are always required, so don't get overwhelmed at first:
 Sudo
 ====
 
-It is worth noting that the sudo operations that happen above happen only once per role.  In fact, existing connections are reused
+It is worth noting that the sudo operations that happen above happen only once per role.  SSH connections, however, are reused
 between subsequent roles. 
 
 The most common use of sudo is to log in as a normal account and then sudo to root, rather than allowing SSH to the root account.
 From root, it is easy to trivially execute sudo to less priveledged accounts, if needed, but this is not done with the 'sudo_as' 
 methods, you would simply just specify 'sudo' in front of any shell commands.
 
-Or, to put it another way, we expect 'sudo_as' to be used for priveledge escalation about 105% of the time.  This is why you can
-leave the 'sudo_as' undefined if you want, and it will just try root and no-password (or you can set a password in defaults.toml,
-which is explained below).
-
-.. _push_defaults:
-
-Defaults Files
-==============
-
-For values not specified on the role object, defaults are first looked for in ~/.opsmop/defaults.toml.  If that file does
-not exist, defaults are looked for in /etc/opsmop/defaults.toml.  If there are both files, the second is ignored.
-
-The file has the following format::
-
-    [ssh]
-    username = "mpdehaan"
-    # password = "1234"
-    # check_host_keys = "ignore" # or 'all'
-
-    [sudo]
-    username = "root"
-    # password = "letmein1234"
-
-    [tuning]
-    max_workers = 16
-
-    [python]
-    # this is the default for remote hosts
-    python_path = '/usr/bin/python3'
-
-    [log]
-    path = '~/.opsmop/opsmop.log'
-    format = "%(asctime)s %(message)s"
-
-
-These values are ignored if specified in the "sudo_as" or "connect_as" methods on the *Role* object.
+Or, to put it another way, we expect 'sudo_as' to be used for priveledge escalation most of the time.  This is why you can
+leave the 'sudo_as' undefined if you want, and it will just try root and no-password.
          
 .. _push_inventory:
 
@@ -479,7 +442,9 @@ deploy.
 To do this, simply login to the remote system and cat ~/.opsmop/opsmop.log
 
 The output will contain the exact output as if the configuration was run locally, with timestamps.  The file is automatically logrotated
-so you do not need to worry about it growing too large.  The log file path can be changed in defaults.toml.
+so you do not need to worry about it growing too large.
+
+This path should be configurable in the future.
 
 Credits
 =======
