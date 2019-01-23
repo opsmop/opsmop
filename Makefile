@@ -1,5 +1,5 @@
 requirements:
-	pip3 install -r requirements.txt --trusted-host pypi.org --trusted-host files.pypi.org --trusted-host files.pythonhosted.org
+	pip install -r requirements.txt # --trusted-host pypi.org --trusted-host files.pypi.org --trusted-host files.pythonhosted.org
 
 venv:
 	virtualenv env -p /usr/local/bin/python3

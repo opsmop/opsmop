@@ -20,7 +20,7 @@ from opsmop.core.fields import Fields
 from opsmop.core.handlers import Handlers
 from opsmop.core.resource import Resource
 from opsmop.core.resources import Resources
-
+from opsmop.core.vars import VarsLoader
 
 class Role(Collection):
 
@@ -34,6 +34,7 @@ class Role(Collection):
     def __init__(self, *args, **kwargs):
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
+        #self.vars = VarsLoader(self)
 
     def fields(self):
         return Fields(

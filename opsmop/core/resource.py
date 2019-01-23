@@ -109,11 +109,22 @@ class Resource(object):
         Get the full Jinja2 context available for templating at this resource.
         This includes facts + variables
         """
+        # this precedence order is just a first pass, but should be what we want
+        # if there are concerns/questions, please ask!  Things mentioned first
+        # have the LOWEST priority
         context = Context()
-        results = self.get_variables()
+        results = dict()
+        # 1. 'globals' includes things like inventory variables in push mode.  
+        # It's a bit of a misnomer presently.
+        # FIXME: verify inventory variables hop over when doing local ops in push mode
         results.update(context.globals())
+        # 2. any loose variables on the resource itself, this would include role parameters
+        results.update(self.get_variables())
+        # 3. this puts things like facts into the template namespace
         results.update(self.fact_context())
+        # 4. these are regular python variabels inside the method
         results.update(context.scope_variables())
+        # 5. these are specified on the command line with --extra-vars
         results.update(context.extra_vars())
         return results
 
