@@ -137,7 +137,7 @@ Inventory
 =========
 
 Push mode requires an inventory to decide what hosts to target.  Inventory can also attach variables
-to each host (for use in :ref:`templates` or :ref:`conditionals`), and there are certain special
+to each host (for use in :ref:`templates` or conditionals), and there are certain special
 variables that can influence how the push mode operates.
 
 Inventory objects can be filtered, as shown above and in 'push_demo.py', by specifying a `fnmatch <https://docs.python.org/3/library/fnmatch.html>`_ pattern.
@@ -429,7 +429,7 @@ and this is completely usable today.
 be able to switch selinux to permissive mode.  Non-SELinux distributions (Debian, Ubuntu, Arch, etc) 
 are of course not effected.
 
-2. Connecting to new hosts (but not the actual management operations) are conducted in a threadpool with a default of 16 threaded workers (see :ref:`push_defaults`). If you have a large
+2. Connecting to new hosts (but not the actual management operations) are conducted in a threadpool with a default of 16 threaded workers. If you have a large
 number of hosts there may be some lag for the very first time they are contacted that will not occur in subsequent roles. 
 A future forks flag like "-j4" should allow this to use additional CPUs by dividing the list of hosts up between processors.
 
