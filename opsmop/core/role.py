@@ -32,9 +32,9 @@ class Role(Collection):
     """
 
     def __init__(self, *args, **kwargs):
+        self.vars = VarsLoader(self)
         (original, common) = self.split_common_kwargs(kwargs)
         self.setup(extra_variables=original, **common)
-        #self.vars = VarsLoader(self)
 
     def fields(self):
         return Fields(

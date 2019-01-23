@@ -24,9 +24,9 @@ class VarsLoader(object):
 
         self.role = role
 
-    #def __getattr__(self, x):
-    #    variables = self.role.template_context()
-    #    if x in variables:
-    #        return variables[x]
-    #    else:
-    #        raise AttributeError
+    def __getattr__(self, x):
+        variables = self.role.template_context()
+        if x in variables:
+            return variables[x]
+        else:
+            raise AttributeError
