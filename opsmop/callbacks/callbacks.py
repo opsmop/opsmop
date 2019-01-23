@@ -107,4 +107,3 @@ class Callbacks(metaclass=Singleton):
 
     def on_host_changed_list(self, hosts):
         self._run_callbacks('on_host_changed_list', hosts)
-

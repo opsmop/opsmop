@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from opsmop.core.common import Singleton
 import inspect
+
+from opsmop.core.common import Singleton
 
 CHECK = 'check'
 APPLY = 'apply'
@@ -119,6 +120,3 @@ class Context(metaclass=Singleton):
                 elif not isinstance(z, Provider):
                     return localz
         return dict()
-
-
-    

@@ -27,6 +27,7 @@ from opsmop.core.errors import FailedResult, OpsMopStop, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
 
+
 class LocalCliCallbacks(BaseCallbacks):
 
     """

@@ -88,5 +88,3 @@ class FailedResult(ProviderError):
 
     def __str__(self):
         return "<FailedResult (%s)>" % (self.result)
-
-

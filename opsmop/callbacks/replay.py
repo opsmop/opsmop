@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from colorama import Back, Fore, Style
+
 from opsmop.callbacks.callback import BaseCallbacks
 from opsmop.core.context import Context
 
-from colorama import Fore, Back, Style
 
 class ReplayCallbacks(BaseCallbacks):
 

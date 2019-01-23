@@ -14,8 +14,9 @@
 
 import jinja2
 
-from opsmop.core.fields import COMMON_FIELDS
 from opsmop.core.context import Context
+from opsmop.core.fields import COMMON_FIELDS
+
 
 class Resource(object):
 

@@ -19,6 +19,7 @@ import stat
 from opsmop.core.context import Context
 from opsmop.facts.facts import Facts
 
+
 class FileTestFacts(Facts):
     
     """

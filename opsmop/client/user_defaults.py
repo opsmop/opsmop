@@ -1,7 +1,10 @@
-import os
-import toml
-from opsmop.core.common import memoize
 import getpass
+import os
+
+import toml
+
+from opsmop.core.common import memoize
+
 
 @memoize
 def get_user():

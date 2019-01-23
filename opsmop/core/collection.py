@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.field import Field
 from opsmop.core.fields import Fields
 from opsmop.core.resource import Resource
-from opsmop.callbacks.callbacks import Callbacks
 
 
 class Collection(Resource):
@@ -74,4 +74,3 @@ class Collection(Resource):
         Returns child objects, mode may be 'resources' or 'handlers'
         """
         return self.items
-

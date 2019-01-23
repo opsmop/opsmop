@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import fnmatch
+import logging
 import os
 import sys
 import time
-import logging
 import zlib
 
 import mitogen.core
@@ -33,8 +33,8 @@ from opsmop.callbacks.replay import ReplayCallbacks
 from opsmop.core.context import Context
 from opsmop.core.errors import InventoryError
 from opsmop.core.roles import Roles
-from opsmop.inventory.host import Host
 from opsmop.facts.filetests import FileTestFacts
+from opsmop.inventory.host import Host
 
 
 class ConnectionManager(object):
@@ -44,7 +44,7 @@ class ConnectionManager(object):
         Constructor.  Establishes mitogen router/broker.
         """
         
-        logging.getLogger('mitogen').setLevel(logging.ERROR)
+        logging.getLogger('mitogen').setLevel(logging.DEBUG) # (ERROR)
 
         self.policy = policy
         self.broker = mitogen.master.Broker()

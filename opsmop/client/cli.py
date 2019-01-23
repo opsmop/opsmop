@@ -24,9 +24,9 @@ from opsmop.callbacks.common import CommonCallbacks
 from opsmop.callbacks.event_stream import EventStreamCallbacks
 from opsmop.callbacks.local import LocalCliCallbacks
 from opsmop.core.api import Api
+from opsmop.core.common import load_data_file, shlex_kv
 from opsmop.core.context import Context
 from opsmop.core.errors import OpsMopError, OpsMopStop
-from opsmop.core.common import load_data_file, shlex_kv
 
 USAGE = """
 |

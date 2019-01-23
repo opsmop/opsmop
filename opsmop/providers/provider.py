@@ -23,7 +23,7 @@ from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.action import Action
 from opsmop.core.command import Command
 from opsmop.core.context import Context
-from opsmop.core.errors import ProviderError, FailedResult
+from opsmop.core.errors import FailedResult, ProviderError
 from opsmop.core.result import Result
 from opsmop.core.template import Template
 from opsmop.lookups.lookup import Lookup

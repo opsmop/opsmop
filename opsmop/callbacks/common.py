@@ -17,10 +17,11 @@ import json
 import sys
 
 from opsmop.callbacks.callback import BaseCallbacks
+from opsmop.core.context import Context
 from opsmop.core.errors import FailedResult, OpsMopError, ProviderError
 from opsmop.core.role import Role
 from opsmop.types.type import Type
-from opsmop.core.context import Context
+
 
 class CommonCallbacks(BaseCallbacks):
 

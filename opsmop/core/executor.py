@@ -120,6 +120,10 @@ class Executor(object):
 
     def connect_to_all_hosts(self, hosts, role, max_workers):
         batch = Batch(hosts, batch_size=200)
+
+        import mitogen
+        # mitogen.utils.log_to_file() #log_level='DEBUG') 
+
         def host_connector(host):
             Context().set_host(host)
             self.connection_manager.connect(host, role)
@@ -186,5 +190,3 @@ class Executor(object):
             # this includes any resources where failed_when / ignore_errors was not used
             # but also any random python exceptions
             Callbacks().on_fatal(e, tb)
-            
- 

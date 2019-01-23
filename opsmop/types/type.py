@@ -15,12 +15,12 @@
 import inspect
 import json
 
-from opsmop.core.resource import Resource
-from opsmop.core.template import Template
-from opsmop.core.result import Result
-from opsmop.lookups.lookup import Lookup
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.context import Context
+from opsmop.core.resource import Resource
+from opsmop.core.result import Result
+from opsmop.core.template import Template
+from opsmop.lookups.lookup import Lookup
 
 
 class Type(Resource):
@@ -207,7 +207,3 @@ class Type(Resource):
         This is the version of apply() that runs in CHECK mode.
         """
         return provider.apply_simulated_actions()
-
-
-
-

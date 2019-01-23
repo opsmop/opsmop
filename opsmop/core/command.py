@@ -19,8 +19,8 @@ import subprocess
 
 from opsmop.callbacks.callbacks import Callbacks
 from opsmop.core.common import memoize
-from opsmop.core.result import Result
 from opsmop.core.errors import FailedResult
+from opsmop.core.result import Result
 
 
 class Command(object):
