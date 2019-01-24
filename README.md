@@ -3,7 +3,7 @@ It's OpsMop!
 
 NOTE: this repository is in the middle of a language revision. Examples are *NOT* expected to be fully functional for about a week as the examples get adapted and various details are sorted out.  Note as of: January 15, 2019.
 
-Full Documentation: [docs.opsmop.io](http://docs.opsmop.io)
+Full Documentation: [docs.opsmop.io](https://docs.opsmop.io)
 
 License
 =======
@@ -18,8 +18,8 @@ Michael DeHaan [<michael@michaeldehaan.net>](https://michaeldehaan.net)
 Twitter
 =======
 
-* [@opsmop](http://twitter.com/opsmop)
-* [@laserllama](http://twitter.com/laserllama)
+* [@opsmop](https://twitter.com/opsmop)
+* [@laserllama](https://twitter.com/laserllama)
 
 Forum
 =====

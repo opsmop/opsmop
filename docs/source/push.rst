@@ -114,7 +114,7 @@ are always required, so don't get overwhelmed at first:
 .. note::
 
     Usage of ssh-agent with  SSH keys is highly recommended for ease of automation, and the integrated SSH key management
-    features of `Vespene <http://docs.vespene.io>` pair well with OpsMop push mode.
+    features of `Vespene <https://docs.vespene.io>` pair well with OpsMop push mode.
 
 .. _sudo_notes:
 

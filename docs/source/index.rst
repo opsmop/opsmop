@@ -4,8 +4,8 @@
 About OpsMop
 ------------
 
-OpsMop is an extremely-efficient agentless distributed SSH control plane for all manner of computing tasks, created and led by 
-`Michael DeHaan <http://michaeldehaan.net>`_.
+OpsMop is an extremely-efficient agentless distributed SSH control plane for all manner of computing tasks, created and led by
+`Michael DeHaan <https://michaeldehaan.net>`_.
 
 OpsMop works off a (pluggable) inventory of systems/nodes, and then allows running
 arbitrary tasks, represented by Python functions, against those systems. 
@@ -54,8 +54,8 @@ License
 GitHub
 ======
 
-* `opsmop <http://github.com/opsmop/opsmop>`_
-* `opsmop-demo (examples) <http://github.com/opsmop/opsmop-demo>`_
+* `opsmop <https://github.com/opsmop/opsmop>`_
+* `opsmop-demo (examples) <https://github.com/opsmop/opsmop-demo>`_
 
 Forum
 =====
@@ -70,4 +70,4 @@ Twitter
 Support and Engineering Contracts Available
 ===========================================
 
-Please contact <mailto:michael@michaeldehaan.net>Michael DeHaan</A> for details.
+Please contact `Michael DeHaan <mailto:michael@michaeldehaan.net>`_ for details.
